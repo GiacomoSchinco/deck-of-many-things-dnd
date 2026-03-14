@@ -1,4 +1,4 @@
-// app/api/races/route.ts
+// app/api/classes/route.ts
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
@@ -21,8 +21,8 @@ export async function GET() {
     }
   )
   
-  const { data: races, error } = await supabase
-    .from('races')
+  const { data: classes, error } = await supabase
+    .from('classes')
     .select('*')
     .order('name')
 
@@ -30,5 +30,5 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  return NextResponse.json(races)
+  return NextResponse.json(classes)
 }
