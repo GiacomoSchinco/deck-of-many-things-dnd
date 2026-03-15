@@ -12,7 +12,7 @@ const CardBack: React.FC = () => (
         backgroundImage: `repeating-linear-gradient(45deg, #000 0px, #000 2px, transparent 2px, transparent 8px)`,
       }}
     />
-
+{/* Motivo centrale */}
     {/* Motivo centrale */}
     <div className="absolute inset-0 flex items-center justify-center">
       <div className="relative w-32 h-32">
@@ -26,7 +26,6 @@ const CardBack: React.FC = () => (
             viewBox="0 0 100 100"
             className="w-10 h-10 text-antique-gold/60"
           >
-
           </svg>
         </div>
       </div>
