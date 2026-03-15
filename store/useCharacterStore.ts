@@ -1,39 +1,54 @@
 // store/useCharacterStore.ts
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { Character } from '@/types/character';
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+
+// Tipo minimale per iniziare
+export interface Character {
+  id: string
+  name: string
+  raceId: number
+  classId: number
+  level: number
+  abilityScores: {
+    strength: number
+    dexterity: number
+    constitution: number
+    intelligence: number
+    wisdom: number
+    charisma: number
+  }
+  createdAt: string
+}
 
 interface CharacterState {
-  currentCharacter: Character | null;
-  characters: Character[];
-  loading: boolean;
+  characters: Character[]
+  currentCharacter: Character | null
+  loading: boolean
   
-  setCurrentCharacter: (character: Character | null) => void;
-  setCharacters: (characters: Character[]) => void;
-  addCharacter: (character: Character) => void;
-  updateCharacter: (id: string, updates: Partial<Character>) => void;
-  deleteCharacter: (id: string) => void;
-  setLoading: (loading: boolean) => void;
+  // Azioni
+  addCharacter: (character: Character) => void
+  setCurrentCharacter: (character: Character | null) => void
+  updateCharacter: (id: string, updates: Partial<Character>) => void
+  deleteCharacter: (id: string) => void
+  clearCharacters: () => void
+  setLoading: (loading: boolean) => void
 }
 
 export const useCharacterStore = create<CharacterState>()(
   persist(
     (set) => ({
-      currentCharacter: null,
       characters: [],
+      currentCharacter: null,
       loading: false,
-      
-      setCurrentCharacter: (character) => 
-        set({ currentCharacter: character }),
-      
-      setCharacters: (characters) => 
-        set({ characters }),
-      
+
       addCharacter: (character) =>
-        set((state) => ({ 
-          characters: [...state.characters, character] 
+        set((state) => ({
+          characters: [...state.characters, character]
         })),
-      
+
+      setCurrentCharacter: (character) =>
+        set({ currentCharacter: character }),
+
       updateCharacter: (id, updates) =>
         set((state) => ({
           characters: state.characters.map((c) =>
@@ -43,7 +58,7 @@ export const useCharacterStore = create<CharacterState>()(
             ? { ...state.currentCharacter, ...updates }
             : state.currentCharacter
         })),
-      
+
       deleteCharacter: (id) =>
         set((state) => ({
           characters: state.characters.filter((c) => c.id !== id),
@@ -51,15 +66,17 @@ export const useCharacterStore = create<CharacterState>()(
             ? null
             : state.currentCharacter
         })),
-      
-      setLoading: (loading) => set({ loading }),
+
+      clearCharacters: () =>
+        set(() => ({
+          characters: [],
+          currentCharacter: null,
+        })),
+
+      setLoading: (loading) => set({ loading })
     }),
     {
-      name: 'character-storage',
-      partialize: (state) => ({ 
-        characters: state.characters,
-        currentCharacter: state.currentCharacter 
-      }),
+      name: 'dnd-characters-storage', // nome nel localStorage
     }
   )
-);
+)

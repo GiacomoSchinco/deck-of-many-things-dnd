@@ -1,11 +1,12 @@
 'use client';
 
+import Loading from "@/components/ui/custom/Loading";
 import { useWeapons } from "@/hooks/useWeapons";
 
 export default function WeaponsPage() {
   const { data, isLoading, isError, error } = useWeapons();
   
-  if (isLoading) return <>Loading</>;
+  if (isLoading) return <Loading />;
   
   if (isError) return (
     <div className="min-h-screen flex items-center justify-center p-4">

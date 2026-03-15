@@ -1,0 +1,15 @@
+/* Parchment background used for lore, notes and character sheets */
+.parchment {
+  background: linear-gradient(180deg, #FBF5E6 0%, #F2E7C7 100%);
+  background-image: url('/textures/parchment-grain.png');
+  background-size: 600px;
+  color: var(--ink, #2b2b2b);
+  padding: 1.25rem;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+.parchment .title {
+  font-family: var(--font-geist-sans);
+  font-weight: 700;
+}

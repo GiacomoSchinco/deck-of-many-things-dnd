@@ -1,0 +1,9 @@
+.text-parchment { color: #3b2f2f; }
+.shadow-ink { box-shadow: 0 4px 24px rgba(43,43,43,0.12); }
+.fade-in { animation: fadeIn 400ms ease both; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: none } }
+
+.moss { color: #4B7A56 }
+.gold { color: #D4AF37 }
+.center { display:flex; align-items:center; justify-content:center }
