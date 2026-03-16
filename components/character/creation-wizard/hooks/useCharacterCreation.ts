@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateCharacter } from '@/hooks/mutations/useCharacterMutations';
+import { useCharacterCalculations } from '@/hooks/useCharacterCalculations';
 
 export interface CreationData {
   // Step 1 - Basic Info
@@ -58,6 +59,12 @@ export function useCharacterCreation() {
   
   const [error, setError] = useState<string | null>(null);
 
+  const calculations = useCharacterCalculations(
+    data.raceId ?? null,
+    data.classId ?? null,
+    data.abilityScores ?? null,
+  );
+
   const updateData = (newData: Partial<CreationData>) => {
     setData(prev => ({ ...prev, ...newData }));
   };
@@ -91,6 +98,11 @@ export function useCharacterCreation() {
       return;
     }
 
+    if (!calculations.calculations) {
+      setError('Calcoli non pronti, riprova tra un momento');
+      return;
+    }
+
     createCharacter.mutate(
       {
         name: data.name,
@@ -103,6 +115,7 @@ export function useCharacterCreation() {
         background: data.background || undefined,
         alignment: data.alignment || undefined,
         abilityScores: data.abilityScores,
+        combatStats: calculations.calculations.combatStats,
       },
       {
         onSuccess: (character) => {
@@ -125,6 +138,7 @@ export function useCharacterCreation() {
     prevStep,
     goToStep,
     saveCharacter,
+    calculations,
     isFirstStep: currentStep === 'basic-info',
     isLastStep: currentStep === 'review',
   };

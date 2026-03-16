@@ -1,12 +1,12 @@
 // components/character/creation-wizard/steps/ReviewStep.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import AncientCardContainer from '@/components/ui/custom/AncientCardContainer';
 import { CreationData } from '../hooks/useCharacterCreation';
 import { calculateModifier } from '@/lib/calculations/abilityModifiers';
+import { useCharacterCalculations } from '@/hooks/useCharacterCalculations';
 
 interface ReviewStepProps {
   data: Partial<CreationData>;
@@ -27,50 +27,11 @@ const ABILITY_NAMES: Record<string, string> = {
 };
 
 export function ReviewStep({ data, onBack, onSave, loading, error }: ReviewStepProps) {
-  const [raceName, setRaceName] = useState<string>('');
-  const [className, setClassName] = useState<string>('');
-  const [loadingDetails, setLoadingDetails] = useState(true);
-
-  // Carica i dettagli di razza e classe
-  useEffect(() => {
-    async function loadDetails() {
-      setLoadingDetails(true);
-      try {
-        if (data.raceId) {
-          const raceRes = await fetch(`/api/races/${data.raceId}`);
-          const raceData = await raceRes.json();
-          setRaceName(raceData.name);
-        }
-        
-        if (data.classId) {
-          const classRes = await fetch(`/api/classes/${data.classId}`);
-          const classData = await classRes.json();
-          setClassName(classData.name);
-        }
-      } catch (error) {
-        console.error('Errore nel caricamento dettagli:', error);
-      } finally {
-        setLoadingDetails(false);
-      }
-    }
-
-    loadDetails();
-  }, [data.raceId, data.classId]);
-
-  // Calcoli automatici
-  const calculateHP = () => {
-    // Per ora valore fisso, poi lo calcoleremo dalla classe
-    return 10 + (data.abilityScores ? calculateModifier(data.abilityScores.constitution) : 0);
-  };
-
-  const calculateAC = () => {
-    // CA base = 10 + mod DES
-    return 10 + (data.abilityScores ? calculateModifier(data.abilityScores.dexterity) : 0);
-  };
-
-  const calculateInitiative = () => {
-    return data.abilityScores ? calculateModifier(data.abilityScores.dexterity) : 0;
-  };
+  const { calculations, isLoading: calcLoading, isReady } = useCharacterCalculations(
+    data.raceId ?? null,
+    data.classId ?? null,
+    data.abilityScores ?? null,
+  );
 
   const proficiencyBonus = 2; // Livello 1
 
@@ -120,14 +81,14 @@ export function ReviewStep({ data, onBack, onSave, loading, error }: ReviewStepP
             <AncientCardContainer className="p-4 text-center">
               <p className="text-xs text-amber-700 mb-1">Razza</p>
               <p className="text-lg font-serif font-bold text-amber-900">
-                {loadingDetails ? '...' : raceName || `ID: ${data.raceId}`}
+                {calcLoading ? '...' : calculations?.raceData?.name || `ID: ${data.raceId}`}
               </p>
             </AncientCardContainer>
 
             <AncientCardContainer className="p-4 text-center">
               <p className="text-xs text-amber-700 mb-1">Classe</p>
               <p className="text-lg font-serif font-bold text-amber-900">
-                {loadingDetails ? '...' : className || `ID: ${data.classId}`}
+                {calcLoading ? '...' : calculations?.classData?.name || `ID: ${data.classId}`}
               </p>
               <p className="text-xs text-amber-600">Livello 1</p>
             </AncientCardContainer>
@@ -144,7 +105,7 @@ export function ReviewStep({ data, onBack, onSave, loading, error }: ReviewStepP
                   const modifier = calculateModifier(value);
                   return (
                     <div key={key} className="text-center p-2 bg-amber-100/50 rounded">
-                      <div className="text-xs text-amber-700">{key.slice(0,3).toUpperCase()}</div>
+                      <div className="text-xs text-amber-700">{ABILITY_NAMES[key] ?? key}</div>
                       <div className="text-xl font-bold text-amber-900">{value}</div>
                       <div className="text-xs text-amber-600">
                         ({modifier >= 0 ? '+' : ''}{modifier})
@@ -157,23 +118,30 @@ export function ReviewStep({ data, onBack, onSave, loading, error }: ReviewStepP
           )}
 
           {/* Statistiche di combattimento (calcolate) */}
-          {data.abilityScores && (
-            <div className="grid grid-cols-3 gap-3">
+          {isReady && calculations && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <AncientCardContainer className="p-3 text-center">
                 <p className="text-xs text-amber-700">PF</p>
-                <p className="text-xl font-bold text-amber-900">{calculateHP()}</p>
+                <p className="text-xl font-bold text-amber-900">{calculations.combatStats.max_hp}</p>
+                <p className="text-xs text-amber-600">{calculations.classData.hit_die} + mod COS</p>
               </AncientCardContainer>
 
               <AncientCardContainer className="p-3 text-center">
                 <p className="text-xs text-amber-700">CA</p>
-                <p className="text-xl font-bold text-amber-900">{calculateAC()}</p>
+                <p className="text-xl font-bold text-amber-900">{calculations.combatStats.armor_class}</p>
+                <p className="text-xs text-amber-600">10 + mod DES</p>
               </AncientCardContainer>
 
               <AncientCardContainer className="p-3 text-center">
-                <p className="text-xs text-amber-700">Iniziativa</p>
-                <p className="text-xl font-bold text-amber-900">
-                  {calculateInitiative() >= 0 ? '+' : ''}{calculateInitiative()}
-                </p>
+                <p className="text-xs text-amber-700">Velocità</p>
+                <p className="text-xl font-bold text-amber-900">{calculations.combatStats.speed} ft</p>
+                <p className="text-xs text-amber-600">{calculations.raceData.name}</p>
+              </AncientCardContainer>
+
+              <AncientCardContainer className="p-3 text-center">
+                <p className="text-xs text-amber-700">Bonus Competenza</p>
+                <p className="text-xl font-bold text-amber-900">+{calculations.proficiencyBonus}</p>
+                <p className="text-xs text-amber-600">Livello 1</p>
               </AncientCardContainer>
             </div>
           )}
@@ -204,7 +172,7 @@ export function ReviewStep({ data, onBack, onSave, loading, error }: ReviewStepP
         
         <Button 
           onClick={onSave}
-          disabled={loading || loadingDetails}
+          disabled={loading || calcLoading}
           className="bg-amber-700 hover:bg-amber-800 text-amber-50"
         >
           {loading ? 'Salvataggio...' : '✨ Crea Personaggio'}

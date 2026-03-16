@@ -105,11 +105,21 @@ export async function POST(request: Request) {
 
     // 3. Inserisci combat stats
     if (body.combatStats) {
+      const cs = body.combatStats
       const { error: combatError } = await supabase
         .from('combat_stats')
         .insert({
-          character_id: character.id,
-          ...body.combatStats
+          character_id:    character.id,
+          max_hp:          cs.max_hp,
+          current_hp:      cs.current_hp,
+          temp_hp:         cs.temp_hp          ?? 0,
+          hit_dice_type:   cs.hit_dice_type,
+          hit_dice_total:  cs.hit_dice_total   ?? 1,
+          hit_dice_used:   cs.hit_dice_used    ?? 0,
+          armor_class:     cs.armor_class,
+          initiative_bonus: cs.initiative_bonus ?? 0,
+          speed:           cs.speed            ?? 30,
+          inspiration:     cs.inspiration      ?? false,
         })
 
       if (combatError) throw combatError
