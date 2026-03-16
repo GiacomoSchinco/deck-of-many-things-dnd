@@ -25,7 +25,7 @@ export async function GET(
   )
   
   const { data: campaign, error } = await supabase
-    .from('campaign')
+    .from('campaigns')
     .select('*')
     .eq('id', id)
     .single()

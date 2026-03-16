@@ -18,3 +18,17 @@ export function useCampaigns() {
     staleTime: 1000 * 60 * 5,
   });
 }
+
+export function useCampaign(id: string | null) {
+  return useQuery({
+    queryKey: ['campaign', id],   
+    queryFn: async (): Promise<Campaign | null> => {
+      if (!id) return null;
+      const response = await fetch(`/api/campaigns/${id}`);
+      if (!response.ok) throw new Error('Errore caricamento campagna');
+      return response.json() as Promise<Campaign>;
+    },
+    enabled: !!id,
+    staleTime: 1000 * 60 * 5,
+  });
+}

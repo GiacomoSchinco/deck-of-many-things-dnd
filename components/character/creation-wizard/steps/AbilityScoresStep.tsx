@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AncientCardContainer from '@/components/ui/custom/AncientCardContainer';
 import { calculateModifier } from '@/lib/calculations/abilityModifiers';
+import StatDiamond from '@/components/ui/custom/StatDiaiamont';
 
 interface AbilityScores {
   strength: number;
@@ -287,7 +288,7 @@ export function AbilityScoresStep({
       </div>
 
       {/* Riepilogo con bonus applicati */}
-      <AncientCardContainer className="p-4">
+      <div className="p-4">
         <h3 className="font-serif font-semibold text-amber-900 mb-2 text-center">
           Punteggi Finali (con bonus razza)
         </h3>
@@ -296,14 +297,11 @@ export function AbilityScoresStep({
             const finalScore = (scores[key as keyof AbilityScores] + (raceBonuses[key] || 0));
             const modifier = calculateModifier(finalScore);
             return (
-              <div key={key} className="text-center">
-                <span className="font-medium">{label}:</span> {finalScore} 
-                <span className="text-amber-600 ml-1">({modifier >= 0 ? '+' : ''}{modifier})</span>
-              </div>
+              <StatDiamond key={key} label={label} value={finalScore} modifier={modifier} />
             );
           })}
         </div>
-      </AncientCardContainer>
+      </div>
 
       {/* Pulsanti */}
       <div className="flex justify-between pt-4">

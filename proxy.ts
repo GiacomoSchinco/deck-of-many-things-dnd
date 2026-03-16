@@ -26,6 +26,7 @@ export async function proxy(req: NextRequest) {
     req.nextUrl.pathname === '/' ||
     req.nextUrl.pathname === '/login' ||
     req.nextUrl.pathname === '/register' ||
+    req.nextUrl.pathname.startsWith('/forgot-password') ||
     req.nextUrl.pathname.startsWith('/auth/')
 
   if (!session && !isPublicRoute) {

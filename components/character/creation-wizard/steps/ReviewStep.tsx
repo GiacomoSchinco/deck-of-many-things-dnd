@@ -7,6 +7,7 @@ import AncientCardContainer from '@/components/ui/custom/AncientCardContainer';
 import { CreationData } from '../hooks/useCharacterCreation';
 import { calculateModifier } from '@/lib/calculations/abilityModifiers';
 import { useCharacterCalculations } from '@/hooks/useCharacterCalculations';
+import { useCampaign } from '@/hooks/queries/useCampaigns';
 
 interface ReviewStepProps {
   data: Partial<CreationData>;
@@ -32,6 +33,7 @@ export function ReviewStep({ data, onBack, onSave, loading, error }: ReviewStepP
     data.classId ?? null,
     data.abilityScores ?? null,
   );
+  const { data: campaign } = useCampaign(data.campaignId ?? null);
 
   const proficiencyBonus = 2; // Livello 1
 
@@ -72,7 +74,8 @@ export function ReviewStep({ data, onBack, onSave, loading, error }: ReviewStepP
           {(data.playerName || data.campaignId) && (
             <div className="text-sm text-amber-700 text-center">
               {data.playerName && <p>Giocato da: {data.playerName}</p>}
-              {data.campaignId && <p>Campagna: {data.campaignId}</p>}
+              
+              {data.campaignId && <p>Campagna: {campaign?.name ?? '...'}</p>}
             </div>
           )}
 
