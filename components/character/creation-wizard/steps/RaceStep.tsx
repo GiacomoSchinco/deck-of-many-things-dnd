@@ -1,60 +1,26 @@
-// components/character/creation-wizard/steps/RaceStep.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useRaces } from '@/hooks/queries/useRaces';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import AncientCardContainer from '@/components/ui/custom/AncientCardContainer';
-import { Skeleton } from '@/components/ui/skeleton';
-
-interface Race {
-  id: number;
-  name: string;
-  description: string;
-  speed: number;
-  size: 'Small' | 'Medium' | 'Large';
-  ability_bonuses: Record<string, number>;
-  traits: Array<{ name: string; description: string }>;
-  subraces?: Array<{
-    name: string;
-    ability_bonuses: Record<string, number>;
-    traits: string[];
-  }>;
-}
+import Loading from '@/components/ui/custom/Loading';
 
 interface RaceStepProps {
   initialRaceId?: number | null;
+  onBack: () => void;
   onSelect: (raceId: number) => void;
 }
 
-export function RaceStep({ initialRaceId, onSelect }: RaceStepProps) {
-  const [races, setRaces] = useState<Race[]>([]);
+export function RaceStep({ initialRaceId, onBack, onSelect }: RaceStepProps) {
+  const { data: races, isLoading, error } = useRaces();
   const [selectedRaceId, setSelectedRaceId] = useState<number | null>(initialRaceId || null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  // Carica le razze dall'API
-  useEffect(() => {
-    async function loadRaces() {
-      try {
-        const response = await fetch('/api/races');
-        if (!response.ok) throw new Error('Errore nel caricamento delle razze');
-        const data = await response.json();
-        setRaces(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Errore sconosciuto');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadRaces();
-  }, []);
-
-  const selectedRace = races.find(r => r.id === selectedRaceId);
+  const selectedRace = races?.find(r => r.id === selectedRaceId);
 
   // Formatta il bonus caratteristica in modo leggibile
   const formatBonus = (bonuses: Record<string, number>) => {
@@ -73,36 +39,21 @@ export function RaceStep({ initialRaceId, onSelect }: RaceStepProps) {
       .join(' · ');
   };
 
-  if (loading) {
-    return (
-      <div className="space-y-4">
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-serif text-amber-900 mb-2">
-            🧝 Scegli la Razza
-          </h2>
-          <p className="text-amber-700 text-sm">Caricando le razze dal grimorio...</p>
-        </div>
-        <div className="space-y-2">
-          <Skeleton className="h-16 w-full" />
-          <Skeleton className="h-16 w-full" />
-          <Skeleton className="h-16 w-full" />
-        </div>
-      </div>
-    );
+  if (isLoading) {
+    return <Loading />;
   }
 
   if (error) {
     return (
-      <AncientCardContainer>
-        <div className="p-6 text-center">
-          <p className="text-red-500 mb-4">❌ {error}</p>
-          <Button 
-            onClick={() => window.location.reload()}
-            className="bg-amber-700 hover:bg-amber-800"
-          >
-            Riprova
-          </Button>
-        </div>
+      <AncientCardContainer className="p-6 text-center">
+        <p className="text-red-500">Errore: {error.message}</p>
+        <Button 
+          onClick={() => window.location.reload()} 
+          variant="outline" 
+          className="mt-4"
+        >
+          Riprova
+        </Button>
       </AncientCardContainer>
     );
   }
@@ -124,7 +75,7 @@ export function RaceStep({ initialRaceId, onSelect }: RaceStepProps) {
         className="space-y-3"
       >
         <ScrollArea className="h-[400px] pr-4">
-          {races.map((race) => (
+          {races?.map((race) => (
             <div key={race.id} className="mb-3">
               <RadioGroupItem
                 value={race.id.toString()}
@@ -223,7 +174,7 @@ export function RaceStep({ initialRaceId, onSelect }: RaceStepProps) {
       <div className="flex justify-between pt-4">
         <Button 
           variant="outline"
-          onClick={() => window.history.back()}
+          onClick={onBack}
           className="border-amber-700 text-amber-700"
         >
           ← Indietro

@@ -22,18 +22,6 @@ const ALIGNMENTS = [
   'Caotico Malvagio',
 ];
 
-// Lista background (da popolare poi con API)
-const BACKGROUNDS = [
-  'Accolito',
-  'Artigiano',
-  'Criminale',
-  'Eroe del Popolo',
-  'Nobile',
-  'Saggio',
-  'Soldato',
-  'Viandante',
-];
-
 interface BasicInfoStepProps {
   initialData?: Partial<CreationData>;
   onNext: (data: Partial<CreationData>) => void;
@@ -96,6 +84,7 @@ export function BasicInfoStep({ initialData, onNext }: BasicInfoStepProps) {
             id="name"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            maxLength={100}
             placeholder="Es. Gimli Figlio di Glóin"
             className={errors.name ? 'border-red-500' : ''}
           />
@@ -113,6 +102,7 @@ export function BasicInfoStep({ initialData, onNext }: BasicInfoStepProps) {
             id="playerName"
             value={formData.playerName}
             onChange={(e) => setFormData({ ...formData, playerName: e.target.value })}
+            maxLength={100}
             placeholder="Es. Mario Rossi"
           />
           <p className="text-xs text-amber-600">
@@ -127,7 +117,7 @@ export function BasicInfoStep({ initialData, onNext }: BasicInfoStepProps) {
           </Label>
           <Select 
             value={formData.alignment}
-            onValueChange={(value) => setFormData({ ...formData, alignment: value })}
+            onValueChange={(value) => setFormData({ ...formData, alignment: value ?? 'Neutrale' })}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Seleziona allineamento" />
@@ -145,28 +135,21 @@ export function BasicInfoStep({ initialData, onNext }: BasicInfoStepProps) {
         {/* Background */}
         <div className="space-y-2">
           <Label htmlFor="background" className="text-amber-900">
-            Background <span className="text-red-500">*</span>
+             Background <span className="text-red-500">*</span>
           </Label>
-          <Select 
+          <Input
+            id="background"
             value={formData.background}
-            onValueChange={(value) => setFormData({ ...formData, background: value })}
-          >
-            <SelectTrigger className={errors.background ? 'border-red-500' : ''}>
-              <SelectValue placeholder="Seleziona background" />
-            </SelectTrigger>
-            <SelectContent>
-              {BACKGROUNDS.map((bg) => (
-                <SelectItem key={bg} value={bg}>
-                  {bg}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            onChange={(e) => setFormData({ ...formData, background: e.target.value })}
+            maxLength={100}
+            placeholder="Es. Gimli Figlio di Glóin"
+            className={errors.background ? 'border-red-500' : ''}
+          />
           {errors.background && (
             <p className="text-sm text-red-500">{errors.background}</p>
           )}
         </div>
-
+        
         {/* Anteprima */}
         {formData.name && (
           <AncientCardContainer className="mt-6 p-4 text-center">

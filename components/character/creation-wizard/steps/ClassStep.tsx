@@ -1,68 +1,27 @@
 // components/character/creation-wizard/steps/ClassStep.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useClasses } from '@/hooks/queries/useClasses';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import AncientCardContainer from '@/components/ui/custom/AncientCardContainer';
-
-interface DndClass {
-  id: number;
-  name: string;
-  description: string;
-  hit_die: string;
-  primary_ability: string[];
-  saving_throws: string[];
-  armor_proficiencies: string[];
-  weapon_proficiencies: string[];
-  skill_choices: {
-    count: number;
-    options: string[];
-  };
-  spellcasting?: {
-    spellcasting_ability: string;
-  };
-  features: Array<{
-    level: number;
-    name: string;
-    description: string;
-  }>;
-}
+import Loading from '@/components/ui/custom/Loading';
 
 interface ClassStepProps {
   initialClassId?: number | null;
+  onBack: () => void;
   onSelect: (classId: number) => void;
 }
 
-export function ClassStep({ initialClassId, onSelect }: ClassStepProps) {
-  const [classes, setClasses] = useState<DndClass[]>([]);
+export function ClassStep({ initialClassId, onBack, onSelect }: ClassStepProps) {
+  const { data: classes, isLoading, error } = useClasses();
   const [selectedClassId, setSelectedClassId] = useState<number | null>(initialClassId || null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  // Carica le classi dall'API
-  useEffect(() => {
-    async function loadClasses() {
-      try {
-        const response = await fetch('/api/classes');
-        if (!response.ok) throw new Error('Errore nel caricamento delle classi');
-        const data = await response.json();
-        setClasses(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Errore sconosciuto');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadClasses();
-  }, []);
-
-  const selectedClass = classes.find(c => c.id === selectedClassId);
+  const selectedClass = classes?.find(c => c.id === selectedClassId);
 
   // Formatta array in stringa leggibile
   const formatArray = (arr: string[] | undefined) => {
@@ -70,29 +29,15 @@ export function ClassStep({ initialClassId, onSelect }: ClassStepProps) {
     return arr.join(', ');
   };
 
-  if (loading) {
-    return (
-      <div className="space-y-4">
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-serif text-amber-900 mb-2">
-            ⚔️ Scegli la Classe
-          </h2>
-          <p className="text-amber-700 text-sm">Caricando le classi dal grimorio...</p>
-        </div>
-        <div className="space-y-2">
-          <Skeleton className="h-16 w-full" />
-          <Skeleton className="h-16 w-full" />
-          <Skeleton className="h-16 w-full" />
-        </div>
-      </div>
-    );
+  if (isLoading) {
+    return <Loading />;
   }
 
   if (error) {
     return (
       <AncientCardContainer>
         <div className="p-6 text-center">
-          <p className="text-red-500 mb-4">❌ {error}</p>
+          <p className="text-red-500 mb-4">❌ {error.message}</p>
           <Button 
             onClick={() => window.location.reload()}
             className="bg-amber-700 hover:bg-amber-800"
@@ -121,7 +66,7 @@ export function ClassStep({ initialClassId, onSelect }: ClassStepProps) {
         className="space-y-3"
       >
         <ScrollArea className="h-[400px] pr-4">
-          {classes.map((dndClass) => (
+          {classes?.map((dndClass) => (
             <div key={dndClass.id} className="mb-3">
               <RadioGroupItem
                 value={dndClass.id.toString()}
@@ -224,7 +169,7 @@ export function ClassStep({ initialClassId, onSelect }: ClassStepProps) {
       <div className="flex justify-between pt-4">
         <Button 
           variant="outline"
-          onClick={() => window.history.back()}
+          onClick={onBack}
           className="border-amber-700 text-amber-700"
         >
           ← Indietro

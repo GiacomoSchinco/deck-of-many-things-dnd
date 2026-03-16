@@ -20,8 +20,9 @@ interface AbilityScores {
 
 interface AbilityScoresStepProps {
   initialScores?: AbilityScores | null;
-  raceBonuses?: Record<string, number>; // Bonus dalla razza selezionata
-  raceName?: string; // Nome razza per mostrarlo
+  raceBonuses?: Record<string, number>;
+  raceName?: string;
+  onBack: () => void;
   onConfirm: (scores: AbilityScores) => void;
 }
 
@@ -43,6 +44,7 @@ export function AbilityScoresStep({
   initialScores, 
   raceBonuses = {}, 
   raceName = 'la tua razza',
+  onBack,
   onConfirm 
 }: AbilityScoresStepProps) {
   const [method, setMethod] = useState<'standard' | 'pointbuy' | 'rolled' | 'manual'>('standard');
@@ -307,7 +309,7 @@ export function AbilityScoresStep({
       <div className="flex justify-between pt-4">
         <Button 
           variant="outline"
-          onClick={() => window.history.back()}
+          onClick={onBack}
           className="border-amber-700 text-amber-700"
         >
           ← Indietro

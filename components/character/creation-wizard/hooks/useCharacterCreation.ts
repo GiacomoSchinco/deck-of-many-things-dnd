@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase/client';
+import { useCreateCharacter } from '@/hooks/mutations/useCharacterMutations';
 
 export interface CreationData {
   // Step 1 - Basic Info
@@ -42,6 +42,7 @@ export type CreationStep =
 
 export function useCharacterCreation() {
   const router = useRouter();
+  const createCharacter = useCreateCharacter();
   
   const [currentStep, setCurrentStep] = useState<CreationStep>('basic-info');
   const [data, setData] = useState<Partial<CreationData>>({
@@ -55,7 +56,6 @@ export function useCharacterCreation() {
     abilityScores: null,
   });
   
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const updateData = (newData: Partial<CreationData>) => {
@@ -82,99 +82,43 @@ export function useCharacterCreation() {
     setCurrentStep(step);
   };
 
-  // Salvataggio su Supabase
+  // Salvataggio tramite mutation API
   const saveCharacter = async () => {
-    setLoading(true);
     setError(null);
-    
-    try {
-      // Validazione
-      if (!data.name || !data.raceId || !data.classId || !data.abilityScores) {
-        throw new Error('Dati incompleti');
-      }
 
-      // 1. Ottieni l'utente corrente
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        throw new Error('Devi essere loggato per creare un personaggio');
-      }
-
-      // 2. Inserisci il personaggio
-      const { data: character, error: charError } = await supabase
-        .from('characters')
-        .insert({
-          user_id: user.id,
-          name: data.name,
-          player_name: data.playerName || null,
-          campaign_id: data.campaignId || null,
-          race_id: data.raceId,
-          class_id: data.classId,
-          level: 1,
-          experience: 0,
-          background: data.background,
-          alignment: data.alignment,
-        })
-        .select()
-        .single();
-
-      if (charError) throw charError;
-
-      // 3. Inserisci i punteggi di caratteristica
-      const { error: scoresError } = await supabase
-        .from('ability_scores')
-        .insert({
-          character_id: character.id,
-          strength: data.abilityScores.strength,
-          dexterity: data.abilityScores.dexterity,
-          constitution: data.abilityScores.constitution,
-          intelligence: data.abilityScores.intelligence,
-          wisdom: data.abilityScores.wisdom,
-          charisma: data.abilityScores.charisma,
-        });
-
-      if (scoresError) throw scoresError;
-
-      // 4. Crea le combat_stats di base
-      const { error: combatError } = await supabase
-        .from('combat_stats')
-        .insert({
-          character_id: character.id,
-          max_hp: 10, // Da calcolare in base a classe e COS
-          current_hp: 10,
-          temp_hp: 0,
-          hit_dice_type: 'd10', // Da prendere dalla classe
-          hit_dice_total: 1,
-          hit_dice_used: 0,
-          armor_class: 10, // Da calcolare
-          initiative_bonus: 0,
-          speed: 30, // Da prendere dalla razza
-          inspiration: false,
-        });
-
-      if (combatError) throw combatError;
-
-      // 5. Reindirizza alla pagina del personaggio
-      router.push(`/characters/${character.id}`);
-      
-    } catch (err) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : typeof err === 'object' && err !== null && 'message' in err
-            ? String((err as { message: unknown }).message)
-            : 'Errore durante il salvataggio';
-      setError(message);
-      console.error('Errore salvataggio:', JSON.stringify(err, null, 2));
-    } finally {
-      setLoading(false);
+    if (!data.name || !data.raceId || !data.classId || !data.abilityScores) {
+      setError('Dati incompleti');
+      return;
     }
+
+    createCharacter.mutate(
+      {
+        name: data.name,
+        playerName: data.playerName || undefined,
+        campaignId: data.campaignId || undefined,
+        raceId: String(data.raceId),
+        classId: String(data.classId),
+        level: 1,
+        experience: 0,
+        background: data.background || undefined,
+        alignment: data.alignment || undefined,
+        abilityScores: data.abilityScores,
+      },
+      {
+        onSuccess: (character) => {
+          router.push(`/dashboard/${character.id}`);
+        },
+        onError: (err) => {
+          setError(err instanceof Error ? err.message : 'Errore durante il salvataggio');
+        },
+      }
+    );
   };
 
   return {
     currentStep,
     data,
-    loading,
+    loading: createCharacter.isPending,
     error,
     updateData,
     nextStep,

@@ -1,47 +1,24 @@
 // components/character/creation-wizard/steps/CampaignStep.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useCampaigns } from '@/hooks/queries/useCampaigns';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Card, CardContent } from '@/components/ui/card';
 import AncientCardContainer from '@/components/ui/custom/AncientCardContainer';
-
-interface Campaign {
-  id: string;
-  name: string;
-  description: string;
-  dungeon_master: string;
-}
+import Loading from '@/components/ui/custom/Loading';
 
 interface CampaignStepProps {
   initialCampaignId?: string | null;
+  onBack: () => void;
   onSelect: (campaignId: string | null) => void;
 }
 
-export function CampaignStep({ initialCampaignId, onSelect }: CampaignStepProps) {
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+export function CampaignStep({ initialCampaignId, onBack, onSelect }: CampaignStepProps) {
+  const { data: campaigns, isLoading, error } = useCampaigns();
   const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(initialCampaignId || null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Carica tutte le campagne disponibili via API
-  useEffect(() => {
-    async function loadCampaigns() {
-      try {
-        const response = await fetch('/api/campaigns');
-        if (!response.ok) throw new Error('Errore nel caricamento delle campagne');
-        const data = await response.json();
-        setCampaigns(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Errore sconosciuto');
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadCampaigns();
-  }, []);
 
   const handleContinue = () => {
     onSelect(selectedCampaignId);
@@ -51,18 +28,14 @@ export function CampaignStep({ initialCampaignId, onSelect }: CampaignStepProps)
     onSelect(null); // Nessuna campagna
   };
 
-  if (loading) {
-    return (
-      <div className="text-center p-8">
-        <p className="text-amber-700">Caricamento campagne...</p>
-      </div>
-    );
+  if (isLoading) {
+    return <Loading />;
   }
 
   if (error) {
     return (
       <AncientCardContainer className="p-8 text-center">
-        <p className="text-red-500">Errore: {error}</p>
+        <p className="text-red-500">Errore: {error.message}</p>
         <Button 
           onClick={() => window.location.reload()} 
           variant="outline" 
@@ -86,7 +59,7 @@ export function CampaignStep({ initialCampaignId, onSelect }: CampaignStepProps)
       </div>
 
       {/* Lista campagne esistenti */}
-      {campaigns.length > 0 ? (
+      {campaigns && campaigns.length > 0 ? (
         <RadioGroup
           value={selectedCampaignId || ''}
           onValueChange={(v) => setSelectedCampaignId(v === '' ? null : v)}
@@ -122,7 +95,7 @@ export function CampaignStep({ initialCampaignId, onSelect }: CampaignStepProps)
       <div className="flex justify-between pt-4">
         <Button 
           variant="outline"
-          onClick={() => window.history.back()}
+          onClick={onBack}
           className="border-amber-700 text-amber-700"
         >
           ← Indietro

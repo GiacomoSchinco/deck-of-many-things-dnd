@@ -27,8 +27,6 @@ export function CreationWizard() {
     nextStep,
     prevStep,
     saveCharacter,
-    isFirstStep,
-    isLastStep,
   } = useCharacterCreation();
 
   const [selectedRace, setSelectedRace] = useState<Race | null>(null);
@@ -66,6 +64,7 @@ export function CreationWizard() {
       return (
         <RaceStep
           initialRaceId={data.raceId}
+          onBack={prevStep}
           onSelect={(raceId) => {
             updateData({ raceId });
             nextStep();
@@ -77,6 +76,7 @@ export function CreationWizard() {
       return (
         <ClassStep
           initialClassId={data.classId}
+          onBack={prevStep}
           onSelect={(classId) => {
             updateData({ classId });
             nextStep();
@@ -89,6 +89,7 @@ export function CreationWizard() {
       return (
         <CampaignStep
           initialCampaignId={data.campaignId}
+          onBack={prevStep}
           onSelect={(campaignId) => {
             updateData({ campaignId });
             nextStep();
@@ -102,6 +103,7 @@ export function CreationWizard() {
           initialScores={data.abilityScores}
           raceBonuses={selectedRace?.ability_bonuses || {}}
           raceName={selectedRace?.name}
+          onBack={prevStep}
           onConfirm={(abilityScores) => {
             updateData({ abilityScores });
             nextStep();
