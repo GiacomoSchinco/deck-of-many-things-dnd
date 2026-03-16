@@ -261,7 +261,7 @@ export function AbilityScoresStep({
       </Tabs>
 
       {/* Griglia punteggi con bonus */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mt-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3 mt-6">
         {ABILITIES.map(({ key, label, name }) => {
           const baseScore = scores[key as keyof AbilityScores];
           const raceBonus = raceBonuses[key] || 0;

@@ -77,7 +77,7 @@ export default function AncientCardStack({
           // top card - animated and contains children
           return (
             <div key={idx} className={`absolute inset-0 ${animation}`}>
-              <AncientCardContainer className={`w-full h-full`}>
+              <AncientCardContainer padded={false} className={`w-full h-full`}>
                 {children}
               </AncientCardContainer>
             </div>

@@ -119,7 +119,7 @@ export function ReviewStep({ data, onBack, onSave, loading, error }: ReviewStepP
 
           {/* Statistiche di combattimento (calcolate) */}
           {isReady && calculations && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-2 gap-3">
               <AncientCardContainer className="p-3 text-center">
                 <p className="text-xs text-amber-700">PF</p>
                 <p className="text-xl font-bold text-amber-900">{calculations.combatStats.max_hp}</p>

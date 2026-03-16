@@ -38,7 +38,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
   const [isFlipped, setIsFlipped] = React.useState(false);
   
   const renderFront = () => (
-    <AncientCardContainer className="w-full h-full">
+    <AncientCardContainer className="w-full h-full" padded={false}>
       {/* Contenuto principale */}
       <div className="relative h-full flex flex-col p-4">
         {/* Nome e allineamento */}

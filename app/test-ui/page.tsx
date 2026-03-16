@@ -44,6 +44,7 @@ import { Sword, Heart, Wand, Shield, Skull, Crown } from 'lucide-react';
 import AncientCardContainer from "@/components/ui/custom/AncientCardContainer";
 import CharacterCard from "@/components/ui/custom/CharacterCard";
 import Loading from "@/components/ui/custom/Loading";
+import { AncientScroll } from "@/components/ui/custom/AncientScroll";
 
 export default function TestUIPage() {
   const [text, setText] = useState("");
@@ -273,7 +274,7 @@ export default function TestUIPage() {
       </div>
 
       {/* Arrotondamenti */}
-      <AncientCardContainer haveMargin>
+      <AncientCardContainer padded>
       <div className="space-y-4">
         <h2 className="text-2xl font-serif">Arrotondamenti</h2>
         <div className="flex flex-wrap gap-4">
@@ -320,7 +321,21 @@ export default function TestUIPage() {
       </div>
     </div>
     <Loading />
-  
+  <AncientScroll>
+  <h2 className="text-2xl font-serif text-amber-900 mb-4">Storia del Personaggio</h2>
+  <p className="text-amber-800 leading-relaxed">
+    Gimli Figlio di Glóin, nano delle Montagne Nebbiose...
+  </p>
+</AncientScroll>
+
+<AncientScroll variant="rolled" className="w-64">
+  <nav className="space-y-2">
+    <a href="#" className="block p-2 hover:bg-amber-100 rounded">Storia</a>
+    <a href="#" className="block p-2 hover:bg-amber-100 rounded">Equipaggiamento</a>
+    <a href="#" className="block p-2 hover:bg-amber-100 rounded">Incantesimi</a>
+    <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Harum magni, ea architecto dolore praesentium distinctio explicabo ratione! Veniam tempora maxime quae dolorem, ad necessitatibus sed deserunt alias nobis perferendis natus.</p>
+  </nav>
+</AncientScroll>
     </div>
     
   );

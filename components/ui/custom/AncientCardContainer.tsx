@@ -9,7 +9,7 @@ interface AncientCardContainerProps {
   onClick?: () => void;
   className?: string;
   isDashed?: boolean;
-  haveMargin?: boolean;
+  padded?: boolean;
   variant?: 'default' | 'add' | 'flipped' | 'transparent';
 }
 
@@ -18,7 +18,7 @@ const AncientCardContainer: React.FC<AncientCardContainerProps> = ({
   onClick,
   className = '',
   isDashed = false,
-  haveMargin = false,
+  padded = true,
   variant = 'default',
 }) => {
   const variantStyles = {
@@ -75,7 +75,7 @@ const AncientCardContainer: React.FC<AncientCardContainerProps> = ({
         {/* Contenuto principale con padding condizionale */}
         <div className={cn(
           'relative h-full w-full',
-          haveMargin && 'p-10'
+          padded && 'p-10'
         )}>
           {children}
         </div>

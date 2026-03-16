@@ -19,6 +19,39 @@
   --color-antique-copper: #b87333;
   --color-antique-rust: #8b4513;
 
+  /* Variabili base per componenti shadcn/ui (bg-background, text-foreground, ecc.) */
+  --color-background: hsl(40 30% 96%);
+  --color-foreground: hsl(30 40% 20%);
+  --color-border: hsl(30 30% 70%);
+  --color-ring: hsl(25 60% 35%);
+
+  /* Primary — oro antico */
+  --color-primary: hsl(38 80% 35%);
+  --color-primary-foreground: hsl(40 30% 96%);
+
+  /* Secondary — pergamena scura */
+  --color-secondary: hsl(35 30% 80%);
+  --color-secondary-foreground: hsl(30 40% 20%);
+
+  /* Muted — sfondo neutro */
+  --color-muted: hsl(0 0% 100%);
+  --color-muted-foreground: hsl(30 25% 45%);
+
+  /* Accent */
+  --color-accent: hsl(35 50% 75%);
+  --color-accent-foreground: hsl(30 40% 20%);
+
+  /* Destructive — rosso sangue */
+  --color-destructive: hsl(0 65% 45%);
+  --color-destructive-foreground: hsl(40 30% 96%);
+
+  /* Input e card */
+  --color-input: hsl(35 25% 78%);
+  --color-card: hsl(40 30% 94%);
+  --color-card-foreground: hsl(30 40% 20%);
+  --color-popover: hsl(40 30% 94%);
+  --color-popover-foreground: hsl(30 40% 20%);
+
   /* 📝 Font */
   --font-serif: 'Cinzel', Georgia, serif;
   --font-sans: 'Cinzel', sans-serif;
