@@ -41,7 +41,14 @@ export async function GET() {
 // POST /api/characters -> crea nuovo personaggio
 export async function POST(request: Request) {
   const cookieStore = await cookies()
-  const body = await request.json()
+
+  // 1. Body malformato (JSON non valido)
+  let body: Record<string, unknown>
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: 'Corpo della richiesta non valido' }, { status: 400 })
+  }
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -58,68 +65,107 @@ export async function POST(request: Request) {
     }
   )
 
-  // Ottieni l'utente loggato
+  // 2. Utente non autenticato
   const { data: { user } } = await supabase.auth.getUser()
-  
   if (!user) {
     return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
   }
 
+  // 3. Validazione campi obbligatori
+  const name = typeof body.name === 'string' ? body.name.trim() : ''
+  if (!name) {
+    return NextResponse.json({ error: 'Il nome del personaggio è obbligatorio' }, { status: 400 })
+  }
+  if (!body.raceId) {
+    return NextResponse.json({ error: 'La razza è obbligatoria' }, { status: 400 })
+  }
+  if (!body.classId) {
+    return NextResponse.json({ error: 'La classe è obbligatoria' }, { status: 400 })
+  }
+
   try {
-    // 1. Inserisci personaggio
+    // 4. Controlla duplicati: stesso nome (case-insensitive) per lo stesso utente
+    const { data: existing } = await supabase
+      .from('characters')
+      .select('id')
+      .eq('user_id', user.id)
+      .ilike('name', name)
+      .maybeSingle()
+
+    if (existing) {
+      return NextResponse.json(
+        { error: `Hai già un personaggio di nome "${name}"` },
+        { status: 409 }
+      )
+    }
+
+    // 5. Verifica che raceId e classId esistano
+    const [{ error: raceErr }, { error: classErr }] = await Promise.all([
+      supabase.from('races').select('id').eq('id', body.raceId).single(),
+      supabase.from('classes').select('id').eq('id', body.classId).single(),
+    ])
+    if (raceErr) {
+      return NextResponse.json({ error: 'Razza non valida' }, { status: 400 })
+    }
+    if (classErr) {
+      return NextResponse.json({ error: 'Classe non valida' }, { status: 400 })
+    }
+
+    // 6. Inserisci personaggio
     const { data: character, error: charError } = await supabase
       .from('characters')
       .insert({
         user_id: user.id,
-        name: body.name,
+        name,
         player_name: body.playerName || null,
         campaign_id: body.campaignId || null,
         race_id: body.raceId,
         class_id: body.classId,
         level: body.level || 1,
         experience: body.experience || 0,
-        background: body.background,
-        alignment: body.alignment,
+        background: body.background || null,
+        alignment: body.alignment || null,
       })
       .select()
       .single()
 
     if (charError) throw charError
 
-    // 2. Inserisci ability scores
-    if (body.abilityScores) {
+    // 7. Inserisci ability scores
+    if (body.abilityScores && typeof body.abilityScores === 'object') {
+      const as = body.abilityScores as Record<string, number>
       const { error: scoresError } = await supabase
         .from('ability_scores')
         .insert({
           character_id: character.id,
-          strength: body.abilityScores.strength,
-          dexterity: body.abilityScores.dexterity,
-          constitution: body.abilityScores.constitution,
-          intelligence: body.abilityScores.intelligence,
-          wisdom: body.abilityScores.wisdom,
-          charisma: body.abilityScores.charisma,
+          strength:     as.strength,
+          dexterity:    as.dexterity,
+          constitution: as.constitution,
+          intelligence: as.intelligence,
+          wisdom:       as.wisdom,
+          charisma:     as.charisma,
         })
 
       if (scoresError) throw scoresError
     }
 
-    // 3. Inserisci combat stats
-    if (body.combatStats) {
-      const cs = body.combatStats
+    // 8. Inserisci combat stats
+    if (body.combatStats && typeof body.combatStats === 'object') {
+      const cs = body.combatStats as Record<string, unknown>
       const { error: combatError } = await supabase
         .from('combat_stats')
         .insert({
-          character_id:    character.id,
-          max_hp:          cs.max_hp,
-          current_hp:      cs.current_hp,
-          temp_hp:         cs.temp_hp          ?? 0,
-          hit_dice_type:   cs.hit_dice_type,
-          hit_dice_total:  cs.hit_dice_total   ?? 1,
-          hit_dice_used:   cs.hit_dice_used    ?? 0,
-          armor_class:     cs.armor_class,
+          character_id:     character.id,
+          max_hp:           cs.max_hp,
+          current_hp:       cs.current_hp,
+          temp_hp:          cs.temp_hp          ?? 0,
+          hit_dice_type:    cs.hit_dice_type,
+          hit_dice_total:   cs.hit_dice_total   ?? 1,
+          hit_dice_used:    cs.hit_dice_used    ?? 0,
+          armor_class:      cs.armor_class,
           initiative_bonus: cs.initiative_bonus ?? 0,
-          speed:           cs.speed            ?? 30,
-          inspiration:     cs.inspiration      ?? false,
+          speed:            cs.speed            ?? 30,
+          inspiration:      cs.inspiration      ?? false,
         })
 
       if (combatError) throw combatError
