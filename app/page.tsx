@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import AncientCardContainer from '@/components/ui/custom/AncientCardContainer';
-import { Sword, Scroll, Users, Dice6 } from 'lucide-react';
+import { Sword, Users, Dice6 } from 'lucide-react';
 
 export default function HomePage() {
   return (

@@ -108,10 +108,10 @@ export function ReviewStep({ data, onBack, onSave, loading, error }: ReviewStepP
           </div>
 
           {/* Info giocatore/campagna */}
-          {(data.playerName || data.campaign) && (
+          {(data.playerName || data.campaignId) && (
             <div className="text-sm text-amber-700 text-center">
               {data.playerName && <p>Giocato da: {data.playerName}</p>}
-              {data.campaign && <p>Campagna: {data.campaign}</p>}
+              {data.campaignId && <p>Campagna: {data.campaignId}</p>}
             </div>
           )}
 
