@@ -17,7 +17,6 @@ interface CharacterCardProps {
   level: number;
   background: string;
   alignment: string;
-  image: string;
   hp: number;
   maxhp: number;
   isFlippable?: boolean;

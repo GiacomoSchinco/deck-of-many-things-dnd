@@ -299,7 +299,6 @@ export default function TestUIPage() {
             level={5}
             background="Esploratore"
             alignment="Caotico Buono"
-            image="/images/characters/eldrin.png"
             hp={28}
             maxhp={38}
             isFlippable
@@ -309,11 +308,10 @@ export default function TestUIPage() {
             id={2}
             name="Brunna Martelloferro"
             race="Nano delle Colline"
-            characterClass="Fighter"
+            characterClass="Thief"
             level={7}
             background="Soldato"
             alignment="Legale Neutrale"
-            image="/images/characters/brunna.png"
             hp={62}
             maxhp={78}
           />

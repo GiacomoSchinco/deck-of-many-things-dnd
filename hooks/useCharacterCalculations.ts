@@ -20,9 +20,20 @@ export function useCharacterCalculations(
       return null;
     }
 
+    // Applica i bonus razza ai punteggi base
+    const raceBonuses: Record<string, number> = raceData?.ability_bonuses || {};
+    const effectiveScores = {
+      strength:     abilityScores.strength     + (raceBonuses['strength']     || 0),
+      dexterity:    abilityScores.dexterity    + (raceBonuses['dexterity']    || 0),
+      constitution: abilityScores.constitution + (raceBonuses['constitution'] || 0),
+      intelligence: abilityScores.intelligence + (raceBonuses['intelligence'] || 0),
+      wisdom:       abilityScores.wisdom       + (raceBonuses['wisdom']       || 0),
+      charisma:     abilityScores.charisma     + (raceBonuses['charisma']     || 0),
+    };
+
     // Calcoli (puramente derivati!)
-    const conMod = calculateModifier(abilityScores.constitution);
-    const dexMod = calculateModifier(abilityScores.dexterity);
+    const conMod = calculateModifier(effectiveScores.constitution);
+    const dexMod = calculateModifier(effectiveScores.dexterity);
     
     const hitDieMap: Record<string, number> = {
       'd6': 6, 'd8': 8, 'd10': 10, 'd12': 12

@@ -8,6 +8,7 @@ import { CreationData } from '../hooks/useCharacterCreation';
 import { calculateModifier } from '@/lib/calculations/abilityModifiers';
 import { useCharacterCalculations } from '@/hooks/useCharacterCalculations';
 import { useCampaign } from '@/hooks/queries/useCampaigns';
+import StatDiamond from '@/components/ui/custom/StatDiamond';
 
 interface ReviewStepProps {
   data: Partial<CreationData>;
@@ -105,15 +106,11 @@ export function ReviewStep({ data, onBack, onSave, loading, error }: ReviewStepP
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {Object.entries(data.abilityScores).map(([key, value]) => {
-                  const modifier = calculateModifier(value);
+                  const bonus = (calculations?.raceData?.ability_bonuses?.[key] || 0);
+                  const finalValue = value + bonus;
+                  const modifier = calculateModifier(finalValue);
                   return (
-                    <div key={key} className="text-center p-2 bg-amber-100/50 rounded">
-                      <div className="text-xs text-amber-700">{ABILITY_NAMES[key] ?? key}</div>
-                      <div className="text-xl font-bold text-amber-900">{value}</div>
-                      <div className="text-xs text-amber-600">
-                        ({modifier >= 0 ? '+' : ''}{modifier})
-                      </div>
-                    </div>
+                    <StatDiamond key={key} label={ABILITY_NAMES[key] ?? key} value={finalValue} modifier={modifier} statKey={key} />
                   );
                 })}
               </div>

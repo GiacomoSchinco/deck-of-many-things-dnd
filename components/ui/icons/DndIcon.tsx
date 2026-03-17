@@ -36,7 +36,14 @@ export type DndIconName =
   | 'perspective-dice-two'
   | 'rolling-dice-cup'
   | 'rolling-dices'
-  | 'rule-book';
+  | 'rule-book'
+  | 'icon_strength'
+  | 'icon_dexterity'
+  | 'icon_constitution'
+  | 'icon_intelligence'
+  | 'icon_wisdom'
+  | 'icon_charisma';
+
 
 interface DndIconProps {
   /** Nome del file SVG (senza .svg) */

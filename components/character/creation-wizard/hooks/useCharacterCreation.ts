@@ -114,7 +114,18 @@ export function useCharacterCreation() {
         experience: 0,
         background: data.background || undefined,
         alignment: data.alignment || undefined,
-        abilityScores: data.abilityScores,
+        abilityScores: (() => {
+          const bonuses: Record<string, number> = calculations.calculations.raceData?.ability_bonuses || {};
+          const base = data.abilityScores!;
+          return {
+            strength:     base.strength     + (bonuses['strength']     || 0),
+            dexterity:    base.dexterity    + (bonuses['dexterity']    || 0),
+            constitution: base.constitution + (bonuses['constitution'] || 0),
+            intelligence: base.intelligence + (bonuses['intelligence'] || 0),
+            wisdom:       base.wisdom       + (bonuses['wisdom']       || 0),
+            charisma:     base.charisma     + (bonuses['charisma']     || 0),
+          };
+        })(),
         combatStats: calculations.calculations.combatStats,
       },
       {
