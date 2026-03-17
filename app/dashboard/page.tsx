@@ -10,7 +10,6 @@ import {
   LogOut,
   Key,
   Sword,
-  Users,
   Scroll,
   PlusCircle,
   User as UserIcon
@@ -167,7 +166,8 @@ export default function DashboardPage() {
                 <h3 className="font-serif font-bold text-amber-900 mb-2">I Miei Personaggi</h3>
                 <p className="text-sm text-amber-700">Gestisci i tuoi eroi esistenti</p>
               </div>
-            </AncientCardContainer></Link>
+            </AncientCardContainer>
+          </Link>
           <Link href="/campaigns">
             <AncientCardContainer className="p-0 m-8 w-64 h-80 transform hover:scale-105 transition-transform">
               <div className="h-full flex flex-col items-center justify-center p-6 text-center">
@@ -177,7 +177,8 @@ export default function DashboardPage() {
                   <p className="text-sm text-amber-700">Le tue avventure in corso</p>
                 </div>
               </div>
-            </AncientCardContainer></Link>
+            </AncientCardContainer>
+          </Link>
           <Link href="/create-character">
             <AncientCardContainer className="p-0 m-8 w-64 h-80 transform hover:scale-105 transition-transform">
               <div className="h-full flex flex-col items-center justify-center p-6 text-center">
@@ -187,7 +188,8 @@ export default function DashboardPage() {
                   <p className="text-sm text-amber-700">Crea un nuovo eroe per la tua avventura</p>
                 </div>
               </div>
-            </AncientCardContainer></Link>
+            </AncientCardContainer>
+          </Link>
         </div>
         
 

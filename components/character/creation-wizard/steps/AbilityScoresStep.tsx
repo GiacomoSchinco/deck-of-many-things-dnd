@@ -4,7 +4,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import AncientCardContainer from '@/components/ui/custom/AncientCardContainer';
-import { calculateModifier } from '@/lib/calculations/abilityModifiers';
 import { DndIcon } from '@/components/ui/icons/DndIcon';
 import type { DndIconName } from '@/components/ui/icons/DndIcon';
 
