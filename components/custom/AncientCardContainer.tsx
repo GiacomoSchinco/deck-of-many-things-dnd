@@ -3,6 +3,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { CARD_SIZES } from '@/lib/utils/cardSizes';
 
 interface AncientCardContainerProps {
   children: React.ReactNode;
@@ -11,6 +12,7 @@ interface AncientCardContainerProps {
   isDashed?: boolean;
   padded?: boolean;
   variant?: 'default' | 'add' | 'flipped' | 'transparent';
+  size?: 'sm' | 'md' | 'lg' | 'auto';
 }
 
 const AncientCardContainer: React.FC<AncientCardContainerProps> = ({
@@ -20,6 +22,7 @@ const AncientCardContainer: React.FC<AncientCardContainerProps> = ({
   isDashed = false,
   padded = true,
   variant = 'default',
+  size = 'auto',
 }) => {
   const variantStyles = {
     default: { bg: 'bg-parchment-100', border: 'border-amber-800' },
@@ -30,12 +33,16 @@ const AncientCardContainer: React.FC<AncientCardContainerProps> = ({
 
   const { bg, border } = variantStyles[variant];
 
+  // Determina le classi di dimensione
+  const sizeClasses = size !== 'auto' ? CARD_SIZES[size] : '';
+
   return (
     <div className={cn('relative', className)} onClick={onClick}>
       <div className={cn(
         'relative w-full h-full rounded-xl overflow-hidden border-8 shadow-2xl',
         bg,
-        border
+        border,
+        sizeClasses // Solo se non è 'auto'
       )}>
         {/* Texture noise con SVG */}
         <div className="absolute inset-0 pointer-events-none opacity-20">

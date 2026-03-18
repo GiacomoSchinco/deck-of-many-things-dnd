@@ -4,9 +4,9 @@
 import { useState } from 'react';
 import { useCampaigns } from '@/hooks/queries/useCampaigns';
 import { Button } from '@/components/ui/button';
-import AncientCardContainer from '@/components/ui/custom/AncientCardContainer';
-import Loading from '@/components/ui/custom/Loading';
-import { AncientScroll } from '@/components/ui/custom/AncientScroll';
+import AncientCardContainer from '@/components/custom/AncientCardContainer';
+import Loading from '@/components/custom/Loading';
+import { AncientScroll } from '@/components/custom/AncientScroll';
 
 interface CampaignStepProps {
   initialCampaignId?: string | null;

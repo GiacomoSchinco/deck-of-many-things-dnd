@@ -3,14 +3,13 @@
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import AncientCardContainer from '@/components/ui/custom/AncientCardContainer';
 import { CreationData } from '../hooks/useCharacterCreation';
 import { calculateModifier } from '@/lib/calculations/abilityModifiers';
 import { useCharacterCalculations } from '@/hooks/useCharacterCalculations';
 import { useCampaign } from '@/hooks/queries/useCampaigns';
-import StatDiamond from '@/components/ui/custom/StatDiamond';
-import { RaceClassCard } from '@/components/ui/custom/RaceClassCard';
-import { FanCardGroup } from '@/components/ui/custom/FanCardGroup';
+import StatDiamond from '@/components/custom/StatDiamond';
+import { RaceClassCard } from '@/components/custom/RaceClassCard';
+import { FanCardGroup } from '@/components/custom/FanCardGroup';
 
 interface ReviewStepProps {
   data: Partial<CreationData>;

@@ -1,5 +1,5 @@
-import { DndIcon } from '@/components/ui/icons/DndIcon';
-import type { DndIconName } from '@/components/ui/icons/DndIcon';
+import { DndIcon } from '@/components/icons/DndIcon';
+import type { DndIconName } from '@/components/icons/DndIcon';
 
 type StatDiamondProps = {
   label: string;

@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CreationData } from '../hooks/useCharacterCreation';
-import AncientCardContainer from '@/components/ui/custom/AncientCardContainer';
+import AncientCardContainer from '@/components/custom/AncientCardContainer';
 
 // Lista allineamenti D&D
 const ALIGNMENTS = [

@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AncientScroll } from '../ui/custom/AncientScroll';
+import { AncientScroll } from '../custom/AncientScroll';
 import { Eye, EyeOff } from 'lucide-react';
 
 export function LoginForm() {

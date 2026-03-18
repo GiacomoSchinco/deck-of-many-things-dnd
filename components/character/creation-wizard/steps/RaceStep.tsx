@@ -5,9 +5,9 @@ import { useRaces } from '@/hooks/queries/useRaces';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { RaceClassCard } from '../../../ui/custom/RaceClassCard';
-import AncientCardContainer from '@/components/ui/custom/AncientCardContainer';
-import Loading from '@/components/ui/custom/Loading';
+import { RaceClassCard } from '../../../custom/RaceClassCard';
+import AncientCardContainer from '@/components/custom/AncientCardContainer';
+import Loading from '@/components/custom/Loading';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface RaceStepProps {
@@ -108,7 +108,7 @@ export function RaceStep({ initialRaceId, onBack, onSelect }: RaceStepProps) {
             type="race"
             isSelected={isSelected}
             onSelect={handleSelectCurrent}
-            size="lg"
+            size="md"
           />
           
           {/* Indicatore di selezione */}

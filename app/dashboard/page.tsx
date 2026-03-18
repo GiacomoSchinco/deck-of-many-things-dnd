@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
-import { AncientScroll } from '@/components/ui/custom/AncientScroll';
+import { AncientScroll } from '@/components/custom/AncientScroll';
 import {
   LogOut,
   Key,
@@ -15,8 +15,8 @@ import {
   User as UserIcon
 } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
-import AncientCardContainer from '@/components/ui/custom/AncientCardContainer';
-import Loading from '@/components/ui/custom/Loading';
+import AncientCardContainer from '@/components/custom/AncientCardContainer';
+import Loading from '@/components/custom/Loading';
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);

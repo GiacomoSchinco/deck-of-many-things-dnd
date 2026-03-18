@@ -3,8 +3,8 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import AncientCardContainer from '@/components/ui/custom/AncientCardContainer';
-import { DndIcon } from '@/components/ui/icons/DndIcon';
+import AncientCardContainer from '@/components/custom/AncientCardContainer';
+import { DndIcon } from '@/components/icons/DndIcon';
 import { 
   Sword, 
   Users, 

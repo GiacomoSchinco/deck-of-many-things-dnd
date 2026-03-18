@@ -8,6 +8,7 @@ import AncientCardContainer from './AncientCardContainer';
 import HpBar from './HpBar';
 import CardBack from './CardBack';
 import { cn } from '@/lib/utils';
+import { CardSize, CARD_SIZES } from '@/lib/utils/cardSizes';
 
 interface CharacterCardProps {
   id: number;
@@ -20,6 +21,7 @@ interface CharacterCardProps {
   hp: number;
   maxhp: number;
   isFlippable?: boolean;
+  size?: CardSize; // ← aggiungi questa prop
 }
 
 const CharacterCard: React.FC<CharacterCardProps> = ({
@@ -33,6 +35,8 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
   hp,
   maxhp,
   isFlippable = false,
+  size = 'md' 
+  
 }) => {
   const [isFlipped, setIsFlipped] = React.useState(false);
   
@@ -84,7 +88,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
         
         {/* Pulsante Dettagli con classi utility */}
         <div className="flex justify-center mt-3">
-          <Link href={`characters/${id}`}>
+          <Link href={`/characters/${id}`}>
             <button className={cn(
               "relative px-6 py-1.5",
               "bg-amber-700 text-amber-100 text-sm font-serif tracking-wide",
@@ -113,9 +117,9 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
 
   return (
     <div 
-      className={`relative w-72 h-96 cursor-pointer transition-all duration-700 transform-gpu preserve-3d ${
+      className={`relative cursor-pointer transition-all duration-700 transform-gpu preserve-3d ${
         isFlipped ? 'rotate-y-180' : ''
-      }`}
+      } ${CARD_SIZES[size]}`}
       onClick={() => isFlippable && setIsFlipped(!isFlipped)}
       style={{ transformStyle: 'preserve-3d' }}
     >

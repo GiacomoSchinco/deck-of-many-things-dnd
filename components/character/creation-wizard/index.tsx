@@ -9,7 +9,7 @@ import { ClassStep } from './steps/ClassStep';
 import { AbilityScoresStep } from './steps/AbilityScoresStep';
 import { ReviewStep } from './steps/ReviewStep';
 import { CampaignStep } from './steps/CampaignStep';
-import Loading from '@/components/ui/custom/Loading';
+import Loading from '@/components/custom/Loading';
 
 interface Race {
   id: number;

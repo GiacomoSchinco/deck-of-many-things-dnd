@@ -1,6 +1,6 @@
 // app/credits/page.tsx
 import Link from 'next/link';
-import AncientCardContainer from '@/components/ui/custom/AncientCardContainer';
+import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import { Button } from '@/components/ui/button';
 import { Heart, ExternalLink, ArrowLeft } from 'lucide-react';
 

@@ -5,9 +5,9 @@ import { useState } from 'react';
 import { useClasses } from '@/hooks/queries/useClasses';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { RaceClassCard } from '../../../ui/custom/RaceClassCard';
-import AncientCardContainer from '@/components/ui/custom/AncientCardContainer';
-import Loading from '@/components/ui/custom/Loading';
+import { RaceClassCard } from '../../../custom/RaceClassCard';
+import AncientCardContainer from '@/components/custom/AncientCardContainer';
+import Loading from '@/components/custom/Loading';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ClassFeature {
@@ -104,7 +104,7 @@ export function ClassStep({ initialClassId, onBack, onSelect }: ClassStepProps) 
             type="class"
             isSelected={isSelected}
             onSelect={handleSelectCurrent}
-            size="lg"
+            size="md"
           />
           
           {/* Indicatore di selezione */}

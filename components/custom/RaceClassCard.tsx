@@ -3,9 +3,10 @@
 
 import Image from 'next/image';
 import { Check } from 'lucide-react';
-import AncientCardContainer from '@/components/ui/custom/AncientCardContainer';
+import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import { cn } from '@/lib/utils';
 import { getEnglishName } from '@/lib/utils/nameMappers';
+import { CARD_SIZES } from '@/lib/utils/cardSizes';
 
 // Mappa nomi italiani → inglese per razze
 
@@ -19,11 +20,7 @@ interface RaceClassCardProps {
   disabled?: boolean;
 }
 
-const sizeMap = {
-  sm: 'w-40 h-64',
-  md: 'w-48 h-75',
-  lg: 'w-64 h-96',
-};
+const sizeMap = CARD_SIZES;
 
 export function RaceClassCard({
   id,

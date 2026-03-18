@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { appMetadata } from "@/lib/metadata";
-import AuthButton from "../ui/custom/AuthButton";
+import AuthButton from "../custom/AuthButton";
 import { supabase } from "@/lib/supabase/client";
 
 const navLinks = [

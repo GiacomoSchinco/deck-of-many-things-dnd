@@ -39,12 +39,12 @@ import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/comp
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
-import { AntiqueButton } from '@/components/ui/custom/AntiqueButton';
+import { AntiqueButton } from '@/components/custom/AntiqueButton';
 import { Sword, Heart, Wand, Shield, Skull, Crown } from 'lucide-react';
-import AncientCardContainer from "@/components/ui/custom/AncientCardContainer";
-import CharacterCard from "@/components/ui/custom/CharacterCard";
-import Loading from "@/components/ui/custom/Loading";
-import { AncientScroll } from "@/components/ui/custom/AncientScroll";
+import AncientCardContainer from "@/components/custom/AncientCardContainer";
+import CharacterCard from "@/components/custom/CharacterCard";
+import Loading from "@/components/custom/Loading";
+import { AncientScroll } from "@/components/custom/AncientScroll";
 
 export default function TestUIPage() {
   const [text, setText] = useState("");

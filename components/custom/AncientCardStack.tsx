@@ -1,5 +1,6 @@
 import React from 'react';
 import AncientCardContainer from './AncientCardContainer';
+import { CARD_SIZES } from '@/lib/utils/cardSizes';
 
 interface AncientCardStackProps {
   children?: React.ReactNode; // contenuto per la carta superiore
@@ -9,11 +10,7 @@ interface AncientCardStackProps {
 }
 
 // Use Tailwind width/height classes; md is canonical (w-64 h-80)
-const sizeMap = {
-  sm: 'w-56 h-72',
-  md: 'w-64 h-80',
-  lg: 'w-80 h-96',
-};
+const sizeMap = CARD_SIZES;
 
 export default function AncientCardStack({
   children,

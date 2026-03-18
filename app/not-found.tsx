@@ -1,6 +1,6 @@
 "use client";
-import AncientCardStack from "@/components/ui/custom/AncientCardStack";
-import { AntiqueButton } from "@/components/ui/custom/AntiqueButton";
+import AncientCardStack from "@/components/custom/AncientCardStack";
+import { AntiqueButton } from "@/components/custom/AntiqueButton";
 
 export default function NotFound() {
     return (
