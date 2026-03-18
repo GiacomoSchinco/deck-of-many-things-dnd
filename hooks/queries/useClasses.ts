@@ -9,6 +9,7 @@ export interface DndClass {
   saving_throws: string[];
   armor_proficiencies: string[];
   weapon_proficiencies: string[];
+  tool_proficiencies?: string[];
   skill_choices: {
     count: number;
     options: string[];

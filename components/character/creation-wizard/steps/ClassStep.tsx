@@ -4,12 +4,17 @@
 import { useState } from 'react';
 import { useClasses } from '@/hooks/queries/useClasses';
 import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { RaceClassCard } from '../../../ui/custom/RaceClassCard';
 import AncientCardContainer from '@/components/ui/custom/AncientCardContainer';
 import Loading from '@/components/ui/custom/Loading';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+interface ClassFeature {
+  level: number;
+  name: string;
+  description: string;
+}
 
 interface ClassStepProps {
   initialClassId?: number | null;
@@ -19,9 +24,31 @@ interface ClassStepProps {
 
 export function ClassStep({ initialClassId, onBack, onSelect }: ClassStepProps) {
   const { data: classes, isLoading, error } = useClasses();
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedClassId, setSelectedClassId] = useState<number | null>(initialClassId || null);
 
-  const selectedClass = classes?.find(c => c.id === selectedClassId);
+  const selectedClass = classes?.[currentIndex];
+  const totalClasses = classes?.length || 0;
+
+  const handlePrevious = () => {
+    setCurrentIndex(prev => (prev > 0 ? prev - 1 : totalClasses - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentIndex(prev => (prev < totalClasses - 1 ? prev + 1 : 0));
+  };
+
+  const handleSelectCurrent = () => {
+    if (selectedClass) {
+      setSelectedClassId(selectedClass.id);
+    }
+  };
+
+  const handleConfirm = () => {
+    if (selectedClassId) {
+      onSelect(selectedClassId);
+    }
+  };
 
   // Formatta array in stringa leggibile
   const formatArray = (arr: string[] | undefined) => {
@@ -33,150 +60,166 @@ export function ClassStep({ initialClassId, onBack, onSelect }: ClassStepProps) 
     return <Loading />;
   }
 
-  if (error) {
+  if (error || !selectedClass) {
     return (
-      <AncientCardContainer>
-        <div className="p-6 text-center">
-          <p className="text-red-500 mb-4">❌ {error.message}</p>
-          <Button 
-            onClick={() => window.location.reload()}
-            className="bg-amber-700 hover:bg-amber-800"
-          >
-            Riprova
-          </Button>
-        </div>
+      <AncientCardContainer className="p-6 text-center">
+        <p className="text-red-500">Errore: {error?.message || 'Nessuna classe disponibile'}</p>
+        <Button onClick={() => window.location.reload()} variant="outline" className="mt-4">
+          Riprova
+        </Button>
       </AncientCardContainer>
     );
   }
 
+  const isSelected = selectedClassId === selectedClass.id;
+
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-serif text-amber-900 mb-2">
-          ⚔️ Scegli la Classe
+    <div className="space-y-8">
+      <div className="text-center">
+        <h2 className="text-3xl font-serif text-amber-900 mb-2">
+          ⚔️ Scegli la tua Classe
         </h2>
-        <p className="text-amber-700 text-sm">
-          La classe definisce il tuo ruolo e le tue abilità principali
+        <p className="text-amber-700">
+          Sfoglia le carte con le frecce e seleziona la tua classe
         </p>
       </div>
 
-      <RadioGroup
-        value={selectedClassId !== null ? selectedClassId.toString() : ''}
-        onValueChange={(value) => setSelectedClassId(parseInt(value))}
-        className="space-y-3"
-      >
-        <ScrollArea className="h-[400px] pr-4">
-          {classes?.map((dndClass) => (
-            <div key={dndClass.id} className="mb-3">
-              <RadioGroupItem
-                value={dndClass.id.toString()}
-                id={`class-${dndClass.id}`}
-                className="peer sr-only"
-              />
-              <Label
-                htmlFor={`class-${dndClass.id}`}
-                className={`
-                  flex flex-col p-4 rounded-lg border-2 cursor-pointer
-                  transition-all duration-200
-                  ${selectedClassId === dndClass.id 
-                    ? 'border-amber-700 bg-amber-50 shadow-lg' 
-                    : 'border-amber-900/20 hover:border-amber-700/50 bg-parchment-50'
-                  }
-                `}
-              >
-                <div className="flex justify-between items-start mb-2">
-                  <span className="text-lg font-serif font-bold text-amber-900">
-                    {dndClass.name}
-                  </span>
-                  <Badge variant="outline" className="bg-amber-100">
-                    Dado Vita: {dndClass.hit_die}
-                  </Badge>
-                </div>
+      {/* Carosello principale */}
+      <div className="relative flex items-center justify-center gap-4">
+        {/* Freccia sinistra */}
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handlePrevious}
+          className="rounded-full border-2 border-amber-700 text-amber-700 hover:bg-amber-100 w-12 h-12"
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </Button>
 
-                <p className="text-sm text-amber-700 mb-2 line-clamp-2">
-                  {dndClass.description}
-                </p>
-
-                <div className="flex flex-wrap gap-2 mt-2">
-                  <Badge className="bg-amber-200 text-amber-900 border-amber-700">
-                    Tiri Salvezza: {dndClass.saving_throws?.map(s => s.slice(0,3).toUpperCase()).join('/')}
-                  </Badge>
-                  {dndClass.spellcasting && (
-                    <Badge variant="outline" className="border-purple-700 text-purple-800">
-                      ✦ Magico
-                    </Badge>
-                  )}
-                </div>
-              </Label>
+        {/* Carta centrale */}
+        <div className="relative">
+          <RaceClassCard
+            id={selectedClass.id}
+            name={selectedClass.name}
+            type="class"
+            isSelected={isSelected}
+            onSelect={handleSelectCurrent}
+            size="lg"
+          />
+          
+          {/* Indicatore di selezione */}
+          {isSelected && (
+            <div className="absolute -top-4 -right-4 bg-green-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+              Selezionata!
             </div>
-          ))}
-        </ScrollArea>
-      </RadioGroup>
+          )}
+        </div>
 
-      {/* Dettaglio classe selezionata */}
-      {selectedClass && (
-        <AncientCardContainer className="mt-6">
-          <div className="p-4">
-            <h3 className="text-lg font-serif font-bold text-amber-900 mb-3">
-              {selectedClass.name} - Caratteristiche
+        {/* Freccia destra */}
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handleNext}
+          className="rounded-full border-2 border-amber-700 text-amber-700 hover:bg-amber-100 w-12 h-12"
+        >
+          <ChevronRight className="w-6 h-6" />
+        </Button>
+      </div>
+
+      {/* Indicatore di posizione */}
+      <div className="text-center text-amber-600">
+        {currentIndex + 1} di {totalClasses}
+      </div>
+
+      {/* Dettagli della classe corrente */}
+      <AncientCardContainer className="mt-6 p-6">
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-2xl font-serif font-bold text-amber-900">
+              {selectedClass.name}
             </h3>
-            
-            <div className="space-y-3">
-              {/* Competenze */}
-              <div>
-                <h4 className="font-semibold text-amber-800 mb-1">Armature</h4>
-                <p className="text-sm text-amber-700">{formatArray(selectedClass.armor_proficiencies)}</p>
-              </div>
+            <Badge variant="outline" className="bg-amber-100">
+              Dado Vita: {selectedClass.hit_die}
+            </Badge>
+          </div>
 
-              <div>
-                <h4 className="font-semibold text-amber-800 mb-1">Armi</h4>
-                <p className="text-sm text-amber-700">{formatArray(selectedClass.weapon_proficiencies)}</p>
-              </div>
+          <p className="text-amber-700">
+            {selectedClass.description}
+          </p>
 
-              {/* Caratteristiche di livello 1 */}
-              <div>
-                <h4 className="font-semibold text-amber-800 mb-1">Caratteristiche (Livello 1)</h4>
-                <ul className="space-y-2">
-                  {selectedClass.features
-                    ?.filter(f => f.level === 1)
-                    .map((feature, idx) => (
-                      <li key={idx} className="text-sm">
-                        <span className="font-medium text-amber-900">{feature.name}:</span>{' '}
-                        <span className="text-amber-700">{feature.description}</span>
-                      </li>
-                    ))}
-                </ul>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Tiri salvezza */}
+            <div>
+              <h4 className="font-semibold text-amber-800 mb-2">Tiri Salvezza</h4>
+              <div className="flex flex-wrap gap-2">
+                {selectedClass.saving_throws?.map((save, idx) => (
+                  <Badge key={idx} className="bg-amber-200 text-amber-900 border-amber-700">
+                    {save.slice(0,3).toUpperCase()}
+                  </Badge>
+                ))}
               </div>
+            </div>
 
-              {/* Incantesimi (se presenti) */}
-              {selectedClass.spellcasting && (
-                <div className="bg-purple-100/50 p-2 rounded">
-                  <p className="text-sm">
-                    <span className="font-medium text-purple-900">Incantatore:</span>{' '}
-                    <span className="text-purple-700">
-                      Usa {selectedClass.spellcasting.spellcasting_ability === 'intelligence' ? 'Intelligenza' :
-                           selectedClass.spellcasting.spellcasting_ability === 'wisdom' ? 'Saggezza' : 'Carisma'}
-                    </span>
-                  </p>
-                </div>
-              )}
+            {/* Incantesimi (se presenti) */}
+            {selectedClass.spellcasting && (
+              <div>
+                <h4 className="font-semibold text-amber-800 mb-2">Incantesimi</h4>
+                <Badge variant="outline" className="border-purple-700 text-purple-800">
+                  ✦ Incantatore: {selectedClass.spellcasting.spellcasting_ability === 'intelligence' ? 'Intelligenza' :
+                               selectedClass.spellcasting.spellcasting_ability === 'wisdom' ? 'Saggezza' : 'Carisma'}
+                </Badge>
+              </div>
+            )}
+          </div>
+
+          {/* Competenze */}
+          <div>
+            <h4 className="font-semibold text-amber-800 mb-2">Competenze</h4>
+            <div className="space-y-2">
+              <p className="text-sm">
+                <span className="font-medium text-amber-900">Armature:</span>{' '}
+                <span className="text-amber-700">{formatArray(selectedClass.armor_proficiencies)}</span>
+              </p>
+              <p className="text-sm">
+                <span className="font-medium text-amber-900">Armi:</span>{' '}
+                <span className="text-amber-700">{formatArray(selectedClass.weapon_proficiencies)}</span>
+              </p>
+              <p className="text-sm">
+                <span className="font-medium text-amber-900">Attrezzi:</span>{' '}
+                <span className="text-amber-700">{formatArray(selectedClass.tool_proficiencies)}</span>
+              </p>
             </div>
           </div>
-        </AncientCardContainer>
-      )}
 
-      {/* Pulsanti */}
+          {/* Caratteristiche di livello 1 */}
+          <div>
+            <h4 className="font-semibold text-amber-800 mb-2">Caratteristiche (Livello 1)</h4>
+            <ul className="space-y-2">
+              {selectedClass.features
+                ?.filter((f: ClassFeature) => f.level === 1)
+                .map((feature: ClassFeature, idx: number) => (
+                  <li key={idx} className="text-sm">
+                    <span className="font-medium text-amber-900">{feature.name}:</span>{' '}
+                    <span className="text-amber-700">{feature.description}</span>
+                  </li>
+                ))}
+            </ul>
+          </div>
+        </div>
+      </AncientCardContainer>
+
+      {/* Pulsanti navigazione */}
       <div className="flex justify-between pt-4">
-        <Button 
+        <Button
           variant="outline"
           onClick={onBack}
           className="border-amber-700 text-amber-700"
         >
           ← Indietro
         </Button>
-        
-        <Button 
-          onClick={() => selectedClassId && onSelect(selectedClassId)}
+
+        <Button
+          onClick={handleConfirm}
           disabled={!selectedClassId}
           className="bg-amber-700 hover:bg-amber-800 text-amber-50 disabled:opacity-50"
         >

@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateCharacter } from '@/hooks/mutations/useCharacterMutations';
 import { useCharacterCalculations } from '@/hooks/useCharacterCalculations';
+import { useCreationStore } from '@/store/useCreationStore';
 
 export interface CreationData {
   // Step 1 - Basic Info
@@ -44,19 +45,9 @@ export type CreationStep =
 export function useCharacterCreation() {
   const router = useRouter();
   const createCharacter = useCreateCharacter();
-  
-  const [currentStep, setCurrentStep] = useState<CreationStep>('basic-info');
-  const [data, setData] = useState<Partial<CreationData>>({
-    name: '',
-    playerName: '',
-    alignment: 'Neutrale',
-    background: '',
-    raceId: null,
-    classId: null,
-    campaignId: null,
-    abilityScores: null,
-  });
-  
+
+  const { currentStep, data, setStep, updateData, reset, _hasHydrated } = useCreationStore();
+
   const [error, setError] = useState<string | null>(null);
 
   const calculations = useCharacterCalculations(
@@ -65,28 +56,24 @@ export function useCharacterCreation() {
     data.abilityScores ?? null,
   );
 
-  const updateData = (newData: Partial<CreationData>) => {
-    setData(prev => ({ ...prev, ...newData }));
-  };
-
   const steps: CreationStep[] = ['basic-info', 'race', 'class', 'campaign', 'abilities', 'review'];
   
   const nextStep = () => {
     const currentIndex = steps.indexOf(currentStep);
     if (currentIndex < steps.length - 1) {
-      setCurrentStep(steps[currentIndex + 1]);
+      setStep(steps[currentIndex + 1]);
     }
   };
 
   const prevStep = () => {
     const currentIndex = steps.indexOf(currentStep);
     if (currentIndex > 0) {
-      setCurrentStep(steps[currentIndex - 1]);
+      setStep(steps[currentIndex - 1]);
     }
   };
 
   const goToStep = (step: CreationStep) => {
-    setCurrentStep(step);
+    setStep(step);
   };
 
   // Salvataggio tramite mutation API
@@ -130,6 +117,7 @@ export function useCharacterCreation() {
       },
       {
         onSuccess: (character) => {
+          reset();
           router.push(`/dashboard/${character.id}`);
         },
         onError: (err) => {
@@ -152,5 +140,6 @@ export function useCharacterCreation() {
     calculations,
     isFirstStep: currentStep === 'basic-info',
     isLastStep: currentStep === 'review',
+    isHydrated: _hasHydrated,
   };
 }

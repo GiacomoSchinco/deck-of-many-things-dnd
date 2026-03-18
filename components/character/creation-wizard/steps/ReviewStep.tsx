@@ -9,6 +9,8 @@ import { calculateModifier } from '@/lib/calculations/abilityModifiers';
 import { useCharacterCalculations } from '@/hooks/useCharacterCalculations';
 import { useCampaign } from '@/hooks/queries/useCampaigns';
 import StatDiamond from '@/components/ui/custom/StatDiamond';
+import { RaceClassCard } from '@/components/ui/custom/RaceClassCard';
+import { AncientScroll } from '@/components/ui/custom/AncientScroll';
 
 interface ReviewStepProps {
   data: Partial<CreationData>;
@@ -39,7 +41,7 @@ export function ReviewStep({ data, onBack, onSave, loading, error }: ReviewStepP
   const proficiencyBonus = 2; // Livello 1
 
   return (
-    <div className="space-y-6">
+    <div>
       <div className="text-center mb-6">
         <h2 className="text-2xl font-serif text-amber-900 mb-2">
           📜 Riepilogo Personaggio
@@ -48,13 +50,13 @@ export function ReviewStep({ data, onBack, onSave, loading, error }: ReviewStepP
           Controlla i dati prima di creare il tuo eroe
         </p>
       </div>
-{error && (
-  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-    {error}
-  </div>
-)}
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
       {/* Scheda di anteprima in stile carta */}
-      <AncientCardContainer className="p-6">
+      <div className="p-6">
         <div className="space-y-6">
           {/* Header con nome e allineamento */}
           <div className="text-center border-b-2 border-amber-700/30 pb-4">
@@ -75,27 +77,15 @@ export function ReviewStep({ data, onBack, onSave, loading, error }: ReviewStepP
           {(data.playerName || data.campaignId) && (
             <div className="text-sm text-amber-700 text-center">
               {data.playerName && <p>Giocato da: {data.playerName}</p>}
-              
+
               {data.campaignId && <p>Campagna: {campaign?.name ?? '...'}</p>}
             </div>
           )}
 
           {/* Razza e Classe */}
-          <div className="grid grid-cols-2 gap-4">
-            <AncientCardContainer className="p-4 text-center">
-              <p className="text-xs text-amber-700 mb-1">Razza</p>
-              <p className="text-lg font-serif font-bold text-amber-900">
-                {calcLoading ? '...' : calculations?.raceData?.name || `ID: ${data.raceId}`}
-              </p>
-            </AncientCardContainer>
-
-            <AncientCardContainer className="p-4 text-center">
-              <p className="text-xs text-amber-700 mb-1">Classe</p>
-              <p className="text-lg font-serif font-bold text-amber-900">
-                {calcLoading ? '...' : calculations?.classData?.name || `ID: ${data.classId}`}
-              </p>
-              <p className="text-xs text-amber-600">Livello 1</p>
-            </AncientCardContainer>
+          <div className="flex justify-center gap-4">
+            <RaceClassCard type='race' name={calculations?.raceData?.name ?? '...'} size='md' isSelected={false} />
+            <RaceClassCard type='class' name={calculations?.classData?.name ?? '...'} size='md' isSelected={false} />
           </div>
 
           {/* Caratteristiche */}
@@ -151,7 +141,7 @@ export function ReviewStep({ data, onBack, onSave, loading, error }: ReviewStepP
             Bonus competenza: <span className="font-bold">+{proficiencyBonus}</span>
           </div>
         </div>
-      </AncientCardContainer>
+      </div>
 
       {/* Note di riepilogo */}
       <div className="text-xs text-amber-600 text-center">
@@ -161,7 +151,7 @@ export function ReviewStep({ data, onBack, onSave, loading, error }: ReviewStepP
 
       {/* Pulsanti */}
       <div className="flex justify-between pt-4">
-        <Button 
+        <Button
           variant="outline"
           onClick={onBack}
           disabled={loading}
@@ -169,8 +159,8 @@ export function ReviewStep({ data, onBack, onSave, loading, error }: ReviewStepP
         >
           ← Indietro
         </Button>
-        
-        <Button 
+
+        <Button
           onClick={onSave}
           disabled={loading || calcLoading}
           className="bg-amber-700 hover:bg-amber-800 text-amber-50"

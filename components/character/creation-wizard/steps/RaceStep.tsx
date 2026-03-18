@@ -1,14 +1,14 @@
+// components/character/creation-wizard/steps/RaceStep.tsx
 'use client';
 
 import { useRaces } from '@/hooks/queries/useRaces';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
+import { RaceClassCard } from '../../../ui/custom/RaceClassCard';
 import AncientCardContainer from '@/components/ui/custom/AncientCardContainer';
 import Loading from '@/components/ui/custom/Loading';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface RaceStepProps {
   initialRaceId?: number | null;
@@ -18,11 +18,32 @@ interface RaceStepProps {
 
 export function RaceStep({ initialRaceId, onBack, onSelect }: RaceStepProps) {
   const { data: races, isLoading, error } = useRaces();
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedRaceId, setSelectedRaceId] = useState<number | null>(initialRaceId || null);
 
-  const selectedRace = races?.find(r => r.id === selectedRaceId);
+  const selectedRace = races?.[currentIndex];
+  const totalRaces = races?.length || 0;
 
-  // Formatta il bonus caratteristica in modo leggibile
+  const handlePrevious = () => {
+    setCurrentIndex(prev => (prev > 0 ? prev - 1 : totalRaces - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentIndex(prev => (prev < totalRaces - 1 ? prev + 1 : 0));
+  };
+
+  const handleSelectCurrent = () => {
+    if (selectedRace) {
+      setSelectedRaceId(selectedRace.id);
+    }
+  };
+
+  const handleConfirm = () => {
+    if (selectedRaceId) {
+      onSelect(selectedRaceId);
+    }
+  };
+
   const formatBonus = (bonuses: Record<string, number>) => {
     return Object.entries(bonuses)
       .map(([stat, bonus]) => {
@@ -43,145 +64,138 @@ export function RaceStep({ initialRaceId, onBack, onSelect }: RaceStepProps) {
     return <Loading />;
   }
 
-  if (error) {
+  if (error || !selectedRace) {
     return (
       <AncientCardContainer className="p-6 text-center">
-        <p className="text-red-500">Errore: {error.message}</p>
-        <Button 
-          onClick={() => window.location.reload()} 
-          variant="outline" 
-          className="mt-4"
-        >
+        <p className="text-red-500">Errore: {error?.message || 'Nessuna razza disponibile'}</p>
+        <Button onClick={() => window.location.reload()} variant="outline" className="mt-4">
           Riprova
         </Button>
       </AncientCardContainer>
     );
   }
 
+  const isSelected = selectedRaceId === selectedRace.id;
+
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-serif text-amber-900 mb-2">
-          🧝 Scegli la Razza
+    <div className="space-y-8">
+      <div className="text-center">
+        <h2 className="text-3xl font-serif text-amber-900 mb-2">
+          🧝 Scegli la tua Razza
         </h2>
-        <p className="text-amber-700 text-sm">
-          La razza influenza i tuoi punteggi e ti concede abilità speciali
+        <p className="text-amber-700">
+          Sfoglia le carte con le frecce e seleziona la tua razza
         </p>
       </div>
 
-      <RadioGroup
-        value={selectedRaceId !== null ? selectedRaceId.toString() : ''}
-        onValueChange={(value) => setSelectedRaceId(parseInt(value))}
-        className="space-y-3"
-      >
-        <ScrollArea className="h-[400px] pr-4">
-          {races?.map((race) => (
-            <div key={race.id} className="mb-3">
-              <RadioGroupItem
-                value={race.id.toString()}
-                id={`race-${race.id}`}
-                className="peer sr-only"
-              />
-              <Label
-                htmlFor={`race-${race.id}`}
-                className={`
-                  flex flex-col p-4 rounded-lg border-2 cursor-pointer
-                  transition-all duration-200
-                  ${selectedRaceId === race.id 
-                    ? 'border-amber-700 bg-amber-50 shadow-lg' 
-                    : 'border-amber-900/20 hover:border-amber-700/50 bg-parchment-50'
-                  }
-                `}
-              >
-                <div className="flex justify-between items-start mb-2">
-                  <span className="text-lg font-serif font-bold text-amber-900">
-                    {race.name}
-                  </span>
-                  <Badge variant="outline" className="bg-amber-100">
-                    {race.size} · Vel. {race.speed}
-                  </Badge>
-                </div>
+      {/* Carosello principale */}
+      <div className="relative flex items-center justify-center gap-4">
+        {/* Freccia sinistra */}
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handlePrevious}
+          className="rounded-full border-2 border-amber-700 text-amber-700 hover:bg-amber-100 w-12 h-12"
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </Button>
 
-                <p className="text-sm text-amber-700 mb-2 line-clamp-2">
-                  {race.description}
-                </p>
-
-                <div className="flex flex-wrap gap-2 mt-2">
-                  <Badge className="bg-amber-200 text-amber-900 border-amber-700">
-                    {formatBonus(race.ability_bonuses)}
-                  </Badge>
-                  {race.traits?.slice(0, 2).map((trait, idx) => (
-                    <Badge key={idx} variant="outline" className="border-amber-700 text-amber-800">
-                      {trait.name}
-                    </Badge>
-                  ))}
-                  {race.traits?.length > 2 && (
-                    <Badge variant="outline" className="border-amber-700 text-amber-800">
-                      +{race.traits.length - 2}
-                    </Badge>
-                  )}
-                </div>
-              </Label>
+        {/* Carta centrale */}
+        <div className="relative">
+          <RaceClassCard
+            id={selectedRace.id}
+            name={selectedRace.name}
+            type="race"
+            isSelected={isSelected}
+            onSelect={handleSelectCurrent}
+            size="lg"
+          />
+          
+          {/* Indicatore di selezione */}
+          {isSelected && (
+            <div className="absolute -top-4 -right-4 bg-green-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+              Selezionata!
             </div>
-          ))}
-        </ScrollArea>
-      </RadioGroup>
+          )}
+        </div>
 
-      {/* Dettaglio razza selezionata */}
-      {selectedRace && (
-        <AncientCardContainer className="mt-6">
-          <div className="p-4">
-            <h3 className="text-lg font-serif font-bold text-amber-900 mb-3">
-              {selectedRace.name} - Dettagli
+        {/* Freccia destra */}
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handleNext}
+          className="rounded-full border-2 border-amber-700 text-amber-700 hover:bg-amber-100 w-12 h-12"
+        >
+          <ChevronRight className="w-6 h-6" />
+        </Button>
+      </div>
+
+      {/* Indicatore di posizione */}
+      <div className="text-center text-amber-600">
+        {currentIndex + 1} di {totalRaces}
+      </div>
+
+      {/* Dettagli della razza corrente */}
+      <AncientCardContainer className="mt-6 p-6">
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-2xl font-serif font-bold text-amber-900">
+              {selectedRace.name}
             </h3>
-            
-            <div className="space-y-3">
-              {/* Tratti razziali */}
-              <div>
-                <h4 className="font-semibold text-amber-800 mb-2">Tratti Razziali</h4>
-                <ul className="space-y-2">
-                  {selectedRace.traits.map((trait, idx) => (
-                    <li key={idx} className="text-sm">
-                      <span className="font-medium text-amber-900">{trait.name}:</span>{' '}
-                      <span className="text-amber-700">{trait.description}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Sottorazze (se presenti) */}
-              {selectedRace.subraces && selectedRace.subraces.length > 0 && (
-                <div>
-                  <h4 className="font-semibold text-amber-800 mb-2">Sottorazze</h4>
-                  <div className="space-y-2">
-                    {selectedRace.subraces.map((subrace, idx) => (
-                      <div key={idx} className="bg-amber-100/50 p-2 rounded">
-                        <p className="font-medium text-amber-900">{subrace.name}</p>
-                        <p className="text-xs text-amber-700">
-                          Bonus: {formatBonus(subrace.ability_bonuses)}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+            <Badge variant="outline" className="bg-amber-100">
+              {selectedRace.size} · Vel. {selectedRace.speed}
+            </Badge>
           </div>
-        </AncientCardContainer>
-      )}
 
-      {/* Pulsanti */}
+          <p className="text-amber-700">
+            {selectedRace.description}
+          </p>
+
+          <div>
+            <h4 className="font-semibold text-amber-800 mb-2">Bonus Caratteristica</h4>
+            <Badge className="bg-amber-200 text-amber-900 border-amber-700">
+              {formatBonus(selectedRace.ability_bonuses)}
+            </Badge>
+          </div>
+
+          <div>
+            <h4 className="font-semibold text-amber-800 mb-2">Tratti Razziali</h4>
+            <ul className="list-disc list-inside space-y-1">
+              {selectedRace.traits?.map((trait, idx) => (
+                <li key={idx} className="text-sm text-amber-700">
+                  <span className="font-medium text-amber-900">{trait.name}:</span> {trait.description}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {selectedRace.subraces && selectedRace.subraces.length > 0 && (
+            <div>
+              <h4 className="font-semibold text-amber-800 mb-2">Sottorazze</h4>
+              <div className="flex flex-wrap gap-2">
+                {selectedRace.subraces.map((subrace, idx) => (
+                  <Badge key={idx} variant="outline" className="border-amber-700 text-amber-800">
+                    {subrace.name}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </AncientCardContainer>
+
+      {/* Pulsanti navigazione */}
       <div className="flex justify-between pt-4">
-        <Button 
+        <Button
           variant="outline"
           onClick={onBack}
           className="border-amber-700 text-amber-700"
         >
           ← Indietro
         </Button>
-        
-        <Button 
-          onClick={() => selectedRaceId && onSelect(selectedRaceId)}
+
+        <Button
+          onClick={handleConfirm}
           disabled={!selectedRaceId}
           className="bg-amber-700 hover:bg-amber-800 text-amber-50 disabled:opacity-50"
         >
