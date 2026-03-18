@@ -10,14 +10,13 @@ import { useCharacterCalculations } from '@/hooks/useCharacterCalculations';
 import { useCampaign } from '@/hooks/queries/useCampaigns';
 import StatDiamond from '@/components/ui/custom/StatDiamond';
 import { RaceClassCard } from '@/components/ui/custom/RaceClassCard';
-import { AncientScroll } from '@/components/ui/custom/AncientScroll';
+import { FanCardGroup } from '@/components/ui/custom/FanCardGroup';
 
 interface ReviewStepProps {
   data: Partial<CreationData>;
   onBack: () => void;
   onSave: () => void;
   loading: boolean;
-  error?: string | null;
 }
 
 // Mappa per i nomi delle caratteristiche
@@ -30,7 +29,7 @@ const ABILITY_NAMES: Record<string, string> = {
   charisma: 'Carisma',
 };
 
-export function ReviewStep({ data, onBack, onSave, loading, error }: ReviewStepProps) {
+export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
   const { calculations, isLoading: calcLoading, isReady } = useCharacterCalculations(
     data.raceId ?? null,
     data.classId ?? null,
@@ -50,11 +49,6 @@ export function ReviewStep({ data, onBack, onSave, loading, error }: ReviewStepP
           Controlla i dati prima di creare il tuo eroe
         </p>
       </div>
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
-        </div>
-      )}
       {/* Scheda di anteprima in stile carta */}
       <div className="p-6">
         <div className="space-y-6">
@@ -109,31 +103,30 @@ export function ReviewStep({ data, onBack, onSave, loading, error }: ReviewStepP
 
           {/* Statistiche di combattimento (calcolate) */}
           {isReady && calculations && (
-            <div className="grid grid-cols-2 md:grid-cols-2 gap-3">
-              <AncientCardContainer className="p-3 text-center">
-                <p className="text-xs text-amber-700">PF</p>
+            <FanCardGroup size="sm">
+              <div className="flex flex-col items-center justify-center h-full p-1 text-center">
+                <p className="text-xs text-amber-700">Punti ferita</p>
                 <p className="text-xl font-bold text-amber-900">{calculations.combatStats.max_hp}</p>
                 <p className="text-xs text-amber-600">{calculations.classData.hit_die} + mod COS</p>
-              </AncientCardContainer>
+              </div>
 
-              <AncientCardContainer className="p-3 text-center">
-                <p className="text-xs text-amber-700">CA</p>
+              <div className="flex flex-col items-center justify-center h-full p-1 text-center">
+                <p className="text-xs text-amber-700">Classe Armatura</p>
                 <p className="text-xl font-bold text-amber-900">{calculations.combatStats.armor_class}</p>
                 <p className="text-xs text-amber-600">10 + mod DES</p>
-              </AncientCardContainer>
+              </div>
 
-              <AncientCardContainer className="p-3 text-center">
+              <div className="flex flex-col items-center justify-center h-full p-1 text-center">
                 <p className="text-xs text-amber-700">Velocità</p>
                 <p className="text-xl font-bold text-amber-900">{calculations.combatStats.speed} ft</p>
                 <p className="text-xs text-amber-600">{calculations.raceData.name}</p>
-              </AncientCardContainer>
+              </div>
 
-              <AncientCardContainer className="p-3 text-center">
-                <p className="text-xs text-amber-700">Bonus Competenza</p>
+              <div className="flex flex-col items-center justify-center h-full p-1 text-center">
+                <p className="text-xs text-amber-700 whitespace-nowrap">Bonus Competenza</p>
                 <p className="text-xl font-bold text-amber-900">+{calculations.proficiencyBonus}</p>
-                <p className="text-xs text-amber-600">Livello 1</p>
-              </AncientCardContainer>
-            </div>
+              </div>
+            </FanCardGroup>
           )}
 
           {/* Bonus competenza */}

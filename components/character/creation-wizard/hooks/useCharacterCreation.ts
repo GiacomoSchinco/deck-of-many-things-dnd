@@ -1,8 +1,8 @@
 // components/character/creation-wizard/hooks/useCharacterCreation.ts
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { useCreateCharacter } from '@/hooks/mutations/useCharacterMutations';
 import { useCharacterCalculations } from '@/hooks/useCharacterCalculations';
 import { useCreationStore } from '@/store/useCreationStore';
@@ -48,8 +48,6 @@ export function useCharacterCreation() {
 
   const { currentStep, data, setStep, updateData, reset, _hasHydrated } = useCreationStore();
 
-  const [error, setError] = useState<string | null>(null);
-
   const calculations = useCharacterCalculations(
     data.raceId ?? null,
     data.classId ?? null,
@@ -76,17 +74,14 @@ export function useCharacterCreation() {
     setStep(step);
   };
 
-  // Salvataggio tramite mutation API
   const saveCharacter = async () => {
-    setError(null);
-
     if (!data.name || !data.raceId || !data.classId || !data.abilityScores) {
-      setError('Dati incompleti');
+      toast.error('Dati incompleti');
       return;
     }
 
     if (!calculations.calculations) {
-      setError('Calcoli non pronti, riprova tra un momento');
+      toast.error('Calcoli non pronti, riprova tra un momento');
       return;
     }
 
@@ -117,11 +112,12 @@ export function useCharacterCreation() {
       },
       {
         onSuccess: (character) => {
+          toast.success('Personaggio creato!');
           reset();
           router.push(`/dashboard/${character.id}`);
         },
         onError: (err) => {
-          setError(err instanceof Error ? err.message : 'Errore durante il salvataggio');
+          toast.error(err instanceof Error ? err.message : 'Errore durante il salvataggio');
         },
       }
     );
@@ -131,7 +127,6 @@ export function useCharacterCreation() {
     currentStep,
     data,
     loading: createCharacter.isPending,
-    error,
     updateData,
     nextStep,
     prevStep,

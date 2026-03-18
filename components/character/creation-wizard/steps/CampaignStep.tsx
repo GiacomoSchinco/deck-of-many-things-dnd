@@ -4,11 +4,9 @@
 import { useState } from 'react';
 import { useCampaigns } from '@/hooks/queries/useCampaigns';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Card, CardContent } from '@/components/ui/card';
 import AncientCardContainer from '@/components/ui/custom/AncientCardContainer';
 import Loading from '@/components/ui/custom/Loading';
+import { AncientScroll } from '@/components/ui/custom/AncientScroll';
 
 interface CampaignStepProps {
   initialCampaignId?: string | null;
@@ -20,12 +18,16 @@ export function CampaignStep({ initialCampaignId, onBack, onSelect }: CampaignSt
   const { data: campaigns, isLoading, error } = useCampaigns();
   const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(initialCampaignId || null);
 
+  const handleSelect = (campaignId: string) => {
+    setSelectedCampaignId(campaignId);
+  };
+
   const handleContinue = () => {
     onSelect(selectedCampaignId);
   };
 
   const handleSkip = () => {
-    onSelect(null); // Nessuna campagna
+    onSelect(null);
   };
 
   if (isLoading) {
@@ -60,28 +62,36 @@ export function CampaignStep({ initialCampaignId, onBack, onSelect }: CampaignSt
 
       {/* Lista campagne esistenti */}
       {campaigns && campaigns.length > 0 ? (
-        <RadioGroup
-          value={selectedCampaignId || ''}
-          onValueChange={(v) => setSelectedCampaignId(v === '' ? null : v)}
-          className="space-y-3"
-        >
-          {campaigns.map((campaign) => (
-            <div key={campaign.id} className="flex items-start space-x-2">
-              <RadioGroupItem value={campaign.id} id={campaign.id} />
-              <Label htmlFor={campaign.id} className="flex-1 cursor-pointer">
-                <Card className="hover:bg-amber-50 transition-colors">
-                  <CardContent className="p-4">
-                    <div className="font-semibold text-amber-900">{campaign.name}</div>
-                    {campaign.description && (
-                      <p className="text-sm text-amber-600 mt-1">{campaign.description}</p>
-                    )}
-                    <p className="text-xs text-amber-500 mt-2">DM: {campaign.dungeon_master}</p>
-                  </CardContent>
-                </Card>
-              </Label>
-            </div>
-          ))}
-        </RadioGroup>
+        <div className="space-y-4">
+          {campaigns.map((campaign) => {
+            const isSelected = selectedCampaignId === campaign.id;
+            
+            return (
+              <div key={campaign.id} className="relative cursor-pointer" onClick={() => handleSelect(campaign.id)}>
+                {/* Indicatore di selezione (stesso stile di RaceStep) */}
+                {isSelected && (
+                  <div className="absolute -top-4 -right-4 z-10 bg-green-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+                    Selezionata!
+                  </div>
+                )}
+                
+                <AncientScroll 
+                  className={`p-10 mb-2 transition-all duration-300 ${
+                    isSelected ? 'ring-4 ring-antique-gold shadow-2xl scale-[1.02]' : 'hover:scale-[1.01] hover:shadow-xl'
+                  }`} 
+                  title={campaign.name} 
+                  variant='rolled'
+                >
+                  <div className="font-semibold text-amber-900 text-lg">{campaign.name}</div>
+                  {campaign.description && (
+                    <p className="text-sm text-amber-600 mt-1">{campaign.description}</p>
+                  )}
+                  <p className="text-xs text-amber-500 mt-2">DM: {campaign.dungeon_master}</p>
+                </AncientScroll>
+              </div>
+            );
+          })}
+        </div>
       ) : (
         <AncientCardContainer className="p-8 text-center">
           <p className="text-amber-700">Nessuna campagna disponibile</p>

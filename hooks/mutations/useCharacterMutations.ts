@@ -94,3 +94,23 @@ export function useDeleteCharacter() {
     },
   });
 }
+
+// PUT /api/characters/[id]/combat-stats — aggiorna statistiche di combattimento
+export function useUpdateCombatStats(characterId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: Record<string, unknown>) => {
+      const res = await fetch(`/api/characters/${characterId}/combat-stats`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error('Errore aggiornamento combat stats');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['character', characterId, 'combat-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['character', characterId] });
+    },
+  });
+}

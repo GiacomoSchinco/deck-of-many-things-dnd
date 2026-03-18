@@ -23,7 +23,6 @@ export function CreationWizard() {
     currentStep,
     data,
     loading,
-    error,
     updateData,
     nextStep,
     prevStep,
@@ -120,7 +119,6 @@ export function CreationWizard() {
             onBack={prevStep}
             onSave={saveCharacter}
             loading={loading}
-            error={error}
           />
         );
 
