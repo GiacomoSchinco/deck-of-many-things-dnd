@@ -1,19 +1,19 @@
-// app/api/equipment/presets/route.ts
+// app/api/equipment/presets/[id]/route.ts
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { createServerSupabase } from '@/lib/supabase/server'
-import { CreateEquipmentPresetDTO } from '@/types/equipment'
+import { UpdateEquipmentPresetDTO } from '@/types/equipment'
 
-// GET /api/equipment/presets - Lista tutti i preset
-export async function GET(request: Request) {
+// GET /api/equipment/presets/[id] - Singolo preset
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const cookieStore = await cookies()
+  const { id } = await params
   const supabase = createServerSupabase(cookieStore)
-  const { searchParams } = new URL(request.url)
-  
-  const classId = searchParams.get('class_id')
-  const isDefault = searchParams.get('is_default')
 
-  let query = supabase
+  const { data: preset, error } = await supabase
     .from('equipment_presets')
     .select(`
       *,
@@ -22,66 +22,57 @@ export async function GET(request: Request) {
         name
       )
     `)
-    .order('name')
-
-  if (classId) {
-    query = query.eq('class_id', parseInt(classId))
-  }
-
-  if (isDefault === 'true') {
-    query = query.eq('is_default', true)
-  }
-
-  const { data: presets, error } = await query
+    .eq('id', parseInt(id))
+    .single()
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: error.message }, { status: 404 })
   }
 
-  // Formatta la risposta
-  const formattedPresets = presets.map(preset => ({
+  return NextResponse.json({
     ...preset,
     class_name: preset.classes?.name
-  }))
-
-  return NextResponse.json({ 
-    presets: formattedPresets,
-    total: formattedPresets.length 
   })
 }
 
-// POST /api/equipment-presets - Crea un nuovo preset
-export async function POST(request: Request) {
+// PUT /api/equipment/presets/[id] - Aggiorna preset
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const cookieStore = await cookies()
+  const { id } = await params
   const supabase = createServerSupabase(cookieStore)
-  const body: CreateEquipmentPresetDTO = await request.json()
+  const body: UpdateEquipmentPresetDTO = await request.json()
 
-  // Validazione
-  if (!body.name || !body.class_id || !body.items) {
-    return NextResponse.json(
-      { error: 'Nome, class_id e items sono obbligatori' },
-      { status: 400 }
-    )
-  }
-
-  // Se è default, resetta gli altri default per questa classe
+  // Se imposta come default, resetta gli altri
   if (body.is_default) {
-    await supabase
+    const { data: current } = await supabase
       .from('equipment_presets')
-      .update({ is_default: false })
-      .eq('class_id', body.class_id)
+      .select('class_id')
+      .eq('id', parseInt(id))
+      .single()
+
+    if (current) {
+      await supabase
+        .from('equipment_presets')
+        .update({ is_default: false })
+        .eq('class_id', current.class_id)
+        .neq('id', parseInt(id))
+    }
   }
 
   const { data: preset, error } = await supabase
     .from('equipment_presets')
-    .insert({
+    .update({
       name: body.name,
       class_id: body.class_id,
-      description: body.description || null,
+      description: body.description,
       items: body.items,
-      choices: body.choices || [],
-      is_default: body.is_default || false
+      choices: body.choices,
+      is_default: body.is_default
     })
+    .eq('id', parseInt(id))
     .select()
     .single()
 
@@ -89,5 +80,26 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  return NextResponse.json(preset, { status: 201 })
+  return NextResponse.json(preset)
+}
+
+// DELETE /api/equipment/presets/[id] - Elimina preset
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const cookieStore = await cookies()
+  const { id } = await params
+  const supabase = createServerSupabase(cookieStore)
+
+  const { error } = await supabase
+    .from('equipment_presets')
+    .delete()
+    .eq('id', parseInt(id))
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  return NextResponse.json({ success: true })
 }

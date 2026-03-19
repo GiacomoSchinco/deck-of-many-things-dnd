@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { Check } from 'lucide-react';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import { cn } from '@/lib/utils';
-import { getEnglishName } from '@/lib/utils/nameMappers';
 import { CARD_SIZES } from '@/lib/utils/cardSizes';
 
 // Mappa nomi italiani → inglese per razze
