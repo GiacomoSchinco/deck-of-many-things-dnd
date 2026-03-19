@@ -3,5 +3,6 @@ export interface Campaign {
   name: string;
   description: string;
   dungeon_master: string;
-  characters: { count: number };
+  characters: { count: number }[];
+  [key: string]: unknown;
 }

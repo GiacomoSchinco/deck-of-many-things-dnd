@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 import { CardSize, CARD_SIZES } from '@/lib/utils/cardSizes';
 
 interface CharacterCardProps {
-  id: number;
+  id: string | number;
   name: string;
   race: string;
   characterClass: string;

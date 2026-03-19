@@ -1,4 +1,4 @@
-// components/CharacterCard.tsx
+// components/customCharacterCard.tsx
 "use client"
 
 import React from 'react';
@@ -9,6 +9,7 @@ import HpBar from './HpBar';
 import CardBack from './CardBack';
 import { cn } from '@/lib/utils';
 import { CardSize, CARD_SIZES } from '@/lib/utils/cardSizes';
+import { classEnglishNames } from '@/lib/utils/nameMappers';
 
 interface CharacterCardProps {
   id: number;
@@ -18,8 +19,8 @@ interface CharacterCardProps {
   level: number;
   background: string;
   alignment: string;
-  hp: number;
-  maxhp: number;
+  hp?: number;
+  maxhp?: number;
   isFlippable?: boolean;
   size?: CardSize; // ← aggiungi questa prop
 }
@@ -51,13 +52,13 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
         </div>
         
         {/* Barra HP */}
-        <HpBar current={hp} max={maxhp} />
+        {hp !== undefined && maxhp !== undefined && <HpBar current={hp} max={maxhp} />}
         
         {/* Immagine personaggio */}
         <div className="flex-1 flex items-center justify-center my-1">
           <div className="relative w-24 h-24 rounded-full border-2 border-amber-700/50 overflow-hidden bg-parchment-200/50 shadow-lg">   
             <Image
-              src={`/images/classes/token_${characterClass.toLowerCase()}.png`}
+              src={`/images/classes/token_${classEnglishNames[characterClass] ?? characterClass.toLowerCase()}.png`}
               alt={characterClass}
               fill
               sizes="96px"

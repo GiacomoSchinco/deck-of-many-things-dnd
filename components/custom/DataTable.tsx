@@ -9,6 +9,7 @@ import {
     flexRender,
     CellContext,
 } from "@tanstack/react-table";
+import { AncientScroll } from "./AncientScroll";
 
 type AnyRecord = Record<string, unknown>;
 
@@ -18,7 +19,7 @@ export type DataTableProps<T extends AnyRecord> = {
     hiddenColumns?: Array<keyof T & string>;
     readOnlyColumns?: Array<keyof T & string>;
     labels?: Partial<Record<keyof T & string, string>>;
-    visibleColumns?: Array<keyof T & string>;
+    visibleColumns?: Array<string>;
     onEdit?: (id: unknown, row: T) => void;
     onDelete?: (id: unknown, row: T) => void;
     onRowClick?: (id: unknown, row: T) => void;
@@ -76,20 +77,44 @@ export default function DataTable<T extends AnyRecord>({
         const idStr = idKey as string;
         if (visibleColumns && visibleColumns.length) {
             const asStrings = visibleColumns as string[];
-            return asStrings.filter((k) => k !== idStr && (keys as string[]).includes(k));
+            // keep provided visible columns but exclude idKey
+            return asStrings.filter((k) => k !== idStr && k !== idStr);
         }
         return keys.filter((k) => k !== idStr && !(hiddenColumns as string[]).includes(k));
     }, [keys, idKey, hiddenColumns, visibleColumns]);
 
     const columns = useMemo<ColumnDef<T, unknown>[]>(() => {
-        const baseCols: ColumnDef<T, unknown>[] = visibleKeys.map((key) => ({
-            accessorKey: key,
-            header: labels[key] ?? toLabel(key),
-            cell: (info: CellContext<T, unknown>) => {
-                const v = info.getValue();
-                return typeof v === "boolean" ? (v ? "✓" : "✗") : String(v ?? "");
-            },
-        }));
+        const baseCols: ColumnDef<T, unknown>[] = visibleKeys.map((key) => {
+            const headerLabel = (labels as Partial<Record<string, string>>)[key] ?? toLabel(key);
+            if (key.includes('.')) {
+                const path = key.split('.');
+                return {
+                    id: key,
+                    header: headerLabel,
+                    accessorFn: (row: T) => {
+                        return path.reduce((acc: unknown, p: string) => {
+                            if (acc && typeof acc === 'object' && p in (acc as Record<string, unknown>)) {
+                                return (acc as Record<string, unknown>)[p];
+                            }
+                            return undefined;
+                        }, row as unknown);
+                    },
+                    cell: (info: CellContext<T, unknown>) => {
+                        const v = info.getValue();
+                        return typeof v === "boolean" ? (v ? "✓" : "✗") : String(v ?? "");
+                    },
+                } as ColumnDef<T, unknown>;
+            }
+
+            return {
+                accessorKey: key as keyof T & string,
+                header: headerLabel,
+                cell: (info: CellContext<T, unknown>) => {
+                    const v = info.getValue();
+                    return typeof v === "boolean" ? (v ? "✓" : "✗") : String(v ?? "");
+                },
+            } as ColumnDef<T, unknown>;
+        });
 
         if (onEdit || onDelete) {
             baseCols.push({
@@ -125,7 +150,6 @@ export default function DataTable<T extends AnyRecord>({
         return baseCols;
     }, [visibleKeys, labels, idKey, onEdit, onDelete]);
 
-    // eslint-disable-next-line react-compiler/react-compiler -- useReactTable is not compatible with React 19 Compiler (TanStack Table v8 known issue)
     const table = useReactTable<T>({
         data: paginatedData,
         columns,
@@ -134,7 +158,7 @@ export default function DataTable<T extends AnyRecord>({
 
     return (
         <div className="w-full p-4">
-            <AncientCardContainer className="w-full" variant="transparent" >
+            <AncientScroll className="w-full" >
                 <div className="relative z-10 p-6">
                     {/* Titolo con decorazioni */}
                     {title && (
@@ -263,7 +287,7 @@ export default function DataTable<T extends AnyRecord>({
                         </div>
                     )}
                 </div>
-            </AncientCardContainer>
+            </AncientScroll>
         </div>
     );
 }

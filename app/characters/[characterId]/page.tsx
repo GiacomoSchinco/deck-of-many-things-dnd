@@ -52,6 +52,11 @@ export default function CharacterPage() {
         </div>
         
         <div className="flex gap-2">
+          <Link href={`/characters/${characterId}/edit`}>
+            <Button variant="outline" size="sm">
+              Modifica
+            </Button>
+          </Link>
           <Link href={`/characters/${characterId}/spells`}>
             <Button variant="outline" size="sm">
               <Scroll className="w-4 h-4 mr-2" />

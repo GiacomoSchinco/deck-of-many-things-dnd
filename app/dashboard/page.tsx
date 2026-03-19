@@ -156,7 +156,7 @@ export default function DashboardPage() {
                       <p className="font-medium text-amber-900">{character?.name}</p>
                       <p className="text-xs text-amber-600">{character?.classes?.name ?? character?.class ?? ''} · Livello {character?.level}</p>
                     </div>
-                    <Link href={`/dashboard/${character?.id}`} className="text-amber-700 hover:text-amber-900">
+                    <Link href={`/characters/${character?.id}`} className="text-amber-700 hover:text-amber-900">
                       <Button variant="ghost" size="sm">
                         Visualizza
                       </Button>
