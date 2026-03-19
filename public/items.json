@@ -1,0 +1,4128 @@
+[
+  {
+    "name": "Spada lunga",
+    "type": "weapon",
+    "weight": 3.0,
+    "value": 15,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "sword",
+    "description": "Una classica spada a una mano e mezza, versatile in combattimento.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d8",
+      "damageType": "tagliente",
+      "properties": ["versatile"],
+      "versatileDamage": "1d10"
+    }
+  },
+  {
+    "name": "Spada corta",
+    "type": "weapon",
+    "weight": 2.0,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "sword",
+    "description": "Una lama corta e maneggevole, ideale per attacchi rapidi.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d6",
+      "damageType": "perforante",
+      "properties": ["leggera", "accurata"]
+    }
+  },
+  {
+    "name": "Pugnale",
+    "type": "weapon",
+    "weight": 0.5,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "dagger",
+    "description": "Una piccola lama facile da nascondere e da lanciare.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d4",
+      "damageType": "perforante",
+      "properties": ["accurata", "leggera", "lancio"],
+      "range": {"normal": 6, "long": 18}
+    }
+  },
+  {
+    "name": "Ascia bipenne",
+    "type": "weapon",
+    "weight": 3.5,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "axe",
+    "description": "Un'imponente ascia a due mani capace di infliggere danni devastanti.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d12",
+      "damageType": "tagliente",
+      "properties": ["pesante", "a due mani"]
+    }
+  },
+  {
+    "name": "Ascia da battaglia",
+    "type": "weapon",
+    "weight": 2.5,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "axe",
+    "description": "Un'ascia versatile utilizzabile a una o due mani.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d8",
+      "damageType": "tagliente",
+      "properties": ["versatile"],
+      "versatileDamage": "1d10"
+    }
+  },
+  {
+    "name": "Martello da guerra",
+    "type": "weapon",
+    "weight": 2.0,
+    "value": 15,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "hammer",
+    "description": "Un martello da battaglia in acciaio, efficace contro armature.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d8",
+      "damageType": "contundente",
+      "properties": ["versatile"],
+      "versatileDamage": "1d10"
+    }
+  },
+  {
+    "name": "Mazza",
+    "type": "weapon",
+    "weight": 2.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "mace",
+    "description": "Una semplice mazza di legno rinforzata con metallo.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d6",
+      "damageType": "contundente"
+    }
+  },
+  {
+    "name": "Randello",
+    "type": "weapon",
+    "weight": 2.0,
+    "value": 0.2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "club",
+    "description": "Un semplice pezzo di legno usato come arma improvvisata.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d4",
+      "damageType": "contundente"
+    }
+  },
+  {
+    "name": "Lancia",
+    "type": "weapon",
+    "weight": 1.5,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "spear",
+    "description": "Un'arma semplice ma efficace, utilizzabile anche come giavellotto.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d6",
+      "damageType": "perforante",
+      "properties": ["lancio", "versatile"],
+      "versatileDamage": "1d8",
+      "range": {"normal": 6, "long": 18}
+    }
+  },
+  {
+    "name": "Alabarda",
+    "type": "weapon",
+    "weight": 3.0,
+    "value": 20,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "polearm",
+    "description": "Un'arma ad asta che combina lancia e ascia.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d10",
+      "damageType": "tagliente",
+      "properties": ["pesante", "portata", "a due mani"]
+    }
+  },
+  {
+    "name": "Arco lungo",
+    "type": "weapon",
+    "weight": 2.0,
+    "value": 50,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "bow",
+    "description": "Un grande arco in legno composito, richiede forza per essere usato.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d8",
+      "damageType": "perforante",
+      "properties": ["munizioni", "a due mani", "pesante"],
+      "range": {"normal": 45, "long": 180}
+    }
+  },
+  {
+    "name": "Arco corto",
+    "type": "weapon",
+    "weight": 1.5,
+    "value": 25,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "bow",
+    "description": "Un arco piccolo e maneggevole, ideale per i viaggi.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d6",
+      "damageType": "perforante",
+      "properties": ["munizioni", "a due mani"],
+      "range": {"normal": 24, "long": 96}
+    }
+  },
+  {
+    "name": "Balestra leggera",
+    "type": "weapon",
+    "weight": 2.5,
+    "value": 25,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "crossbow",
+    "description": "Una balestra maneggevole, facile da ricaricare.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d8",
+      "damageType": "perforante",
+      "properties": ["munizioni", "carica", "a due mani"],
+      "range": {"normal": 24, "long": 96}
+    }
+  },
+  {
+    "name": "Balestra pesante",
+    "type": "weapon",
+    "weight": 4.5,
+    "value": 50,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "crossbow",
+    "description": "Una balestra massiccia dalla potenza letale.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d10",
+      "damageType": "perforante",
+      "properties": ["munizioni", "carica", "a due mani", "pesante"],
+      "range": {"normal": 30, "long": 120}
+    }
+  },
+  {
+    "name": "Fionda",
+    "type": "weapon",
+    "weight": 0.5,
+    "value": 0.2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "sling",
+    "description": "Una semplice fionda in cuoio per lanciare pietre.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d4",
+      "damageType": "contundente",
+      "properties": ["munizioni"],
+      "range": {"normal": 9, "long": 36}
+    }
+  },
+  {
+    "name": "Dardo",
+    "type": "weapon",
+    "weight": 0.1,
+    "value": 0.05,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "dart",
+    "description": "Un piccolo proiettile da lancio.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d4",
+      "damageType": "perforante",
+      "properties": ["accurata", "lancio"],
+      "range": {"normal": 6, "long": 18}
+    }
+  },
+  {
+    "name": "Giavellotto",
+    "type": "weapon",
+    "weight": 1.0,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "javelin",
+    "description": "Un'arma da lancio a forma di lancia corta.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d6",
+      "damageType": "perforante",
+      "properties": ["lancio"],
+      "range": {"normal": 9, "long": 36}
+    }
+  },
+  {
+    "name": "Tridente",
+    "type": "weapon",
+    "weight": 2.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "spear",
+    "description": "Una lancia a tre punte, usata anche nella pesca.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d6",
+      "damageType": "perforante",
+      "properties": ["lancio", "versatile"],
+      "versatileDamage": "1d8",
+      "range": {"normal": 6, "long": 18}
+    }
+  },
+  {
+    "name": "Falcetto",
+    "type": "weapon",
+    "weight": 1.0,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "sickle",
+    "description": "Un attrezzo agricolo ricurvo, usabile anche come arma.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d4",
+      "damageType": "tagliente",
+      "properties": ["leggera"]
+    }
+  },
+  {
+    "name": "Flagello",
+    "type": "weapon",
+    "weight": 1.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "flail",
+    "description": "Un'arma con una sfera chiodata attaccata a una catena.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d8",
+      "damageType": "contundente"
+    }
+  },
+  {
+    "name": "Mazzafrusto",
+    "type": "weapon",
+    "weight": 2.0,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "flail",
+    "description": "Un'arma pesante con una sfera chiodata all'estremità di una catena.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d8",
+      "damageType": "contundente"
+    }
+  },
+  {
+    "name": "Picca",
+    "type": "weapon",
+    "weight": 4.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "polearm",
+    "description": "Una lunga lancia usata dalla fanteria per tenere a distanza i nemici.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d10",
+      "damageType": "perforante",
+      "properties": ["pesante", "portata", "a due mani"]
+    }
+  },
+  {
+    "name": "Lama uncinata",
+    "type": "weapon",
+    "weight": 3.0,
+    "value": 20,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "polearm",
+    "description": "Un'arma ad asta con una lama ricurva, ideale per disarmare.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d10",
+      "damageType": "tagliente",
+      "properties": ["pesante", "portata", "a due mani"]
+    }
+  },
+  {
+    "name": "Manganello",
+    "type": "weapon",
+    "weight": 1.0,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "club",
+    "description": "Un bastone corto usato dalle guardie cittadine.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d4",
+      "damageType": "contundente"
+    }
+  },
+  {
+    "name": "Randello chiodato",
+    "type": "weapon",
+    "weight": 2.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "club",
+    "description": "Un randello con chiodi sporgenti per maggior danno.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d6",
+      "damageType": "contundente"
+    }
+  },
+  {
+    "name": "Frusta",
+    "type": "weapon",
+    "weight": 1.5,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "whip",
+    "description": "Una frusta in cuoio, utile per colpire a distanza ravvicinata.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d4",
+      "damageType": "tagliente",
+      "properties": ["accurata", "portata"]
+    }
+  },
+  {
+    "name": "Fioretto",
+    "type": "weapon",
+    "weight": 1.0,
+    "value": 25,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "sword",
+    "description": "Una spada leggera e precisa, usata nei duelli.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d8",
+      "damageType": "perforante",
+      "properties": ["accurata"]
+    }
+  },
+  {
+    "name": "Sciabola",
+    "type": "weapon",
+    "weight": 1.5,
+    "value": 25,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "sword",
+    "description": "Una lama ricurva, ideale per attacchi rapidi.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d6",
+      "damageType": "tagliente",
+      "properties": ["accurata", "leggera"]
+    }
+  },
+  {
+    "name": "Katana",
+    "type": "weapon",
+    "weight": 1.5,
+    "value": 50,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "sword",
+    "description": "Una spada giapponese dalla lama affilatissima.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d10",
+      "damageType": "tagliente",
+      "properties": ["pesante", "a due mani"]
+    }
+  },
+  {
+    "name": "Nunchaku",
+    "type": "weapon",
+    "weight": 1.0,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "monk",
+    "description": "Due bastoni collegati da una catena, arma da maestri di arti marziali.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d6",
+      "damageType": "contundente",
+      "properties": ["accurata"]
+    }
+  },
+  {
+    "name": "Shuriken (5)",
+    "type": "weapon",
+    "weight": 0.05,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "thrown",
+    "description": "Stelle da lancio giapponesi, facili da nascondere.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d2",
+      "damageType": "perforante",
+      "properties": ["accurata", "lancio", "munizioni"],
+      "range": {"normal": 4, "long": 12}
+    }
+  },
+  {
+    "name": "Boomerang",
+    "type": "weapon",
+    "weight": 0.5,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "thrown",
+    "description": "Un'arma da lancio che torna indietro se non colpisce il bersaglio.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d4",
+      "damageType": "contundente",
+      "properties": ["lancio"],
+      "range": {"normal": 9, "long": 36}
+    }
+  },
+  {
+    "name": "Cerchio da lancio",
+    "type": "weapon",
+    "weight": 0.5,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "thrown",
+    "description": "Un anello di metallo affilato, usato come arma da lancio.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d4",
+      "damageType": "tagliente",
+      "properties": ["accurata", "lancio"],
+      "range": {"normal": 6, "long": 18}
+    }
+  },
+  {
+    "name": "Lancia lunga",
+    "type": "weapon",
+    "weight": 3.0,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "spear",
+    "description": "Una lancia più lunga del normale, usata dalla cavalleria.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d8",
+      "damageType": "perforante",
+      "properties": ["portata"]
+    }
+  },
+  {
+    "name": "Bastone ferrato",
+    "type": "weapon",
+    "weight": 2.0,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "quarterstaff",
+    "description": "Un robusto bastone con rinforzi metallici alle estremità.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d6",
+      "damageType": "contundente",
+      "properties": ["versatile"],
+      "versatileDamage": "1d8"
+    }
+  },
+  {
+    "name": "Zappa",
+    "type": "weapon",
+    "weight": 2.0,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "tool",
+    "description": "Un attrezzo agricolo, poco bilanciato ma tagliente.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d4",
+      "damageType": "tagliente"
+    }
+  },
+  {
+    "name": "Vanga",
+    "type": "weapon",
+    "weight": 2.5,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "tool",
+    "description": "Una pala robusta, utile per scavare e per colpire.",
+    "properties": {
+      "itemType": "weapon",
+      "damage": "1d6",
+      "damageType": "contundente"
+    }
+  },
+  {
+    "name": "Armatura di cuoio",
+    "type": "armor",
+    "weight": 5.0,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "light armor",
+    "description": "Un'armatura leggera in cuoio trattato, offre buona mobilità.",
+    "properties": {
+      "itemType": "armor",
+      "armorClass": 11,
+      "armorType": "light",
+      "addsDexModifier": true
+    }
+  },
+  {
+    "name": "Armatura di cuoio borchiato",
+    "type": "armor",
+    "weight": 6.5,
+    "value": 45,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "light armor",
+    "description": "Un'armatura di cuoio rinforzata con borchie metalliche.",
+    "properties": {
+      "itemType": "armor",
+      "armorClass": 12,
+      "armorType": "light",
+      "addsDexModifier": true
+    }
+  },
+  {
+    "name": "Armatura di pelle",
+    "type": "armor",
+    "weight": 6.0,
+    "value": 15,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "light armor",
+    "description": "Un'armatura in pelle spessa, più resistente del cuoio semplice.",
+    "properties": {
+      "itemType": "armor",
+      "armorClass": 11,
+      "armorType": "light",
+      "addsDexModifier": true
+    }
+  },
+  {
+    "name": "Gambeson",
+    "type": "armor",
+    "weight": 4.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "light armor",
+    "description": "Una giubba imbottita, spesso indossata sotto le armature metalliche.",
+    "properties": {
+      "itemType": "armor",
+      "armorClass": 10,
+      "armorType": "light",
+      "addsDexModifier": true
+    }
+  },
+  {
+    "name": "Cotta di maglia",
+    "type": "armor",
+    "weight": 20.0,
+    "value": 50,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "medium armor",
+    "description": "Un'armatura di anelli metallici intrecciati, flessibile ma pesante.",
+    "properties": {
+      "itemType": "armor",
+      "armorClass": 14,
+      "armorType": "medium",
+      "addsDexModifier": true,
+      "maxDexBonus": 2
+    }
+  },
+  {
+    "name": "Armatura di scaglie",
+    "type": "armor",
+    "weight": 22.5,
+    "value": 50,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "medium armor",
+    "description": "Un'armatura composta da scaglie metalliche sovrapposte.",
+    "properties": {
+      "itemType": "armor",
+      "armorClass": 14,
+      "armorType": "medium",
+      "addsDexModifier": true,
+      "maxDexBonus": 2
+    }
+  },
+  {
+    "name": "Corazza di piastre",
+    "type": "armor",
+    "weight": 25.0,
+    "value": 400,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "heavy armor",
+    "description": "Un'armatura completa in metallo, la migliore protezione disponibile.",
+    "properties": {
+      "itemType": "armor",
+      "armorClass": 16,
+      "armorType": "heavy",
+      "addsDexModifier": false
+    }
+  },
+  {
+    "name": "Corazza a strisce",
+    "type": "armor",
+    "weight": 22.5,
+    "value": 200,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "heavy armor",
+    "description": "Un'armatura composta da strisce metalliche sovrapposte.",
+    "properties": {
+      "itemType": "armor",
+      "armorClass": 15,
+      "armorType": "heavy",
+      "addsDexModifier": false
+    }
+  },
+  {
+    "name": "Usbergo",
+    "type": "armor",
+    "weight": 20.0,
+    "value": 75,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "heavy armor",
+    "description": "Una cotta di maglia lunga fino alle ginocchia.",
+    "properties": {
+      "itemType": "armor",
+      "armorClass": 15,
+      "armorType": "heavy",
+      "addsDexModifier": false
+    }
+  },
+  {
+    "name": "Corazza di cuoio",
+    "type": "armor",
+    "weight": 8.0,
+    "value": 30,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "medium armor",
+    "description": "Una corazza in cuoio indurito, offre buona protezione senza appesantire.",
+    "properties": {
+      "itemType": "armor",
+      "armorClass": 13,
+      "armorType": "medium",
+      "addsDexModifier": true,
+      "maxDexBonus": 2
+    }
+  },
+  {
+    "name": "Scudo",
+    "type": "armor",
+    "weight": 3.0,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "shield",
+    "description": "Uno scudo in legno rinforzato con metallo.",
+    "properties": {
+      "itemType": "armor",
+      "armorClass": 2,
+      "armorType": "shield"
+    }
+  },
+  {
+    "name": "Scudo di legno",
+    "type": "armor",
+    "weight": 2.5,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "shield",
+    "description": "Un semplice scudo in legno, leggero ma meno resistente.",
+    "properties": {
+      "itemType": "armor",
+      "armorClass": 2,
+      "armorType": "shield"
+    }
+  },
+  {
+    "name": "Scudo metallico",
+    "type": "armor",
+    "weight": 3.5,
+    "value": 15,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "shield",
+    "description": "Uno scudo in acciaio, pesante ma molto resistente.",
+    "properties": {
+      "itemType": "armor",
+      "armorClass": 2,
+      "armorType": "shield"
+    }
+  },
+  {
+    "name": "Elmo",
+    "type": "armor",
+    "weight": 1.5,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "headgear",
+    "description": "Un elmo in metallo che protegge la testa.",
+    "properties": {
+      "itemType": "gear",
+      "armorClass": 0
+    }
+  },
+  {
+    "name": "Bracciali",
+    "type": "armor",
+    "weight": 1.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "bracers",
+    "description": "Protezioni per gli avambracci.",
+    "properties": {
+      "itemType": "gear",
+      "armorClass": 0
+    }
+  },
+  {
+    "name": "Gambali",
+    "type": "armor",
+    "weight": 2.0,
+    "value": 8,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "leggings",
+    "description": "Protezioni per le gambe.",
+    "properties": {
+      "itemType": "gear",
+      "armorClass": 0
+    }
+  },
+  {
+    "name": "Spallacci",
+    "type": "armor",
+    "weight": 1.5,
+    "value": 6,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "pauldrons",
+    "description": "Protezioni per le spalle.",
+    "properties": {
+      "itemType": "gear",
+      "armorClass": 0
+    }
+  },
+  {
+    "name": "Guanti di cuoio",
+    "type": "armor",
+    "weight": 0.5,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "gloves",
+    "description": "Semplici guanti in cuoio.",
+    "properties": {
+      "itemType": "gear",
+      "armorClass": 0
+    }
+  },
+  {
+    "name": "Guanti di ferro",
+    "type": "armor",
+    "weight": 1.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "gloves",
+    "description": "Guanti rinforzati con maglie di ferro.",
+    "properties": {
+      "itemType": "gear",
+      "armorClass": 0
+    }
+  },
+  {
+    "name": "Frecce (20)",
+    "type": "ammunition",
+    "weight": 0.5,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "arrow",
+    "description": "Frecce per arco.",
+    "properties": {
+      "itemType": "ammunition",
+      "ammunitionType": "arrow"
+    }
+  },
+  {
+    "name": "Quadrelli (20)",
+    "type": "ammunition",
+    "weight": 0.75,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "bolt",
+    "description": "Quadrelli per balestra.",
+    "properties": {
+      "itemType": "ammunition",
+      "ammunitionType": "bolt"
+    }
+  },
+  {
+    "name": "Proiettili da fionda (20)",
+    "type": "ammunition",
+    "weight": 0.75,
+    "value": 0.2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "bullet",
+    "description": "Sfere di piombo per fionda.",
+    "properties": {
+      "itemType": "ammunition",
+      "ammunitionType": "bullet"
+    }
+  },
+  {
+    "name": "Frecce d'argento (5)",
+    "type": "ammunition",
+    "weight": 0.5,
+    "value": 25,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "arrow",
+    "description": "Frecce con punta d'argento, efficaci contro licantropi e demoni.",
+    "properties": {
+      "itemType": "ammunition",
+      "ammunitionType": "arrow",
+      "magicBonus": 0,
+      "damageBonus": 0
+    }
+  },
+  {
+    "name": "Frecce incendiarie (5)",
+    "type": "ammunition",
+    "weight": 0.5,
+    "value": 15,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "arrow",
+    "description": "Frecce che prendono fuoco all'impatto.",
+    "properties": {
+      "itemType": "ammunition",
+      "ammunitionType": "arrow",
+      "damageBonus": "1d4 fuoco"
+    }
+  },
+  {
+    "name": "Quadrelli d'acciaio (10)",
+    "type": "ammunition",
+    "weight": 0.5,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "bolt",
+    "description": "Quadrelli in acciaio temprato.",
+    "properties": {
+      "itemType": "ammunition",
+      "ammunitionType": "bolt"
+    }
+  },
+  {
+    "name": "Pietre da fionda (10)",
+    "type": "ammunition",
+    "weight": 0.5,
+    "value": 0.1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "bullet",
+    "description": "Semplici pietre levigate per fionda.",
+    "properties": {
+      "itemType": "ammunition",
+      "ammunitionType": "bullet"
+    }
+  },
+  {
+    "name": "Faretra",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Contiene fino a 20 frecce o quadrelli.",
+    "properties": {
+      "itemType": "gear",
+      "capacity": 20
+    }
+  },
+  {
+    "name": "Cinturone portamunizioni",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Tiene munizioni a portata di mano.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Frecce da caccia (20)",
+    "type": "ammunition",
+    "weight": 0.5,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "arrow",
+    "description": "Frecce appositamente progettate per la caccia.",
+    "properties": {
+      "itemType": "ammunition",
+      "ammunitionType": "arrow"
+    }
+  },
+  {
+    "name": "Quadrelli da balestra leggera (20)",
+    "type": "ammunition",
+    "weight": 0.5,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "bolt",
+    "description": "Quadrelli per balestre leggere.",
+    "properties": {
+      "itemType": "ammunition",
+      "ammunitionType": "bolt"
+    }
+  },
+  {
+    "name": "Quadrelli da balestra pesante (10)",
+    "type": "ammunition",
+    "weight": 0.5,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "bolt",
+    "description": "Quadrelli più pesanti per balestre pesanti.",
+    "properties": {
+      "itemType": "ammunition",
+      "ammunitionType": "bolt"
+    }
+  },
+  {
+    "name": "Frecce da torneo (10)",
+    "type": "ammunition",
+    "weight": 0.5,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "arrow",
+    "description": "Frecce di precisione per competizioni.",
+    "properties": {
+      "itemType": "ammunition",
+      "ammunitionType": "arrow"
+    }
+  },
+  {
+    "name": "Frecce di precisione (5)",
+    "type": "ammunition",
+    "weight": 0.5,
+    "value": 20,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "arrow",
+    "description": "Frecce bilanciate con cura per maggiore precisione.",
+    "properties": {
+      "itemType": "ammunition",
+      "ammunitionType": "arrow",
+      "damageBonus": 0,
+      "magicBonus": 1
+    }
+  },
+  {
+    "name": "Dardi da lancio (10)",
+    "type": "ammunition",
+    "weight": 0.5,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "dart",
+    "description": "Piccoli dardi da lanciare con la mano.",
+    "properties": {
+      "itemType": "ammunition",
+      "ammunitionType": "arrow"
+    }
+  },
+  {
+    "name": "Zaino",
+    "type": "gear",
+    "weight": 2.5,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Contiene fino a 15 kg di materiale.",
+    "properties": {
+      "itemType": "gear",
+      "capacity": 15
+    }
+  },
+  {
+    "name": "Sacco a pelo",
+    "type": "gear",
+    "weight": 2.5,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "bedding",
+    "description": "Mantiene caldo durante la notte all'aperto.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Tenda (2 persone)",
+    "type": "gear",
+    "weight": 5.0,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "shelter",
+    "description": "Protegge dalle intemperie fino a due persone.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Tenda (4 persone)",
+    "type": "gear",
+    "weight": 10.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "shelter",
+    "description": "Spaziosa tenda per quattro persone.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Razioni da viaggio (1 giorno)",
+    "type": "consumable",
+    "weight": 1.0,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "food",
+    "description": "Provviste per un giorno (carne secca, pane, frutta secca).",
+    "properties": {
+      "itemType": "consumable",
+      "effect": "Nutrimento per 1 giorno"
+    }
+  },
+  {
+    "name": "Razioni da viaggio (1 settimana)",
+    "type": "consumable",
+    "weight": 7.0,
+    "value": 3.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "food",
+    "description": "Provviste per sette giorni.",
+    "properties": {
+      "itemType": "consumable",
+      "effect": "Nutrimento per 7 giorni"
+    }
+  },
+  {
+    "name": "Borraccia d'acqua",
+    "type": "gear",
+    "weight": 2.0,
+    "value": 0.2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Contiene 1 litro d'acqua.",
+    "properties": {
+      "itemType": "gear",
+      "capacity": 1
+    }
+  },
+  {
+    "name": "Otre",
+    "type": "gear",
+    "weight": 1.0,
+    "value": 0.1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Contiene 2 litri di liquido.",
+    "properties": {
+      "itemType": "gear",
+      "capacity": 2
+    }
+  },
+  {
+    "name": "Torcia (10)",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 0.1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "light",
+    "description": "Illumina per 1 ora, brucia anche come arma improvvisata.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Lanterna",
+    "type": "gear",
+    "weight": 1.0,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "light",
+    "description": "Illumina per 6 ore con 1 tanica d'olio.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Tanica d'olio",
+    "type": "consumable",
+    "weight": 0.5,
+    "value": 0.1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "fuel",
+    "description": "Per lanterne, brucia per 6 ore.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Candela (10)",
+    "type": "gear",
+    "weight": 0.1,
+    "value": 0.01,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "light",
+    "description": "Illumina debolmente per 1 ora.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Pietra focaia",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "tool",
+    "description": "Accende fuochi, usata con esca.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Acciarino",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "tool",
+    "description": "Accende fuochi rapidamente, più efficace della pietra focaia.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Corda (10m)",
+    "type": "gear",
+    "weight": 2.5,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "rope",
+    "description": "Resistente, canapa.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Corda (50m)",
+    "type": "gear",
+    "weight": 10.0,
+    "value": 4,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "rope",
+    "description": "Resistente, canapa.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Corda di seta (10m)",
+    "type": "gear",
+    "weight": 1.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "rope",
+    "description": "Leggera e resistente, più costosa della canapa.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Gancio da arrampicata",
+    "type": "gear",
+    "weight": 2.0,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "climbing",
+    "description": "Per scalate, usato con corda.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Piccozza da ghiaccio",
+    "type": "gear",
+    "weight": 2.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "climbing",
+    "description": "Per scalate su ghiaccio.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Rampino",
+    "type": "gear",
+    "weight": 2.0,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "climbing",
+    "description": "Per scalate, si lancia per agganciarsi.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Scala di corda (10m)",
+    "type": "gear",
+    "weight": 5.0,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "climbing",
+    "description": "Leggera e pieghevole, si arrotola per il trasporto.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Paletta",
+    "type": "gear",
+    "weight": 1.0,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "tool",
+    "description": "Piccola, per scavare buche o rimuovere detriti.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Piccone",
+    "type": "tool",
+    "weight": 5.0,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "tool",
+    "description": "Per scavare nella roccia, ottimo per minatori.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Mazza",
+    "type": "tool",
+    "weight": 5.0,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "tool",
+    "description": "Per piantare paletti o frantumare oggetti.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Pali di legno (5)",
+    "type": "gear",
+    "weight": 5.0,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "construction",
+    "description": "Per tende o segnalazioni, lunghi circa 1,5 m.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Sacco",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 0.01,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Contiene fino a 15 kg di materiale.",
+    "properties": {
+      "itemType": "gear",
+      "capacity": 15
+    }
+  },
+  {
+    "name": "Sacco grande",
+    "type": "gear",
+    "weight": 1.0,
+    "value": 0.02,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Contiene fino a 30 kg di materiale.",
+    "properties": {
+      "itemType": "gear",
+      "capacity": 30
+    }
+  },
+  {
+    "name": "Cassetta di legno",
+    "type": "gear",
+    "weight": 2.5,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Contiene fino a 20 kg, richiede attrezzi per aprirla.",
+    "properties": {
+      "itemType": "gear",
+      "capacity": 20
+    }
+  },
+  {
+    "name": "Baule",
+    "type": "gear",
+    "weight": 5.0,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Contiene fino a 50 kg, chiudibile a chiave.",
+    "properties": {
+      "itemType": "gear",
+      "capacity": 50
+    }
+  },
+  {
+    "name": "Catenella (1m)",
+    "type": "gear",
+    "weight": 2.5,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "restraint",
+    "description": "10 anelli, robusta, può legare oggetti o persone.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Lucchetto",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "lock",
+    "description": "Con chiave, CD 15 per scassinare.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Lucchetto d'ottone",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "lock",
+    "description": "Con chiave, CD 17 per scassinare.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Manette",
+    "type": "gear",
+    "weight": 1.5,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "restraint",
+    "description": "Per prigionieri, CD 20 per scassinare o fuggire.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Specchietto",
+    "type": "gear",
+    "weight": 0.1,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "tool",
+    "description": "Per guardarsi o segnalare riflettendo la luce.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Lente d'ingrandimento",
+    "type": "gear",
+    "weight": 0.1,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "tool",
+    "description": "Per esaminare dettagli, accendere fuochi.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Cannocchiale",
+    "type": "gear",
+    "weight": 1.0,
+    "value": 20,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "tool",
+    "description": "Vede a grande distanza, ingrandisce fino a 8x.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Bussola",
+    "type": "gear",
+    "weight": 0.2,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "tool",
+    "description": "Indica il nord magnetico.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Orologio solare",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "tool",
+    "description": "Indica l'ora approssimativa col sole.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Clessidra (1 ora)",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "tool",
+    "description": "Misure precise del tempo, 1 ora.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Clessidra (1 minuto)",
+    "type": "gear",
+    "weight": 0.2,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "tool",
+    "description": "Misure rapide, 1 minuto.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Inchiostro (fiala)",
+    "type": "consumable",
+    "weight": 0.1,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "writing",
+    "description": "Nero, per scrivere, dura per 500 pagine.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Penna d'oca",
+    "type": "gear",
+    "weight": 0.05,
+    "value": 0.01,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "writing",
+    "description": "Per scrivere, si intinge nell'inchiostro.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Carta (foglio)",
+    "type": "consumable",
+    "weight": 0.01,
+    "value": 0.02,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "writing",
+    "description": "Per scrivere, un foglio.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Pergamena (foglio)",
+    "type": "consumable",
+    "weight": 0.02,
+    "value": 0.1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "writing",
+    "description": "Più resistente della carta, per documenti importanti.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Quaderno",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "writing",
+    "description": "50 pagine, rilegato in cuoio.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Libro vuoto",
+    "type": "gear",
+    "weight": 1.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "writing",
+    "description": "100 pagine, rilegato in cuoio con copertina rigida.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Mappa",
+    "type": "gear",
+    "weight": 0.1,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "map",
+    "description": "Della regione circostante, mostra città e punti d'interesse.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Sigillo di cera",
+    "type": "consumable",
+    "weight": 0.1,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "writing",
+    "description": "Per sigillare lettere, si scioglie e si timbra.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Anello con sigillo",
+    "type": "gear",
+    "weight": 0.05,
+    "value": 25,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "jewelry",
+    "description": "Personale, per autenticare documenti con ceralacca.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Gesso (10 pezzi)",
+    "type": "consumable",
+    "weight": 0.1,
+    "value": 0.01,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "tool",
+    "description": "Per segnare su superfici, lascia traccia bianca.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Carboncino",
+    "type": "consumable",
+    "weight": 0.05,
+    "value": 0.01,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "art",
+    "description": "Per disegnare, lascia tratti neri.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Pennello",
+    "type": "gear",
+    "weight": 0.1,
+    "value": 0.1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "art",
+    "description": "Per dipingere, setole fini.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Tela (1m)",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "art",
+    "description": "Per dipingere, tela di lino.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Colori (set)",
+    "type": "consumable",
+    "weight": 0.5,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "art",
+    "description": "Per dipingere, pigmenti vari.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Pentolino",
+    "type": "gear",
+    "weight": 1.0,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "cooking",
+    "description": "Per cucinare, piccolo e maneggevole.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Padella",
+    "type": "gear",
+    "weight": 1.0,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "cooking",
+    "description": "Per cucinare, in ferro.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Gavetta",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 0.2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "cooking",
+    "description": "Piatto + pentolino combinati per soldati.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Posate",
+    "type": "gear",
+    "weight": 0.2,
+    "value": 0.1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "cooking",
+    "description": "Coltello, forchetta, cucchiaio in metallo.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Bicchiere di stagno",
+    "type": "gear",
+    "weight": 0.2,
+    "value": 0.02,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Per bere, semplice.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Bottiglia di vetro",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Contiene 1 litro di liquido.",
+    "properties": {
+      "itemType": "gear",
+      "capacity": 1
+    }
+  },
+  {
+    "name": "Fiasco",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 0.2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Contiene 1 litro di vino o acqua.",
+    "properties": {
+      "itemType": "gear",
+      "capacity": 1
+    }
+  },
+  {
+    "name": "Fiasco di vino",
+    "type": "consumable",
+    "weight": 0.5,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "beverage",
+    "description": "Vino comune, qualità da taverna.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Fiasco di vino pregiato",
+    "type": "consumable",
+    "weight": 0.5,
+    "value": 5,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "beverage",
+    "description": "Vino d'annata, riserva speciale.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Boccale di birra",
+    "type": "consumable",
+    "weight": 0.5,
+    "value": 0.05,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "beverage",
+    "description": "Birra chiara, rinfrescante.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Boccale di birra scura",
+    "type": "consumable",
+    "weight": 0.5,
+    "value": 0.1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "beverage",
+    "description": "Birra corposa, gusto deciso.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Sacchetto di tabacco",
+    "type": "consumable",
+    "weight": 0.1,
+    "value": 0.2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "smoking",
+    "description": "Per pipa, foglie essiccate.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Pipa",
+    "type": "gear",
+    "weight": 0.1,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "smoking",
+    "description": "In legno, per fumare tabacco.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Dadi da gioco (set)",
+    "type": "gear",
+    "weight": 0.05,
+    "value": 0.1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "game",
+    "description": "Per giocare d'azzardo, set di 5 dadi.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Carte da gioco (mazzo)",
+    "type": "gear",
+    "weight": 0.1,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "game",
+    "description": "Per giocare, mazzo da 52 carte.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Scacchi",
+    "type": "gear",
+    "weight": 1.0,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "game",
+    "description": "Gioco da tavolo, scacchiera in legno e pezzi.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Dama",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "game",
+    "description": "Gioco da tavolo, più semplice degli scacchi.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Strumento musicale: Liuto",
+    "type": "gear",
+    "weight": 2.0,
+    "value": 15,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "instrument",
+    "description": "A corde, usato da bardi.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Strumento musicale: Flauto",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "instrument",
+    "description": "A fiato, di legno.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Strumento musicale: Tamburo",
+    "type": "gear",
+    "weight": 1.5,
+    "value": 3,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "instrument",
+    "description": "A percussione, due bacchette incluse.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Strumento musicale: Arpa",
+    "type": "gear",
+    "weight": 3.0,
+    "value": 25,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "instrument",
+    "description": "A corde, strumento nobile.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Strumento musicale: Corno",
+    "type": "gear",
+    "weight": 1.0,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "instrument",
+    "description": "A fiato, in ottone.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Strumento musicale: Violino",
+    "type": "gear",
+    "weight": 1.0,
+    "value": 20,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "instrument",
+    "description": "A corde e arco, suono delicato.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Canna da pesca",
+    "type": "gear",
+    "weight": 1.5,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "fishing",
+    "description": "Per pescare, lenza e amo inclusi.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Retino",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 0.2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "fishing",
+    "description": "Per pescare piccoli pesci o farfalle.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Esca (10 pezzi)",
+    "type": "consumable",
+    "weight": 0.1,
+    "value": 0.05,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "fishing",
+    "description": "Per pescare, vermi o esche artificiali.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Trappola per animali",
+    "type": "gear",
+    "weight": 3.0,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "hunting",
+    "description": "Per cacciare piccola selvaggina.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Rete da pesca",
+    "type": "gear",
+    "weight": 2.0,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "fishing",
+    "description": "Per pescare, si getta in acqua.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Bilancia",
+    "type": "gear",
+    "weight": 1.0,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "tool",
+    "description": "Per pesare, precisione artigianale.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Pesi (set)",
+    "type": "gear",
+    "weight": 2.0,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "tool",
+    "description": "Per bilancia, set di pesi in metallo.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da scasso",
+    "type": "tool",
+    "weight": 0.5,
+    "value": 25,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "thieves",
+    "description": "Per aprire serrature, grimaldelli e arnesi.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da fabbro",
+    "type": "tool",
+    "weight": 5.0,
+    "value": 20,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "smith",
+    "description": "Per lavorare il metallo, incudine portatile.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da falegname",
+    "type": "tool",
+    "weight": 4.0,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "carpenter",
+    "description": "Per lavorare il legno, seghe e scalpelli.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da tagliapietre",
+    "type": "tool",
+    "weight": 6.0,
+    "value": 15,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "mason",
+    "description": "Per lavorare la pietra, scalpelli e mazza.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da cuoiaio",
+    "type": "tool",
+    "weight": 2.5,
+    "value": 8,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "leather",
+    "description": "Per lavorare il cuoio, aghi e punzoni.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da sarto",
+    "type": "tool",
+    "weight": 2.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "tailor",
+    "description": "Per cucire, forbici e aghi.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da calzolaio",
+    "type": "tool",
+    "weight": 2.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "cobbler",
+    "description": "Per riparare scarpe, forme e lesine.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da vetraio",
+    "type": "tool",
+    "weight": 2.0,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "glass",
+    "description": "Per lavorare il vetro, tagliavetro.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da ceramista",
+    "type": "tool",
+    "weight": 3.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "potter",
+    "description": "Per modellare l'argilla, tornio portatile.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da pittore",
+    "type": "tool",
+    "weight": 2.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "painter",
+    "description": "Per dipingere, pennelli e spatole.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da calligrafo",
+    "type": "tool",
+    "weight": 1.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "scribe",
+    "description": "Per scrivere, penne e inchiostri speciali.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da cartografo",
+    "type": "tool",
+    "weight": 2.0,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "cartographer",
+    "description": "Per fare mappe, compassi e righelli.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da alchimista",
+    "type": "tool",
+    "weight": 4.0,
+    "value": 25,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "alchemist",
+    "description": "Per preparare pozioni, alambicchi e provette.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da erborista",
+    "type": "tool",
+    "weight": 2.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "herbalist",
+    "description": "Per raccogliere erbe, forbici e mortaio.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da cuoco",
+    "type": "tool",
+    "weight": 3.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "cook",
+    "description": "Per cucinare, coltelli e pentole.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da birraio",
+    "type": "tool",
+    "weight": 5.0,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "brewer",
+    "description": "Per fare birra, tini e botti.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da vignaiolo",
+    "type": "tool",
+    "weight": 4.0,
+    "value": 8,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "vintner",
+    "description": "Per fare vino, torchio e botti.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da minatore",
+    "type": "tool",
+    "weight": 6.0,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "miner",
+    "description": "Per estrarre minerali, piccone e pala.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da scavatore",
+    "type": "tool",
+    "weight": 5.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "digger",
+    "description": "Per scavare, vanga e piccone.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da boscaiolo",
+    "type": "tool",
+    "weight": 4.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "lumberjack",
+    "description": "Per tagliare alberi, ascia e cunei.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da pescatore",
+    "type": "tool",
+    "weight": 2.0,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "fisher",
+    "description": "Per pescare, reti e canne.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da cacciatore",
+    "type": "tool",
+    "weight": 2.0,
+    "value": 3,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "hunter",
+    "description": "Per cacciare, trappole e richiami.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da mercante",
+    "type": "tool",
+    "weight": 1.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "merchant",
+    "description": "Bilancia, pesi, abaco.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da scriba",
+    "type": "tool",
+    "weight": 1.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "scribe",
+    "description": "Per scrivere, inchiostri e penne.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Attrezzi da mago",
+    "type": "tool",
+    "weight": 2.0,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "wizard",
+    "description": "Componenti minori, gessetti e inchiostri magici.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Pozione di cura",
+    "type": "consumable",
+    "weight": 0.2,
+    "value": 50,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "potion",
+    "description": "Vetro contenente liquido rosso brillante.",
+    "properties": {
+      "itemType": "consumable",
+      "effect": "Recupera 2d4+2 PF"
+    }
+  },
+  {
+    "name": "Pozione di cura superiore",
+    "type": "consumable",
+    "weight": 0.2,
+    "value": 200,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "potion",
+    "description": "Liquido rosso più denso.",
+    "properties": {
+      "itemType": "consumable",
+      "effect": "Recupera 4d4+4 PF"
+    }
+  },
+  {
+    "name": "Antidoto",
+    "type": "consumable",
+    "weight": 0.1,
+    "value": 50,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "potion",
+    "description": "Fiala di liquido verdastro.",
+    "properties": {
+      "itemType": "consumable",
+      "effect": "Cura avvelenamento"
+    }
+  },
+  {
+    "name": "Pozione di respirazione",
+    "type": "consumable",
+    "weight": 0.2,
+    "value": 150,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "potion",
+    "description": "Liquido blu, bolle leggermente.",
+    "properties": {
+      "itemType": "consumable",
+      "effect": "Respirare sott'acqua per 1 ora"
+    }
+  },
+  {
+    "name": "Pozione di invisibilità",
+    "type": "consumable",
+    "weight": 0.2,
+    "value": 250,
+    "currency": "po",
+    "rarity": "rare",
+    "requires_attunement": false,
+    "category": "potion",
+    "description": "Liquido trasparente come acqua.",
+    "properties": {
+      "itemType": "consumable",
+      "effect": "Invisibile per 1 ora"
+    }
+  },
+  {
+    "name": "Pozione di velocità",
+    "type": "consumable",
+    "weight": 0.2,
+    "value": 300,
+    "currency": "po",
+    "rarity": "rare",
+    "requires_attunement": false,
+    "category": "potion",
+    "description": "Liquido giallo scintillante.",
+    "properties": {
+      "itemType": "consumable",
+      "effect": "Velocità raddoppiata per 1 minuto"
+    }
+  },
+  {
+    "name": "Pozione di forza",
+    "type": "consumable",
+    "weight": 0.2,
+    "value": 100,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "potion",
+    "description": "Liquido rosso scuro.",
+    "properties": {
+      "itemType": "consumable",
+      "effect": "+2 Forza per 1 ora"
+    }
+  },
+  {
+    "name": "Pozione di agilità",
+    "type": "consumable",
+    "weight": 0.2,
+    "value": 100,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "potion",
+    "description": "Liquido verde chiaro.",
+    "properties": {
+      "itemType": "consumable",
+      "effect": "+2 Destrezza per 1 ora"
+    }
+  },
+  {
+    "name": "Pozione di resistenza",
+    "type": "consumable",
+    "weight": 0.2,
+    "value": 100,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "potion",
+    "description": "Liquido marrone.",
+    "properties": {
+      "itemType": "consumable",
+      "effect": "+2 Costituzione per 1 ora"
+    }
+  },
+  {
+    "name": "Pozione di intelligenza",
+    "type": "consumable",
+    "weight": 0.2,
+    "value": 100,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "potion",
+    "description": "Liquido blu scuro.",
+    "properties": {
+      "itemType": "consumable",
+      "effect": "+2 Intelligenza per 1 ora"
+    }
+  },
+  {
+    "name": "Pozione di saggezza",
+    "type": "consumable",
+    "weight": 0.2,
+    "value": 100,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "potion",
+    "description": "Liquido viola.",
+    "properties": {
+      "itemType": "consumable",
+      "effect": "+2 Saggezza per 1 ora"
+    }
+  },
+  {
+    "name": "Pozione di carisma",
+    "type": "consumable",
+    "weight": 0.2,
+    "value": 100,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "potion",
+    "description": "Liquido rosa.",
+    "properties": {
+      "itemType": "consumable",
+      "effect": "+2 Carisma per 1 ora"
+    }
+  },
+  {
+    "name": "Veleno (dose)",
+    "type": "consumable",
+    "weight": 0.1,
+    "value": 75,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "poison",
+    "description": "Fiala di liquido nero.",
+    "properties": {
+      "itemType": "consumable",
+      "effect": "1d4 danni veleno per 1 minuto"
+    }
+  },
+  {
+    "name": "Veleno potente (dose)",
+    "type": "consumable",
+    "weight": 0.1,
+    "value": 200,
+    "currency": "po",
+    "rarity": "rare",
+    "requires_attunement": false,
+    "category": "poison",
+    "description": "Fiala di liquido viola scuro.",
+    "properties": {
+      "itemType": "consumable",
+      "effect": "2d6 danni veleno"
+    }
+  },
+  {
+    "name": "Acido (fiala)",
+    "type": "consumable",
+    "weight": 0.2,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "chemical",
+    "description": "Fiala di vetro con liquido corrosivo.",
+    "properties": {
+      "itemType": "consumable",
+      "effect": "2d4 danni acido"
+    }
+  },
+  {
+    "name": "Acqua santa (fiala)",
+    "type": "consumable",
+    "weight": 0.2,
+    "value": 15,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "holy",
+    "description": "Acqua benedetta, danneggia non morti.",
+    "properties": {
+      "itemType": "consumable",
+      "effect": "2d6 danni a non morti"
+    }
+  },
+  {
+    "name": "Olio santo (fiala)",
+    "type": "consumable",
+    "weight": 0.2,
+    "value": 30,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "holy",
+    "description": "Olio benedetto, per unzioni.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Incenso (10 bastoncini)",
+    "type": "consumable",
+    "weight": 0.2,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "religious",
+    "description": "Per rituali, profuma e purifica.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Erbe medicinali (dose)",
+    "type": "consumable",
+    "weight": 0.1,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "herb",
+    "description": "Per curare, miscela di erbe.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Erbe aromatiche (dose)",
+    "type": "consumable",
+    "weight": 0.1,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "herb",
+    "description": "Per cucinare, rosmarino, salvia, timo.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Funghi secchi (dose)",
+    "type": "consumable",
+    "weight": 0.1,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "food",
+    "description": "Commestibili, porcini essiccati.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Carne secca (dose)",
+    "type": "consumable",
+    "weight": 0.2,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "food",
+    "description": "Provvista, carne essiccata e salata.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Pesce secco (dose)",
+    "type": "consumable",
+    "weight": 0.2,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "food",
+    "description": "Provvista, merluzzo o aringa essiccata.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Frutta secca (dose)",
+    "type": "consumable",
+    "weight": 0.2,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "food",
+    "description": "Provvista, fichi, uvetta, datteri.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Pane (pagnotta)",
+    "type": "consumable",
+    "weight": 0.5,
+    "value": 0.02,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "food",
+    "description": "Commestibile, pane di segale.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Formaggio (forma)",
+    "type": "consumable",
+    "weight": 0.5,
+    "value": 0.1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "food",
+    "description": "Commestibile, cacio stagionato.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Salame (pezzo)",
+    "type": "consumable",
+    "weight": 0.3,
+    "value": 0.2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "food",
+    "description": "Commestibile, salame piccante.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Miele (vaso)",
+    "type": "consumable",
+    "weight": 0.5,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "food",
+    "description": "Dolcificante, miele di montagna.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Sale (sacchetto)",
+    "type": "consumable",
+    "weight": 0.5,
+    "value": 0.2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "food",
+    "description": "Per conservare cibo, sale marino.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Spezie (set)",
+    "type": "consumable",
+    "weight": 0.2,
+    "value": 5,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "food",
+    "description": "Per cucinare, pepe, cannella, zafferano.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Vesti comuni",
+    "type": "gear",
+    "weight": 2.0,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "clothing",
+    "description": "Abiti semplici, tunica e pantaloni.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Vesti eleganti",
+    "type": "gear",
+    "weight": 2.5,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "clothing",
+    "description": "Abiti per occasioni speciali, tessuti pregiati.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Mantello",
+    "type": "gear",
+    "weight": 1.0,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "clothing",
+    "description": "Per il freddo, lana pesante.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Cappuccio",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 0.2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "clothing",
+    "description": "Protegge dal sole e nasconde il volto.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Cappello",
+    "type": "gear",
+    "weight": 0.3,
+    "value": 0.2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "clothing",
+    "description": "Per coprirsi dal sole, paglia o feltro.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Cintura",
+    "type": "gear",
+    "weight": 0.3,
+    "value": 0.1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "clothing",
+    "description": "Per tenere i pantaloni, cuoio semplice.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Cinturone",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "clothing",
+    "description": "Per appenderci oggetti, cuoio rinforzato.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Stivali",
+    "type": "gear",
+    "weight": 1.5,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "clothing",
+    "description": "Calzature robuste, cuoio spesso.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Scarpe",
+    "type": "gear",
+    "weight": 1.0,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "clothing",
+    "description": "Calzature leggere, pelle morbida.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Guanti",
+    "type": "gear",
+    "weight": 0.3,
+    "value": 0.2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "clothing",
+    "description": "Per le mani, lana o cuoio sottile.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Camicia",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 0.2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "clothing",
+    "description": "Indumento di lino o cotone.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Pantaloni",
+    "type": "gear",
+    "weight": 0.8,
+    "value": 0.3,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "clothing",
+    "description": "Indumento in lana o tela.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Gonna",
+    "type": "gear",
+    "weight": 0.6,
+    "value": 0.2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "clothing",
+    "description": "Indumento femminile.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Tunica",
+    "type": "gear",
+    "weight": 1.0,
+    "value": 0.3,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "clothing",
+    "description": "Indumento lungo, indossato sopra la camicia.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Veste da sacerdote",
+    "type": "gear",
+    "weight": 2.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "clothing",
+    "description": "Per cerimonie, tessuti pregiati.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Toga",
+    "type": "gear",
+    "weight": 1.5,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "clothing",
+    "description": "Abito formale romano.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Uniforme",
+    "type": "gear",
+    "weight": 2.0,
+    "value": 3,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "clothing",
+    "description": "Di una corporazione o gilda.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Veste da mago",
+    "type": "gear",
+    "weight": 1.5,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "clothing",
+    "description": "Con rune, tessuto scuro.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Veste da druido",
+    "type": "gear",
+    "weight": 1.5,
+    "value": 4,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "clothing",
+    "description": "In fibra naturale, verde e marrone.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Abito da cerimonia",
+    "type": "gear",
+    "weight": 2.0,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "clothing",
+    "description": "Per occasioni importanti, tessuti ricchi.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Maschera",
+    "type": "gear",
+    "weight": 0.2,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "accessory",
+    "description": "Per celare il volto, semplice.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Parrucca",
+    "type": "gear",
+    "weight": 0.3,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "accessory",
+    "description": "Per travestirsi, capelli finti.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Gioielli economici (anello)",
+    "type": "gear",
+    "weight": 0.05,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "jewelry",
+    "description": "Di ottone, finto argento.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Gioielli economici (collana)",
+    "type": "gear",
+    "weight": 0.1,
+    "value": 8,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "jewelry",
+    "description": "Di ottone, ciondolo semplice.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Gioielli economici (bracciale)",
+    "type": "gear",
+    "weight": 0.08,
+    "value": 6,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "jewelry",
+    "description": "Di ottone, catena sottile.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Borsa di cuoio",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Piccola, tiene 5 kg di materiale.",
+    "properties": {
+      "itemType": "gear",
+      "capacity": 5
+    }
+  },
+  {
+    "name": "Borsa a tracolla",
+    "type": "gear",
+    "weight": 0.8,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Media, tiene 8 kg di materiale.",
+    "properties": {
+      "itemType": "gear",
+      "capacity": 8
+    }
+  },
+  {
+    "name": "Sacca da viaggio",
+    "type": "gear",
+    "weight": 1.5,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Tiene 10 kg di materiale.",
+    "properties": {
+      "itemType": "gear",
+      "capacity": 10
+    }
+  },
+  {
+    "name": "Tascapane",
+    "type": "gear",
+    "weight": 0.3,
+    "value": 0.2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Per il cibo, piccolo.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Borsello",
+    "type": "gear",
+    "weight": 0.2,
+    "value": 0.3,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Per monete, cuoio.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Borsa portamonete",
+    "type": "gear",
+    "weight": 0.1,
+    "value": 0.2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Per monete, stringa in cuoio.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Fodero",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Per spada, cuoio.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Fodero per pugnale",
+    "type": "gear",
+    "weight": 0.2,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Per pugnale, cuoio.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Portafrecce",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Per frecce, tiene 20 frecce.",
+    "properties": {
+      "itemType": "gear",
+      "capacity": 20
+    }
+  },
+  {
+    "name": "Portapozioni (6)",
+    "type": "gear",
+    "weight": 0.3,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Contiene 6 fiale, cuoio con scomparti.",
+    "properties": {
+      "itemType": "gear",
+      "capacity": 6
+    }
+  },
+  {
+    "name": "Cassetta per erbe",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Per conservare erbe, legno.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Scrigno piccolo",
+    "type": "gear",
+    "weight": 1.0,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Con serratura, legno.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Scrigno medio",
+    "type": "gear",
+    "weight": 2.5,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Con serratura, legno rinforzato.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Scrigno grande",
+    "type": "gear",
+    "weight": 5.0,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Con serratura, legno massiccio.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Forziere",
+    "type": "gear",
+    "weight": 10.0,
+    "value": 25,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "In legno rinforzato, ferramenta in metallo.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Forziere d'acciaio",
+    "type": "gear",
+    "weight": 15.0,
+    "value": 100,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Robusto, interamente in metallo.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Cofano",
+    "type": "gear",
+    "weight": 3.0,
+    "value": 8,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Per vestiti, legno intagliato.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Baule da viaggio",
+    "type": "gear",
+    "weight": 6.0,
+    "value": 12,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Per trasportare oggetti, robusto.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Cassa",
+    "type": "gear",
+    "weight": 8.0,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "container",
+    "description": "Per merci, legno grezzo.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Simbolo sacro di legno",
+    "type": "gear",
+    "weight": 0.1,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "holy",
+    "description": "Per chierici, intagliato a mano.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Simbolo sacro d'argento",
+    "type": "gear",
+    "weight": 0.2,
+    "value": 25,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "holy",
+    "description": "Per chierici, argentato.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Focus arcano (bacchetta)",
+    "type": "gear",
+    "weight": 0.3,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "arcane",
+    "description": "Per maghi, legno di nocciolo.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Focus arcano (bastone)",
+    "type": "gear",
+    "weight": 1.5,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "arcane",
+    "description": "Per maghi, legno di quercia.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Focus druidico (ramo)",
+    "type": "gear",
+    "weight": 0.5,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "druidic",
+    "description": "Per druidi, ramo di vischio.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Grimorio",
+    "type": "gear",
+    "weight": 1.5,
+    "value": 25,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "book",
+    "description": "Libro degli incantesimi, copertina in cuoio.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Grimorio con copertina in cuoio",
+    "type": "gear",
+    "weight": 1.8,
+    "value": 50,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "book",
+    "description": "Di qualità, rilegatura pregiata.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Pergamena magica (incantesimo)",
+    "type": "consumable",
+    "weight": 0.05,
+    "value": 50,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "scroll",
+    "description": "Incantesimo di 1° livello su pergamena.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Pergamena magica (2°)",
+    "type": "consumable",
+    "weight": 0.05,
+    "value": 150,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "scroll",
+    "description": "Incantesimo di 2° livello su pergamena.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Pozione di mana",
+    "type": "consumable",
+    "weight": 0.2,
+    "value": 100,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "potion",
+    "description": "Liquido blu luminoso.",
+    "properties": {
+      "itemType": "consumable",
+      "effect": "Recupera 1 slot incantesimo di 1° livello"
+    }
+  },
+  {
+    "name": "Kit da medicazione",
+    "type": "tool",
+    "weight": 1.5,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "healer",
+    "description": "Per curare ferite, bende e unguenti.",
+    "properties": {
+      "itemType": "tool"
+    }
+  },
+  {
+    "name": "Bende",
+    "type": "consumable",
+    "weight": 0.2,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "healer",
+    "description": "Per medicare, lino.",
+    "properties": {
+      "itemType": "consumable"
+    }
+  },
+  {
+    "name": "Unguento curativo",
+    "type": "consumable",
+    "weight": 0.1,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "healer",
+    "description": "Cura 1d4 PF, applicato su ferite.",
+    "properties": {
+      "itemType": "consumable",
+      "effect": "Cura 1d4 PF"
+    }
+  },
+  {
+    "name": "Amuleto",
+    "type": "gear",
+    "weight": 0.1,
+    "value": 5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "jewelry",
+    "description": "Portafortuna, semplice ciondolo.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Talismano",
+    "type": "gear",
+    "weight": 0.1,
+    "value": 10,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "jewelry",
+    "description": "Per protezione, rune incise.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Moneta straniera (10)",
+    "type": "currency",
+    "weight": 0.1,
+    "value": 1,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "coin",
+    "description": "Di altri regni, non spendibile localmente.",
+    "properties": {
+      "itemType": "currency"
+    }
+  },
+  {
+    "name": "Pietra preziosa grezza",
+    "type": "gear",
+    "weight": 0.05,
+    "value": 10,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "gem",
+    "description": "Non lavorata, valore potenziale.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Pietra preziosa tagliata",
+    "type": "gear",
+    "weight": 0.05,
+    "value": 50,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "gem",
+    "description": "Lavorata, splendente.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Perla",
+    "type": "gear",
+    "weight": 0.03,
+    "value": 100,
+    "currency": "po",
+    "rarity": "rare",
+    "requires_attunement": false,
+    "category": "gem",
+    "description": "Preziosa, perfetta sfera.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Corno da caccia",
+    "type": "gear",
+    "weight": 1.0,
+    "value": 3,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "instrument",
+    "description": "Per segnalare, suono potente.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Campanella",
+    "type": "gear",
+    "weight": 0.2,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "tool",
+    "description": "Per segnalare, suono argentino.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Fischietto",
+    "type": "gear",
+    "weight": 0.05,
+    "value": 0.2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "tool",
+    "description": "Per segnalare, legno o osso.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Fischietto ultrasonico",
+    "type": "gear",
+    "weight": 0.05,
+    "value": 5,
+    "currency": "po",
+    "rarity": "uncommon",
+    "requires_attunement": false,
+    "category": "tool",
+    "description": "Sentito solo dai cani, addestramento.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Boccaglio",
+    "type": "gear",
+    "weight": 0.1,
+    "value": 0.5,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "tool",
+    "description": "Per respirare sott'acqua, canna.",
+    "properties": {
+      "itemType": "gear"
+    }
+  },
+  {
+    "name": "Occhiali da sole",
+    "type": "gear",
+    "weight": 0.1,
+    "value": 2,
+    "currency": "po",
+    "rarity": "common",
+    "requires_attunement": false,
+    "category": "accessory",
+    "description": "Proteggono dal sole, vetri affumicati.",
+    "properties": {
+      "itemType": "gear"
+    }
+  }
+]

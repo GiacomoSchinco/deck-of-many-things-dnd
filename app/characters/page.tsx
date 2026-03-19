@@ -40,9 +40,9 @@ export default function CharactersPage() {
     }
   }
 
-  const tableData = (characters ?? []).map((c: any) => ({
+  const tableData = (characters ?? []).map((c: Record<string, unknown>) => ({
     ...c,
-    created_at_formatted: formatDate(c.created_at),
+    created_at_formatted: formatDate(String(c['created_at'] ?? '')),
   }));
 
   return (

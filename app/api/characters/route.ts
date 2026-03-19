@@ -1,24 +1,10 @@
-import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
+import { createServerSupabase } from '@/lib/supabase/server'
 //GET /api/characters -> lista personaggi dell'utente loggato
 export async function GET() {
   const cookieStore = await cookies()
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => cookieStore.getAll(),
-        setAll: (cookiesToSet) => {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          )
-        },
-      },
-    }
-  )
+  const supabase = createServerSupabase(cookieStore)
 
   // TUTTI i personaggi (admin)
   const { data: characters, error } = await supabase
@@ -50,20 +36,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Corpo della richiesta non valido' }, { status: 400 })
   }
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => cookieStore.getAll(),
-        setAll: (cookiesToSet) => {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          )
-        },
-      },
-    }
-  )
+  const supabase = createServerSupabase(cookieStore)
 
   // 2. Utente non autenticato
   const { data: { user } } = await supabase.auth.getUser()

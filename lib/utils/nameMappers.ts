@@ -1,38 +1,105 @@
-// lib/nameMappers.ts
-// Mappe nomi italiani → inglese per razze
+// lib/utils/nameMappers.ts
+
+// ─── RAZZE ────────────────────────────────────────────────────────────────────
+
+/** Italiano → inglese (lowercase, come arriva dal DB / Open5e slug) */
 export const raceEnglishNames: Record<string, string> = {
-  'Umano': 'human',
-  'Elfo': 'elf',
-  'Nano': 'dwarf',
+  'Umano':    'human',
+  'Elfo':     'elf',
+  'Nano':     'dwarf',
   'Halfling': 'halfling',
-  'Gnomo': 'gnome',
+  'Gnomo':    'gnome',
   'Mezzelfo': 'half-elf',
   'Mezzorco': 'half-orc',
   'Tiefling': 'tiefling',
-  'Dragonide': 'dragonborn',
-};
+  'Dragonide':'dragonborn',
+}
 
-// Mappe nomi italiani → inglese per classi
+/** Inglese lowercase → italiano */
+export const raceItalianNames: Record<string, string> = {
+  'human':     'Umano',
+  'elf':       'Elfo',
+  'dwarf':     'Nano',
+  'halfling':  'Halfling',
+  'gnome':     'Gnomo',
+  'half-elf':  'Mezzelfo',
+  'half-orc':  'Mezzorco',
+  'tiefling':  'Tiefling',
+  'dragonborn':'Dragonide',
+}
+
+/** Restituisce il nome italiano di una razza. Accetta sia inglese lowercase che Title Case. */
+export function getItalianRace(name: string): string {
+  return raceItalianNames[name.toLowerCase()] ?? name
+}
+
+/** Restituisce l'inglese lowercase di una razza a partire dal nome italiano. */
+export function getEnglishRace(name: string): string {
+  return raceEnglishNames[name] ?? name.toLowerCase()
+}
+
+// ─── CLASSI ───────────────────────────────────────────────────────────────────
+
+/** Italiano → inglese lowercase */
 export const classEnglishNames: Record<string, string> = {
-  'Barbaro': 'barbarian',
-  'Bardo': 'bard',
+  'Barbaro':  'barbarian',
+  'Bardo':    'bard',
   'Chierico': 'cleric',
-  'Druido': 'druid',
-  'Guerriero': 'fighter',
-  'Ladro': 'rogue',
-  'Mago': 'wizard',
-  'Monaco': 'monk',
+  'Druido':   'druid',
+  'Guerriero':'fighter',
+  'Ladro':    'rogue',
+  'Mago':     'wizard',
+  'Monaco':   'monk',
   'Paladino': 'paladin',
-  'Ranger': 'ranger',
+  'Ranger':   'ranger',
   'Stregone': 'sorcerer',
-  'Warlock': 'warlock',
-};
+  'Warlock':  'warlock',
+}
 
-// Funzione per ottenere il nome inglese
-export function getEnglishName(name: string, type: 'race' | 'class'): string {
-  if (type === 'race') {
-    return raceEnglishNames[name] || name.toLowerCase();
-  } else {
-    return classEnglishNames[name] || name.toLowerCase();
-  }
+/** Inglese lowercase → italiano */
+export const classItalianNames: Record<string, string> = {
+  'barbarian':'Barbaro',
+  'bard':     'Bardo',
+  'cleric':   'Chierico',
+  'druid':    'Druido',
+  'fighter':  'Guerriero',
+  'rogue':    'Ladro',
+  'wizard':   'Mago',
+  'monk':     'Monaco',
+  'paladin':  'Paladino',
+  'ranger':   'Ranger',
+  'sorcerer': 'Stregone',
+  'warlock':  'Warlock',
+}
+
+/** Restituisce il nome italiano di una classe. Accetta inglese lowercase o Title Case. */
+export function getItalianClass(name: string): string {
+  return classItalianNames[name.toLowerCase()] ?? name
+}
+
+/** Restituisce l'inglese lowercase di una classe a partire dal nome italiano. */
+export function getEnglishClass(name: string): string {
+  return classEnglishNames[name] ?? name.toLowerCase()
+}
+
+/** Converte un array di classi inglesi in italiano. */
+export function getItalianClasses(names: string[]): string[] {
+  return names.map(getItalianClass)
+}
+
+// ─── SCUOLE DI MAGIA ──────────────────────────────────────────────────────────
+
+export const schoolItalianNames: Record<string, string> = {
+  'abjuration':  'Abiurazione',
+  'conjuration': 'Evocazione',
+  'divination':  'Divinazione',
+  'enchantment': 'Ammaliamento',
+  'evocation':   'Invocazione',
+  'illusion':    'Illusione',
+  'necromancy':  'Necromanzia',
+  'transmutation':'Trasmutazione',
+}
+
+export function getItalianSchool(name: string): string {
+  return schoolItalianNames[name.toLowerCase()] ?? name
 }

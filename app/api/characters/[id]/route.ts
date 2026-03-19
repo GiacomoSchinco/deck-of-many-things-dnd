@@ -1,6 +1,6 @@
-import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
+import { createServerSupabase } from '@/lib/supabase/server'
 
 //GET /api/characters/[id] -> personaggio specifico con TUTTI i dettagli
 export async function GET(
@@ -9,21 +9,7 @@ export async function GET(
 ) {
   const cookieStore = await cookies()
   const { id } = await params
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => cookieStore.getAll(),
-        setAll: (cookiesToSet) => {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          )
-        },
-      },
-    }
-  )
+  const supabase = createServerSupabase(cookieStore)
 
   // Ottieni l'utente loggato
   const { data: { user } } = await supabase.auth.getUser()
@@ -71,20 +57,7 @@ export async function PUT(
   const { id } = await params
   const body = await request.json()
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => cookieStore.getAll(),
-        setAll: (cookiesToSet) => {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          )
-        },
-      },
-    }
-  )
+  const supabase = createServerSupabase(cookieStore)
 
   // Ottieni l'utente loggato
   const { data: { user } } = await supabase.auth.getUser()
@@ -161,22 +134,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const cookieStore = await cookies()
-  const { id } = await params
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => cookieStore.getAll(),
-        setAll: (cookiesToSet) => {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          )
-        },
-      },
-    }
-  )
+  const supabase = createServerSupabase(cookieStore)
 
   const { data: { user } } = await supabase.auth.getUser()
   

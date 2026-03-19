@@ -32,7 +32,7 @@ export function RaceClassCard({
   disabled = false
 }: RaceClassCardProps) {
   
-  const englishName = getEnglishName(name, type);
+  //const englishName = getEnglishName(name, type);
   const folder = type === 'race' ? 'races' : 'classes';
   const isInteractive = !!onSelect;
 
@@ -41,7 +41,7 @@ export function RaceClassCard({
       {/* Immagine di sfondo della carta */}
       <div className="absolute inset-0">
         <Image
-          src={`/images/${folder}/card_${englishName}.png`}
+          src={`/images/${folder}/card_${name}.png`}
           alt={name}
           fill
           className="object-fill"

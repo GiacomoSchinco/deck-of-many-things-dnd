@@ -9,7 +9,7 @@ import HpBar from './HpBar';
 import CardBack from './CardBack';
 import { cn } from '@/lib/utils';
 import { CardSize, CARD_SIZES } from '@/lib/utils/cardSizes';
-import { classEnglishNames } from '@/lib/utils/nameMappers';
+import { getItalianClass, getItalianRace } from '@/lib/utils/nameMappers';
 
 interface CharacterCardProps {
   id: number;
@@ -58,8 +58,8 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
         <div className="flex-1 flex items-center justify-center my-1">
           <div className="relative w-24 h-24 rounded-full border-2 border-amber-700/50 overflow-hidden bg-parchment-200/50 shadow-lg">   
             <Image
-              src={`/images/classes/token_${classEnglishNames[characterClass] ?? characterClass.toLowerCase()}.png`}
-              alt={characterClass}
+              src={`/images/classes/token_${characterClass.toLowerCase()}.png`}
+              alt={getItalianClass(characterClass)}
               fill
               sizes="96px"
               className="object-cover"
@@ -71,11 +71,11 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
         <div className="grid grid-cols-2 gap-2 text-sm">
           <div className="bg-parchment-300/50 p-1.5 rounded text-center">
             <span className="text-amber-800 font-semibold">Razza</span>
-            <p className="text-xs text-amber-900">{race}</p>
+            <p className="text-xs text-amber-900">{getItalianRace(race)}</p>
           </div>
           <div className="bg-parchment-300/50 p-1.5 rounded text-center">
             <span className="text-amber-800 font-semibold">Classe</span>
-            <p className="text-xs text-amber-900">{characterClass}</p>
+            <p className="text-xs text-amber-900">{getItalianClass(characterClass)}</p>
           </div>
           <div className="bg-parchment-300/50 p-1.5 rounded text-center">
             <span className="text-amber-800 font-semibold">Livello</span>
