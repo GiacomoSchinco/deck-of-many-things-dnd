@@ -11,7 +11,7 @@ import { Scroll, Package, Zap, Heart, Shield, Footprints, Zap as InitiativeIcon 
 import Link from 'next/link'
 import { useCharacter } from '@/hooks/queries/useCharacter'
 import Loading from '@/components/custom/Loading'
-import { calculateModifier } from '@/lib/calculations/abilityModifiers'
+import { FanCardGroup } from '@/components/custom/FanCardGroup'
 
 export default function CharacterPage() {
   const params = useParams()

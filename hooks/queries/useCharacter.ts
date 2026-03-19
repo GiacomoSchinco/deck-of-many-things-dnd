@@ -68,3 +68,15 @@ export function useCharacterCombatStats(characterId: string | null) {
     staleTime: 1000 * 60,
   });
 }
+// GET /api/characters/me/recent?limit=N — personaggi recenti
+export function useMyRecentCharacters(limit = 3) {
+  return useQuery({
+    queryKey: ['characters', 'me', 'recent', limit],
+    queryFn: async () => {
+      const res = await fetch(`/api/characters/me/recent?limit=${limit}`);
+      if (!res.ok) throw new Error('Errore caricamento personaggi recenti');
+      return res.json();
+    },
+    staleTime: 1000 * 60,
+  });
+}

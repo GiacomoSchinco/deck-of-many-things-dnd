@@ -9,12 +9,7 @@ import { RaceClassCard } from '../../../custom/RaceClassCard';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import Loading from '@/components/custom/Loading';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-
-interface ClassFeature {
-  level: number;
-  name: string;
-  description: string;
-}
+import type { ClassFeature } from '@/types/class';
 
 interface ClassStepProps {
   initialClassId?: number | null;
@@ -83,7 +78,24 @@ export function ClassStep({ initialClassId, onBack, onSelect }: ClassStepProps) 
           Sfoglia le carte con le frecce e seleziona la tua classe
         </p>
       </div>
+      {/* Pulsanti navigazione */}
+      <div className="flex justify-between pt-4">
+        <Button
+          variant="outline"
+          onClick={onBack}
+          className="border-amber-700 text-amber-700"
+        >
+          ← Indietro
+        </Button>
 
+        <Button
+          onClick={handleConfirm}
+          disabled={!selectedClassId}
+          className="bg-amber-700 hover:bg-amber-800 text-amber-50 disabled:opacity-50"
+        >
+          Avanti: Punteggi →
+        </Button>
+      </div>
       {/* Carosello principale */}
       <div className="relative flex items-center justify-center gap-4">
         {/* Freccia sinistra */}
@@ -208,24 +220,7 @@ export function ClassStep({ initialClassId, onBack, onSelect }: ClassStepProps) 
         </div>
       </AncientCardContainer>
 
-      {/* Pulsanti navigazione */}
-      <div className="flex justify-between pt-4">
-        <Button
-          variant="outline"
-          onClick={onBack}
-          className="border-amber-700 text-amber-700"
-        >
-          ← Indietro
-        </Button>
 
-        <Button
-          onClick={handleConfirm}
-          disabled={!selectedClassId}
-          className="bg-amber-700 hover:bg-amber-800 text-amber-50 disabled:opacity-50"
-        >
-          Avanti: Punteggi →
-        </Button>
-      </div>
     </div>
   );
 }

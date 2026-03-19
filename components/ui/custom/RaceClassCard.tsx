@@ -44,8 +44,7 @@ export function RaceClassCard({
           src={`/images/${folder}/card_${englishName}.png`}
           alt={name}
           fill
-          className="object-fill"
-          loading="eager"
+          className="object-fit: cover"
           sizes="(max-width: 768px) 100vw, 320px"
         />
       </div>

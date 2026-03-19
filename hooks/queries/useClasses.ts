@@ -1,28 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
+import type { DndClass } from '@/types/class';
 
-export interface DndClass {
-  id: number;
-  name: string;
-  description: string;
-  hit_die: string;
-  primary_ability: string[];
-  saving_throws: string[];
-  armor_proficiencies: string[];
-  weapon_proficiencies: string[];
-  tool_proficiencies?: string[];
-  skill_choices: {
-    count: number;
-    options: string[];
-  };
-  spellcasting?: {
-    spellcasting_ability: string;
-  };
-  features: Array<{
-    level: number;
-    name: string;
-    description: string;
-  }>;
-}
+export type { DndClass };
 
 export function useClasses() {
   return useQuery({

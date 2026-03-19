@@ -76,28 +76,49 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
           )}
 
           {/* Razza e Classe */}
-          <div className="flex justify-center gap-4">
+          <FanCardGroup size="md" spread="normal" noWrapper>
             <RaceClassCard type='race' name={calculations?.raceData?.name ?? '...'} size='md' isSelected={false} />
             <RaceClassCard type='class' name={calculations?.classData?.name ?? '...'} size='md' isSelected={false} />
-          </div>
+          </FanCardGroup>
 
           {/* Caratteristiche */}
           {data.abilityScores && (
-            <div>
-              <h3 className="font-serif font-semibold text-amber-900 mb-3 text-center">
-                Caratteristiche
-              </h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {Object.entries(data.abilityScores).map(([key, value]) => {
-                  const bonus = (calculations?.raceData?.ability_bonuses?.[key] || 0);
-                  const finalValue = value + bonus;
-                  const modifier = calculateModifier(finalValue);
-                  return (
-                    <StatDiamond key={key} label={ABILITY_NAMES[key] ?? key} value={finalValue} modifier={modifier} statKey={key} />
-                  );
-                })}
+              <div>
+                <h3 className="font-serif font-semibold text-amber-900 mb-3 text-center">
+                  Caratteristiche
+                </h3>
+
+                {/* Desktop/Tablet: stat diamonds */}
+                <div className="hidden md:grid md:grid-cols-3 gap-3">
+                  {Object.entries(data.abilityScores).map(([key, value]) => {
+                    const bonus = (calculations?.raceData?.ability_bonuses?.[key] || 0);
+                    const finalValue = value + bonus;
+                    const modifier = calculateModifier(finalValue);
+                    return (
+                      <StatDiamond key={key} label={ABILITY_NAMES[key] ?? key} value={finalValue} modifier={modifier} statKey={key} />
+                    );
+                  })}
+                </div>
+
+                {/* Mobile: compact list with value and modifier */}
+                <div className="flex flex-col md:hidden gap-2">
+                  {Object.entries(data.abilityScores).map(([key, value]) => {
+                    const bonus = (calculations?.raceData?.ability_bonuses?.[key] || 0);
+                    const finalValue = value + bonus;
+                    const modifier = calculateModifier(finalValue);
+                    return (
+                      <div key={key} className="flex items-center justify-between bg-amber-50 p-3 rounded">
+                        <div>
+                          <div className="text-sm font-semibold text-amber-800">{ABILITY_NAMES[key] ?? key}</div>
+                          <div className="text-lg font-serif font-bold text-amber-900">
+                            {finalValue} <span className="text-sm text-amber-600 ml-2">({modifier >= 0 ? `+${modifier}` : modifier})</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
           )}
 
           {/* Statistiche di combattimento (calcolate) */}
@@ -127,11 +148,6 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
               </div>
             </FanCardGroup>
           )}
-
-          {/* Bonus competenza */}
-          <div className="text-center text-sm text-amber-700">
-            Bonus competenza: <span className="font-bold">+{proficiencyBonus}</span>
-          </div>
         </div>
       </div>
 

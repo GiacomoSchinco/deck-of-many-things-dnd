@@ -39,21 +39,21 @@ export function BasicInfoStep({ initialData, onNext }: BasicInfoStepProps) {
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!formData.name.trim()) {
       newErrors.name = 'Il nome del personaggio è obbligatorio';
     }
-    
+
     if (!formData.background) {
       newErrors.background = 'Seleziona un background';
     }
-    
+
     return newErrors;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const newErrors = validate();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -75,6 +75,16 @@ export function BasicInfoStep({ initialData, onNext }: BasicInfoStepProps) {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Pulsanti */}
+        <div className="flex justify-end pt-4">
+          <Button
+            type="submit"
+            variant={"default"}
+            size="lg"
+          >
+            Avanti: Scegli Razza →
+          </Button>
+        </div>
         {/* Nome Personaggio */}
         <div className="space-y-2">
           <Label htmlFor="name" className="text-amber-900">
@@ -115,7 +125,7 @@ export function BasicInfoStep({ initialData, onNext }: BasicInfoStepProps) {
           <Label htmlFor="alignment" className="text-amber-900">
             Allineamento
           </Label>
-          <Select 
+          <Select
             value={formData.alignment}
             onValueChange={(value) => setFormData({ ...formData, alignment: value ?? 'Neutrale' })}
           >
@@ -135,7 +145,7 @@ export function BasicInfoStep({ initialData, onNext }: BasicInfoStepProps) {
         {/* Background */}
         <div className="space-y-2">
           <Label htmlFor="background" className="text-amber-900">
-             Background <span className="text-red-500">*</span>
+            Background <span className="text-red-500">*</span>
           </Label>
           <Input
             id="background"
@@ -149,7 +159,7 @@ export function BasicInfoStep({ initialData, onNext }: BasicInfoStepProps) {
             <p className="text-sm text-red-500">{errors.background}</p>
           )}
         </div>
-        
+
         {/* Anteprima */}
         {formData.name && (
           <AncientCardContainer className="mt-6 p-4 text-center">
@@ -168,16 +178,7 @@ export function BasicInfoStep({ initialData, onNext }: BasicInfoStepProps) {
           </AncientCardContainer>
         )}
 
-        {/* Pulsanti */}
-        <div className="flex justify-end pt-4">
-          <Button 
-            type="submit"
-            variant={"default"}
-            size="lg"
-          >
-            Avanti: Scegli Razza →
-          </Button>
-        </div>
+
       </form>
 
       {/* Note decorative */}

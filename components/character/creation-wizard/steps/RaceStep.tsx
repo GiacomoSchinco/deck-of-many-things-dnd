@@ -87,7 +87,24 @@ export function RaceStep({ initialRaceId, onBack, onSelect }: RaceStepProps) {
           Sfoglia le carte con le frecce e seleziona la tua razza
         </p>
       </div>
+      {/* Pulsanti navigazione */}
+      <div className="flex justify-between pt-4">
+        <Button
+          variant="outline"
+          onClick={onBack}
+          className="border-amber-700 text-amber-700"
+        >
+          ← Indietro
+        </Button>
 
+        <Button
+          onClick={handleConfirm}
+          disabled={!selectedRaceId}
+          className="bg-amber-700 hover:bg-amber-800 text-amber-50 disabled:opacity-50"
+        >
+          Avanti: Scegli Classe →
+        </Button>
+      </div>
       {/* Carosello principale */}
       <div className="relative flex items-center justify-center gap-4">
         {/* Freccia sinistra */}
@@ -184,24 +201,7 @@ export function RaceStep({ initialRaceId, onBack, onSelect }: RaceStepProps) {
         </div>
       </AncientCardContainer>
 
-      {/* Pulsanti navigazione */}
-      <div className="flex justify-between pt-4">
-        <Button
-          variant="outline"
-          onClick={onBack}
-          className="border-amber-700 text-amber-700"
-        >
-          ← Indietro
-        </Button>
 
-        <Button
-          onClick={handleConfirm}
-          disabled={!selectedRaceId}
-          className="bg-amber-700 hover:bg-amber-800 text-amber-50 disabled:opacity-50"
-        >
-          Avanti: Scegli Classe →
-        </Button>
-      </div>
     </div>
   );
 }

@@ -1,5 +1,4 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -17,9 +16,19 @@ import {
 import type { User } from '@supabase/supabase-js';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import Loading from '@/components/custom/Loading';
+import { useMyRecentCharacters } from '@/hooks/queries/useCharacter';
+
+type DashboardCharacter = {
+  id: string;
+  name: string;
+  level?: number;
+  class?: string | null;
+  classes?: { name?: string } | null;
+};
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
+  const { data: characters, isLoading: isCharactersLoading } = useMyRecentCharacters();
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -44,7 +53,7 @@ export default function DashboardPage() {
     router.refresh();
   };
 
-  if (loading) {
+  if (loading || isCharactersLoading) {
     return <Loading />;
   }
 
@@ -96,7 +105,7 @@ export default function DashboardPage() {
         {/* Statistiche rapide e azioni */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Area account */}
-          <AncientScroll className="p-6">
+          <AncientScroll className="p-6 h-full">
             <h2 className="text-xl font-serif font-bold text-amber-900 mb-4 flex items-center gap-2">
               <Key className="w-5 h-5 text-amber-700" />
               Il Tuo Account
@@ -129,29 +138,39 @@ export default function DashboardPage() {
               </Link>
             </div>
           </AncientScroll>
-          {/* Ultimi personaggi */}
-          <AncientScroll className="p-6">
+          {/* Personaggi */}
+          <AncientScroll className="p-6 h-full">
             <h2 className="text-xl font-serif font-bold text-amber-900 mb-4 flex items-center gap-2">
               <Sword className="w-5 h-5 text-amber-700" />
-              Ultimi Personaggi
+              Personaggi
             </h2>
             <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center gap-3 p-2 hover:bg-amber-100/50 rounded-lg transition-colors">
-                  <div className="w-10 h-10 bg-amber-200 rounded-full border border-amber-700 flex items-center justify-center">
-                    <span className="text-lg">🧝</span>
+              <div className="flex flex-col h-full">
+                <div className="flex-1 overflow-y-auto pr-2 space-y-3">
+                {characters?.map((character: DashboardCharacter) => (
+                  <div key={character?.id} className="flex items-center gap-3 p-2 hover:bg-amber-100/50 rounded-lg transition-colors">
+                    <div className="w-10 h-10 bg-amber-200 rounded-full border border-amber-700 flex items-center justify-center">
+                      <span className="text-lg">🧝</span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-amber-900">{character?.name}</p>
+                      <p className="text-xs text-amber-600">{character?.classes?.name ?? character?.class ?? ''} · Livello {character?.level}</p>
+                    </div>
+                    <Link href={`/dashboard/${character?.id}`} className="text-amber-700 hover:text-amber-900">
+                      <Button variant="ghost" size="sm">
+                        Visualizza
+                      </Button>
+                    </Link>
                   </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-amber-900">Eroe {i}</p>
-                    <p className="text-xs text-amber-600">Guerriero · Livello 5</p>
-                  </div>
-                  <span className="text-amber-500 text-sm">Ultima modifica 2h fa</span>
+                ))}
                 </div>
-              ))}
-              <Button variant="ghost" className="w-full mt-2 text-amber-700">
-                <PlusCircle className="w-4 h-4 mr-2" />
-                Carica altri personaggi
-              </Button>
+                <div>
+                  <Button variant="ghost" className="w-full mt-2 text-amber-700">
+                    <PlusCircle className="w-4 h-4 mr-2" />
+                    Carica altri personaggi
+                  </Button>
+                </div>
+              </div>
             </div>
           </AncientScroll>
 

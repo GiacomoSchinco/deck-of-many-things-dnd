@@ -23,7 +23,10 @@ export async function GET() {
   
   const { data: campaigns, error } = await supabase
     .from('campaigns')
-    .select('*')
+    .select(`
+      *,
+      characters:characters(count)
+    `)
     .order('name')
 
   if (error) {

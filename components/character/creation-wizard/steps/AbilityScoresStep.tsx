@@ -6,15 +6,7 @@ import { Button } from '@/components/ui/button';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import { DndIcon } from '@/components/icons/DndIcon';
 import type { DndIconName } from '@/components/icons/DndIcon';
-
-interface AbilityScores {
-  strength: number;
-  dexterity: number;
-  constitution: number;
-  intelligence: number;
-  wisdom: number;
-  charisma: number;
-}
+import type { AbilityScores } from '@/types/character';
 
 interface AbilityScoresStepProps {
   initialScores?: AbilityScores | null;
@@ -93,6 +85,23 @@ export function AbilityScoresStep({
         <p className="text-amber-700 text-sm">
           Tira 4d6 e droppa il risultato più basso per ogni caratteristica
         </p>
+              {/* Pulsanti di navigazione */}
+      <div className="flex justify-between pt-4">
+        <Button
+          variant="outline"
+          onClick={onBack}
+          className="border-amber-700 text-amber-700"
+        >
+          ← Indietro
+        </Button>
+
+        <Button
+          onClick={handleConfirm}
+          className="bg-amber-700 hover:bg-amber-800 text-amber-50"
+        >
+          Conferma Punteggi →
+        </Button>
+      </div>
         {Object.keys(raceBonuses).length > 0 && (
           <div className="bg-amber-100 p-2 rounded mt-2">
             <p className="text-sm text-amber-800">
@@ -125,28 +134,25 @@ export function AbilityScoresStep({
         </Button>
       </div>
 
-      {/* Griglia delle card */}
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-1">
+      {/* Desktop/Tablet: griglia di card; Mobile: lista compatta */}
+      <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-3 mt-1 justify-items-center">
         {ABILITIES.map(({ key, name }) => {
           const baseScore = scores[key as keyof AbilityScores];
           const raceBonus = raceBonuses[key] || 0;
 
           return (
-            <AncientCardContainer className="w-45 h-62" key={key}>
+            <AncientCardContainer className="w-44 sm:w-48 lg:w-48 h-64 sm:h-72 lg:h-72 overflow-hidden shrink-0" key={key}>
               <div className="h-full flex flex-col relative">
-                {/* Icona di sfondo centrata per tutta la card */}
                 <DndIcon
                   name={`icon_${key}` as DndIconName}
-                  size={160}
+                  size={120}
                   className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-8 text-gold-500 pointer-events-none"
                 />
 
-                {/* Nome centrato in alto */}
                 <div className="flex justify-center pt-0 z-10">
                   <div className="text-2xl text-center">{name}</div>
                 </div>
 
-                {/* Contenuto centrato verticalmente e orizzontalmente */}
                 <div className="flex-1 flex items-center justify-center z-10">
                   <div className="text-center">
                     <h3 className="font-serif font-bold text-amber-900 mb-4 text-4xl">
@@ -158,7 +164,6 @@ export function AbilityScoresStep({
                   </div>
                 </div>
 
-                {/* Pulsante per tiro singolo */}
                 <div className="absolute bottom-4 left-0 right-0 flex justify-center z-20">
                   <Button
                     size="sm"
@@ -175,23 +180,38 @@ export function AbilityScoresStep({
         })}
       </div>
 
-      {/* Pulsanti di navigazione */}
-      <div className="flex justify-between pt-4">
-        <Button
-          variant="outline"
-          onClick={onBack}
-          className="border-amber-700 text-amber-700"
-        >
-          ← Indietro
-        </Button>
+      {/* Mobile: lista compatta con pulsante di rilancio per ogni abilità */}
+      <div className="flex flex-col gap-3 md:hidden mt-1">
+        {ABILITIES.map(({ key, name }) => {
+          const baseScore = scores[key as keyof AbilityScores];
+          const raceBonus = raceBonuses[key] || 0;
 
-        <Button
-          onClick={handleConfirm}
-          className="bg-amber-700 hover:bg-amber-800 text-amber-50"
-        >
-          Conferma Punteggi →
-        </Button>
+          return (
+            <div key={key} className="flex items-center justify-between bg-amber-50 p-3 rounded">
+              <div>
+                <div className="text-sm font-semibold text-amber-800">{name}</div>
+                <div className="text-2xl font-serif font-bold text-amber-900">
+                  {baseScore}
+                  {raceBonus > 0 && <span className="text-green-600 text-lg ml-1">+{raceBonus}</span>}
+                </div>
+              </div>
+
+              <div>
+                <Button
+                  size="sm"
+                  onClick={() => rollSingle(key as keyof AbilityScores)}
+                  disabled={rollingAbility === key}
+                  className="bg-amber-700/80 hover:bg-amber-800 text-amber-50 text-xs px-3 py-1 rounded-full"
+                >
+                  {rollingAbility === key ? '🎲 Tirando...' : '🎲 Ritira'}
+                </Button>
+              </div>
+            </div>
+          );
+        })}
       </div>
+
+
     </div>
   );
 }

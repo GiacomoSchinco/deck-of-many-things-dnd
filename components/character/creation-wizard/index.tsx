@@ -10,13 +10,7 @@ import { AbilityScoresStep } from './steps/AbilityScoresStep';
 import { ReviewStep } from './steps/ReviewStep';
 import { CampaignStep } from './steps/CampaignStep';
 import Loading from '@/components/custom/Loading';
-
-interface Race {
-  id: number;
-  name: string;
-  ability_bonuses: Record<string, number>;
-  // ... altri campi
-}
+import type { Race } from '@/types/race';
 
 export function CreationWizard() {
   const {

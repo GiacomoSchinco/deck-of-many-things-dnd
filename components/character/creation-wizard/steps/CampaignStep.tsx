@@ -59,7 +59,34 @@ export function CampaignStep({ initialCampaignId, onBack, onSelect }: CampaignSt
           Seleziona una campagna per il tuo personaggio
         </p>
       </div>
-
+      {/* Pulsanti navigazione */}
+      <div className="flex justify-between pt-4">
+        <Button 
+          variant="outline"
+          onClick={onBack}
+          className="border-amber-700 text-amber-700"
+        >
+          ← Indietro
+        </Button>
+        
+        <div className="flex gap-2">
+          <Button 
+            variant="ghost"
+            onClick={handleSkip}
+            className="text-amber-600"
+          >
+            Salta (nessuna campagna)
+          </Button>
+          
+          <Button 
+            onClick={handleContinue}
+            disabled={!selectedCampaignId}
+            className="bg-amber-700 hover:bg-amber-800 text-amber-50"
+          >
+            Avanti →
+          </Button>
+        </div>
+      </div>
       {/* Lista campagne esistenti */}
       {campaigns && campaigns.length > 0 ? (
         <div className="space-y-4">
@@ -101,34 +128,7 @@ export function CampaignStep({ initialCampaignId, onBack, onSelect }: CampaignSt
         </AncientCardContainer>
       )}
 
-      {/* Pulsanti navigazione */}
-      <div className="flex justify-between pt-4">
-        <Button 
-          variant="outline"
-          onClick={onBack}
-          className="border-amber-700 text-amber-700"
-        >
-          ← Indietro
-        </Button>
-        
-        <div className="flex gap-2">
-          <Button 
-            variant="ghost"
-            onClick={handleSkip}
-            className="text-amber-600"
-          >
-            Salta (nessuna campagna)
-          </Button>
-          
-          <Button 
-            onClick={handleContinue}
-            disabled={!selectedCampaignId}
-            className="bg-amber-700 hover:bg-amber-800 text-amber-50"
-          >
-            Avanti →
-          </Button>
-        </div>
-      </div>
+
     </div>
   );
 }

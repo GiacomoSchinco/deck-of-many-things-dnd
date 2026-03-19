@@ -1,60 +1,76 @@
 // components/ui/custom/FanCardGroup.tsx
 'use client';
 
-import { ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import AncientCardContainer from './AncientCardContainer';
-
-export type CardSize = 'sm' | 'md' | 'lg';
+import { CARD_SIZES, type CardSize } from '@/lib/utils/cardSizes';
 
 interface FanCardGroupProps {
-  children: ReactNode[];
-  size?: CardSize;
+  children: ReactNode;
+  size?: CardSize; // le dimensioni sono fisse in base a questa prop
   className?: string;
   cardClassName?: string;
+  spread?: 'tight' | 'normal' | 'wide';
+  noWrapper?: boolean; // salta AncientCardContainer se i figli hanno già il loro container
 }
 
-const sizeMap = {
-  sm: 'w-40 h-64',
-  md: 'w-48 h-75',
-  lg: 'w-64 h-96',
+// Genera posizioni dinamiche in base al numero di elementi
+const generateFanPositions = (count: number, spread: 'tight' | 'normal' | 'wide') => {
+  if (count === 1) return [{ rotate: '0deg', marginLeft: '0px', zIndex: 1 }];
+  
+  const spreadMap = {
+    tight: 15,
+    normal: 25,
+    wide: 35,
+  };
+  
+  const marginValue = spreadMap[spread];
+  const angleStep = Math.min(8, 20 / count); // riduci l'angolo se ci sono tante carte
+  const startAngle = -((count - 1) * angleStep) / 2;
+  
+  return Array.from({ length: count }).map((_, index) => ({
+    rotate: `${startAngle + index * angleStep}deg`,
+    marginLeft: index === 0 ? '0px' : `-${marginValue}px`,
+    zIndex: index, // semplice: ultima carta sopra
+  }));
 };
-
-const fanPositions = [
-  { rotate: '-3deg', marginLeft: '0px', zIndex: 1 },
-  { rotate: '-1deg', marginLeft: '-25px', zIndex: 2 },
-  { rotate: '1deg', marginLeft: '-25px', zIndex: 2 },
-  { rotate: '3deg', marginLeft: '-25px', zIndex: 1 },
-];
 
 export function FanCardGroup({ 
   children, 
   size = 'md',
+  spread = 'normal',
   className,
-  cardClassName
+  cardClassName,
+  noWrapper = false,
 }: FanCardGroupProps) {
   
+  const items = React.Children.toArray(children);
+  const positions = generateFanPositions(items.length, spread);
+
   return (
     <div className={cn("flex items-center justify-center", className)}>
-      {children.map((child, index) => {
-        const pos = fanPositions[index] || { rotate: '0deg', marginLeft: '-20px', zIndex: 1 };
+      {items.map((child, index) => {
+        const pos = positions[index];
         
         return (
           <div
             key={index}
             className={cn(
-              "relative transition-all duration-300 hover:scale-105 hover:z-20",
-              sizeMap[size]
+              "relative transition-all duration-300 hover:scale-105 hover:z-20 overflow-hidden shrink-0",
+              CARD_SIZES[size] // ← dimensioni FISSE in base alla prop size
             )}
             style={{
               transform: `rotate(${pos.rotate})`,
-              marginLeft: index === 0 ? '0px' : pos.marginLeft,
+              marginLeft: pos.marginLeft,
               zIndex: pos.zIndex,
             }}
           >
-            <AncientCardContainer className={cn("w-full h-full", cardClassName)}>
-              {child}
-            </AncientCardContainer>
+            {noWrapper ? child : (
+              <AncientCardContainer className={cn("w-full h-full", cardClassName)}>
+                {child}
+              </AncientCardContainer>
+            )}
           </div>
         );
       })}

@@ -1,11 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
+import type { Campaign } from '@/types/campaign';
 
-export interface Campaign {
-  id: string;
-  name: string;
-  description: string;
-  dungeon_master: string;
-}
+export type { Campaign };
 
 export function useCampaigns() {
   return useQuery({
