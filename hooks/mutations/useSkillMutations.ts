@@ -2,7 +2,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 interface CreateSkillDTO {
-  skill_name: string;
+  skill_id: number;
   proficiency_type?: 'none' | 'proficient' | 'expertise' | 'half';
 }
 
@@ -36,13 +36,14 @@ export function useCreateSkills() {
 }
 
 // Aggiornamento competenza singola
-export function useUpdateSkill(characterId: string | null, skillName: string) {
+export function useUpdateSkill(characterId: string | null, skillId: number | string) {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (data: UpdateSkillDTO) => {
       if (!characterId) throw new Error('Missing character id');
-      const res = await fetch(`/api/characters/${characterId}/skills/${skillName}`, {
+      const idSegment = typeof skillId === 'number' ? skillId : encodeURIComponent(String(skillId));
+      const res = await fetch(`/api/characters/${characterId}/skills/${idSegment}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -55,7 +56,7 @@ export function useUpdateSkill(characterId: string | null, skillName: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['skills', characterId] });
-      queryClient.invalidateQueries({ queryKey: ['skill', characterId, skillName] });
+      queryClient.invalidateQueries({ queryKey: ['skill', characterId, skillId] });
     },
   });
 }
@@ -65,9 +66,10 @@ export function useDeleteSkill(characterId: string | null) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (skillName: string) => {
+    mutationFn: async (skillId: number | string) => {
       if (!characterId) throw new Error('Missing character id');
-      const res = await fetch(`/api/characters/${characterId}/skills/${skillName}`, {
+      const idSegment = typeof skillId === 'number' ? skillId : encodeURIComponent(String(skillId));
+      const res = await fetch(`/api/characters/${characterId}/skills/${idSegment}`, {
         method: 'DELETE',
       });
       if (!res.ok) {
@@ -76,9 +78,9 @@ export function useDeleteSkill(characterId: string | null) {
       }
       return res.json();
     },
-    onSuccess: (_, skillName) => {
+    onSuccess: (_data, skillId) => {
       queryClient.invalidateQueries({ queryKey: ['skills', characterId] });
-      queryClient.invalidateQueries({ queryKey: ['skill', characterId, skillName] });
+      queryClient.invalidateQueries({ queryKey: ['skill', characterId, skillId] });
     },
   });
 }

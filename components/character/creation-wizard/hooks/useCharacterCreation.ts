@@ -129,7 +129,7 @@ export function useCharacterCreation() {
             // 1) Save selected skills (if any) using mutations
             if (data.skills && data.skills.length > 0) {
               const skillsToInsert = data.skills.map((skillId) => ({
-                skill_name: skillId,
+                skill_id: parseInt(skillId, 10),
                 proficiency_type: 'proficient' as const,
               }));
 

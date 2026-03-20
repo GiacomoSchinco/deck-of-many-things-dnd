@@ -42,7 +42,7 @@ export async function GET(
     )
   }
 }
-// app/api/characters/[id]/skills/route.ts (aggiungi POST)
+
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -72,15 +72,16 @@ export async function POST(
       return NextResponse.json({ error: 'skills deve essere un array' }, { status: 400 })
     }
 
+    // 🔥 CAMBIO: usa skill_id invece di skill_name
     const rows = skills.map((skill: any) => ({
       character_id: id,
-      skill_name: skill.skill_name,
+      skill_id: skill.skill_id,           // ← ora è ID numerico
       proficiency_type: skill.proficiency_type || 'proficient'
     }))
 
     const { data, error } = await supabase
       .from('skill_proficiencies')
-      .upsert(rows, { onConflict: 'character_id,skill_name' })
+      .upsert(rows, { onConflict: 'character_id,skill_id' })  // ← conflitto su skill_id
       .select()
 
     if (error) {

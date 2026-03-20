@@ -1,15 +1,15 @@
-// app/api/characters/[id]/skills/[skillName]/route.ts
+// app/api/characters/[id]/skills/[skillId]/route.ts
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { createServerSupabase } from '@/lib/supabase/server'
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ id: string; skillName: string }> }
+  { params }: { params: Promise<{ id: string; skillId: string }> }
 ) {
   try {
     const cookieStore = await cookies()
-    const { id, skillName } = await params
+    const { id, skillId } = await params
     const supabase = createServerSupabase(cookieStore)
 
     // Verifica proprietà
@@ -32,7 +32,7 @@ export async function PUT(
       .from('skill_proficiencies')
       .update({ proficiency_type })
       .eq('character_id', id)
-      .eq('skill_name', skillName)
+      .eq('skill_id', parseInt(skillId))
       .select()
       .single()
 
@@ -48,14 +48,14 @@ export async function PUT(
     )
   }
 }
-// app/api/characters/[id]/skills/[skillName]/route.ts (aggiungi DELETE)
+
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ id: string; skillName: string }> }
+  { params }: { params: Promise<{ id: string; skillId: string }> }
 ) {
   try {
     const cookieStore = await cookies()
-    const { id, skillName } = await params
+    const { id, skillId } = await params
     const supabase = createServerSupabase(cookieStore)
 
     // Verifica proprietà
@@ -75,7 +75,7 @@ export async function DELETE(
       .from('skill_proficiencies')
       .delete()
       .eq('character_id', id)
-      .eq('skill_name', skillName)
+      .eq('skill_id', parseInt(skillId))
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
