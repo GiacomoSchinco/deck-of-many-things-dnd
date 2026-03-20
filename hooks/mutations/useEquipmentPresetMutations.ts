@@ -7,7 +7,7 @@ export function useCreateEquipmentPreset() {
 
   return useMutation({
     mutationFn: async (data: CreateEquipmentPresetDTO) => {
-      const res = await fetch('/api/equipment-presets', {
+      const res = await fetch('/api/equipments/presets', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -29,7 +29,7 @@ export function useUpdateEquipmentPreset() {
 
   return useMutation({
     mutationFn: async ({ id, ...data }: UpdateEquipmentPresetDTO & { id: number }) => {
-      const res = await fetch(`/api/equipment-presets/${id}`, {
+      const res = await fetch(`/api/equipments/presets/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -52,7 +52,7 @@ export function useDeleteEquipmentPreset() {
 
   return useMutation({
     mutationFn: async (id: number) => {
-      const res = await fetch(`/api/equipment-presets/${id}`, {
+      const res = await fetch(`/api/equipments/presets/${id}`, {
         method: 'DELETE'
       })
       if (!res.ok) {

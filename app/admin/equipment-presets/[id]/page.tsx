@@ -1,14 +1,18 @@
-interface EditEquipmentPresetPageProps {
-  params: Promise<{ id: string }>
-}
+// app/admin/equipment-presets/[id]/page.tsx
+'use client'
 
-export default async function EditEquipmentPresetPage({ params }: EditEquipmentPresetPageProps) {
-  const { id } = await params
+import { useParams } from 'next/navigation'
+import { useEquipmentPreset } from '@/hooks/queries/useEquipmentPresets'
+import CreateEquipmentPresetPage from '../create/page'
 
-  return (
-    <main className="p-6">
-      <h1 className="text-2xl font-semibold">Modifica Equipment Preset</h1>
-      <p className="mt-2 text-sm text-muted-foreground">Preset ID: {id}</p>
-    </main>
-  )
+export default function EditEquipmentPresetPage() {
+  const params = useParams()
+  const id = parseInt(params.id as string)
+  const { data: preset, isLoading } = useEquipmentPreset(id)
+
+  if (isLoading) return <div>Caricamento...</div>
+  if (!preset) return <div>Preset non trovato</div>
+
+  // Passa i dati al componente di creazione
+  return <CreateEquipmentPresetPage initialData={preset} />
 }

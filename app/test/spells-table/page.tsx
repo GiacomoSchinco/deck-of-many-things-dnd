@@ -4,7 +4,23 @@
 import { useSpells } from '@/hooks/queries/useSpells';
 import DataTable from '@/components/custom/DataTable';
 import Loading from '@/components/custom/Loading';
-import { getItalianClass, getItalianClasses, getItalianSchool } from '@/lib/utils/nameMappers';
+import { getItalianClasses, getItalianSchool } from '@/lib/utils/nameMappers';
+
+type SpellRow = {
+  id: number;
+  name: string;
+  level: number;
+  school: string;
+  casting_time?: string | null;
+  range?: string | null;
+  duration?: string | null;
+  components?: string[] | null;
+  ritual?: boolean;
+  concentration?: boolean;
+  classes?: string[] | null;
+  description?: string | null;
+  at_higher_levels?: string | null;
+};
 
 export default function SpellsTablePage() {
   const { data: spells, isLoading, error } = useSpells();
@@ -21,7 +37,7 @@ export default function SpellsTablePage() {
   if (error) return <div>Errore: {error.message}</div>;
 
   // Prepara i dati per DataTable
-  const tableData = spells?.map((spell: any) => ({
+  const tableData = (spells as SpellRow[] | undefined)?.map((spell) => ({
     id: spell.id,
     name: spell.name,
     level: spell.level,

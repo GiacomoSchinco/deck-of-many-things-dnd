@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { useCampaigns } from '@/hooks/queries/useCampaigns';
 import type { Campaign } from '@/types';
 import Loading from '@/components/custom/Loading';
-import { AncientScroll } from '@/components/custom/AncientScroll';
 import DataTable from '@/components/custom/DataTable';
 import Link from 'next/link';
 import { PlusCircle } from 'lucide-react';

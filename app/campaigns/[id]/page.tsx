@@ -4,7 +4,6 @@ import Loading from '@/components/custom/Loading';
 import { useCampaign } from '@/hooks/queries/useCampaigns';
 import { useCharactersByCampaign } from '@/hooks/queries/useCharacter';
 import { useParams } from 'next/navigation'
-import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import Link from 'next/link';
 import { Users, Calendar, User, Sword } from 'lucide-react';
 import { Button } from '@/components/ui/button';

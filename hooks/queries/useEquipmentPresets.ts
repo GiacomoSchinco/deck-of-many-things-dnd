@@ -1,6 +1,6 @@
 // hooks/queries/useEquipmentPresets.ts
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { EquipmentPreset, CreateEquipmentPresetDTO, UpdateEquipmentPresetDTO } from '@/types/equipment'
+import { useQuery } from '@tanstack/react-query'
+import { EquipmentPreset } from '@/types/equipment'
 
 // GET lista preset
 export function useEquipmentPresets(classId?: number) {
@@ -10,7 +10,7 @@ export function useEquipmentPresets(classId?: number) {
   return useQuery({
     queryKey: ['equipment-presets', classId],
     queryFn: async () => {
-      const res = await fetch(`/api/equipment-presets?${params}`)
+      const res = await fetch(`/api/equipments/presets?${params}`)
       if (!res.ok) throw new Error('Errore caricamento preset')
       const data = await res.json()
       return data.presets as EquipmentPreset[]
@@ -24,7 +24,7 @@ export function useEquipmentPreset(id: number | null) {
     queryKey: ['equipment-preset', id],
     queryFn: async () => {
       if (!id) return null
-      const res = await fetch(`/api/equipment-presets/${id}`)
+      const res = await fetch(`/api/equipments/presets/${id}`)
       if (!res.ok) throw new Error('Errore caricamento preset')
       return res.json() as Promise<EquipmentPreset>
     },

@@ -11,6 +11,9 @@ const navLinks = [
     { href: "/weapons", label: "Armi" },
 ];
 
+const adminLinks = [
+    { href: "/admin/", label: "Pannello amministratore" }]
+
 export default function Topbar() {
     const [open, setOpen] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -61,6 +64,7 @@ export default function Topbar() {
 
                     {/* Menu desktop */}
                     <ul className="hidden lg:flex items-center gap-1">
+                        {isLoggedIn && (<>
                         {navLinks.map((link) => (
                             <li key={link.href}>
                                 <Link
@@ -73,7 +77,7 @@ export default function Topbar() {
                                 </Link>
                             </li>
                         ))}
-                        {isLoggedIn && (
+                        
                             <li>
                                 <Link
                                     href="/dashboard"
@@ -84,7 +88,20 @@ export default function Topbar() {
                                     <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-amber-500 group-hover:w-full transition-all duration-300" />
                                 </Link>
                             </li>
+                            </>
                         )}
+                        {isLoggedIn && adminLinks.map((link) => (
+                            <li key={link.href}>
+                                <Link
+                                    href={link.href}
+                                    className="relative px-4 py-2 text-amber-100 hover:text-amber-50 transition-all duration-300 group inline-flex"
+                                >
+                                    <span className="relative z-10 font-serif">{link.label}</span>
+                                    <span className="absolute inset-0 bg-amber-800/50 border border-amber-700/50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-amber-500 group-hover:w-full transition-all duration-300" />
+                                </Link>
+                            </li>
+                        ))}
                         <li><AuthButton /></li>
                     </ul>
 
@@ -141,6 +158,17 @@ export default function Topbar() {
                                             Dashboard
                                         </Link>
                                     </li>
+                                    {adminLinks.map((link) => (
+                                        <li key={link.href}>
+                                            <Link
+                                                href={link.href}
+                                                onClick={() => setOpen(false)}
+                                                className="flex items-center px-4 py-3 rounded-lg text-amber-100 hover:text-amber-50 hover:bg-amber-800/50 transition-all duration-200 font-serif"
+                                            >
+                                                Admin · {link.label}
+                                            </Link>
+                                        </li>
+                                    ))}
                                 </>
                             )}
                             <div className="mx-4 border-t border-amber-700/30 my-1" />

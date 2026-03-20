@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { useCreateCharacter } from '@/hooks/mutations/useCharacterMutations';
 import { useCharacterCalculations } from '@/hooks/useCharacterCalculations';
 import { useCreationStore } from '@/store/useCreationStore';
+import type { EquipmentItem } from '@/types/equipment';
 
 export interface CreationData {
   // Step 1 - Basic Info
@@ -32,6 +33,8 @@ export interface CreationData {
     wisdom: number;
     charisma: number;
   } | null;
+  // Optional equipment selected during creation
+  equipment?: EquipmentItem[];
 }
 
 export type CreationStep = 
@@ -40,7 +43,9 @@ export type CreationStep =
   | 'class'
   | 'campaign'
   | 'abilities'
+  | 'equipment'
   | 'review';
+  
 
 export function useCharacterCreation() {
   const router = useRouter();
@@ -54,7 +59,7 @@ export function useCharacterCreation() {
     data.abilityScores ?? null,
   );
 
-  const steps: CreationStep[] = ['basic-info', 'race', 'class', 'campaign', 'abilities', 'review'];
+  const steps: CreationStep[] = ['basic-info', 'race', 'class', 'campaign', 'abilities', 'equipment','review'];
   
   const nextStep = () => {
     const currentIndex = steps.indexOf(currentStep);
@@ -113,8 +118,55 @@ export function useCharacterCreation() {
       {
         onSuccess: (character) => {
           toast.success('Personaggio creato!');
-          reset();
-          router.push(`/dashboard/${character.id}`);
+          // If equipment was selected during creation, save inventory server-side
+          (async () => {
+            try {
+              if (data.equipment && data.equipment.length > 0) {
+                const itemsDetails = await Promise.all(
+                  data.equipment.map(async (item) => {
+                    const res = await fetch(`/api/items/${item.item_id}`);
+                    if (!res.ok) throw new Error('Errore caricamento item');
+                    const fullItem = await res.json();
+                    return {
+                      character_id: character.id,
+                      item_id: item.item_id,
+                      item_name: item.name || fullItem.name,
+                      item_type: fullItem.type,
+                      quantity: item.quantity,
+                      weight: fullItem.weight,
+                      equipped: fullItem.type === 'weapon' || fullItem.type === 'armor',
+                      properties: fullItem.properties ?? null,
+                    };
+                  })
+                );
+
+                  // Posta gli oggetti all'endpoint inventory server-side
+                  try {
+                    const res = await fetch(`/api/characters/${character.id}/inventory`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ items: itemsDetails })
+                    });
+
+                    if (!res.ok) {
+                      const err = await res.json().catch(() => ({ error: 'Unknown' }));
+                      console.error('Errore salvataggio inventario (API):', err);
+                    } else {
+                      const payload = await res.json().catch(() => null);
+                      console.log(`✅ Inventario salvato: ${payload?.inserted ?? 0} oggetti`);
+                    }
+                  } catch (e) {
+                    console.error('Errore salvataggio inventario (fetch):', e);
+                  }
+              }
+            } catch (e) {
+              console.error(e);
+              toast.error('Errore salvataggio inventario');
+            } finally {
+              reset();
+              router.push(`/dashboard/${character.id}`);
+            }
+          })();
         },
         onError: (err) => {
           toast.error(err instanceof Error ? err.message : 'Errore durante il salvataggio');

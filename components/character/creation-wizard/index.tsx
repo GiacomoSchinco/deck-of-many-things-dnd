@@ -9,6 +9,7 @@ import { ClassStep } from './steps/ClassStep';
 import { AbilityScoresStep } from './steps/AbilityScoresStep';
 import { ReviewStep } from './steps/ReviewStep';
 import { CampaignStep } from './steps/CampaignStep';
+import { EquipmentStep } from './steps/EquipmentStep';
 import Loading from '@/components/custom/Loading';
 import type { Race } from '@/types/race';
 
@@ -105,7 +106,17 @@ export function CreationWizard() {
             }}
           />
         );
-
+      case 'equipment':
+        return (
+          <EquipmentStep
+            classId={data.classId!}
+            onBack={prevStep}
+            onConfirm={(selectedItems) => {
+              updateData({ equipment: selectedItems });
+              nextStep();
+            }}
+          />
+        );
       case 'review':
         return (
           <ReviewStep
@@ -137,13 +148,12 @@ export function CreationWizard() {
               <div
                 className="h-full bg-amber-700 rounded-full transition-all"
                 style={{
-                  width: `${
-                    currentStep === 'basic-info' ? 16 :
-                    currentStep === 'race' ? 32 :
-                    currentStep === 'class' ? 48 :
-                    currentStep === 'campaign' ? 64 :
-                    currentStep === 'abilities' ? 80 : 100
-                  }%`
+                  width: `${currentStep === 'basic-info' ? 16 :
+                      currentStep === 'race' ? 32 :
+                        currentStep === 'class' ? 48 :
+                          currentStep === 'campaign' ? 64 :
+                            currentStep === 'abilities' ? 80 : 100
+                    }%`
                 }}
               />
             </div>

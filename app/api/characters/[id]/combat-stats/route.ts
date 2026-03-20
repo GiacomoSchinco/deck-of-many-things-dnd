@@ -46,9 +46,10 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-    const cookieStore = await cookies()
-    const { id } = await params
-    const supabase = createServerSupabase(cookieStore)
+  const cookieStore = await cookies()
+  const { id } = await params
+  const body = await request.json()
+  const supabase = createServerSupabase(cookieStore)
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {

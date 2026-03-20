@@ -7,6 +7,19 @@ import { Button } from '@/components/ui/button';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 
+type ImportItem = {
+  name: string;
+  type: string;
+  weight?: number;
+  value?: number;
+  currency?: string;
+  rarity?: string;
+  requires_attunement?: boolean;
+  category?: string | null;
+  description?: string | null;
+  properties?: unknown;
+};
+
 export default function ImportItemsPage() {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0 });
@@ -33,7 +46,7 @@ export default function ImportItemsPage() {
       const response = await fetch('/items.json');
       if (!response.ok) throw new Error('File items.json non trovato');
       
-      const items = await response.json();
+      const items: ImportItem[] = await response.json();
       setProgress({ current: 0, total: items.length });
       addLog('success', `✅ Caricati ${items.length} oggetti dal JSON`);
       
@@ -58,7 +71,7 @@ export default function ImportItemsPage() {
         const batch = items.slice(i, i + BATCH_SIZE);
         
         // Prepara i dati
-        const formattedBatch = batch.map((item: any) => ({
+        const formattedBatch = batch.map((item: ImportItem) => ({
           name: item.name,
           type: item.type,
           weight: item.weight || 0,
@@ -72,14 +85,14 @@ export default function ImportItemsPage() {
         }));
         
         // Controlla duplicati
-        const names = formattedBatch.map(i => i.name);
+        const names = formattedBatch.map((i) => i.name);
         const { data: existing } = await supabase
           .from('items')
           .select('name')
           .in('name', names);
         
         const existingNames = new Set(existing?.map(e => e.name) || []);
-        const newItems = formattedBatch.filter(i => !existingNames.has(i.name));
+        const newItems = formattedBatch.filter((i) => !existingNames.has(i.name));
         skipped += formattedBatch.length - newItems.length;
         
         if (newItems.length === 0) {
