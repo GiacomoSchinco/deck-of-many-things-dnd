@@ -7,10 +7,11 @@ import { CreationData } from '../hooks/useCharacterCreation';
 import { calculateModifier } from '@/lib/calculations/abilityModifiers';
 import { useCharacterCalculations } from '@/hooks/useCharacterCalculations';
 import { useCampaign } from '@/hooks/queries/useCampaigns';
+import { useSkillList } from '@/hooks/queries/useSkills';
 import StatDiamond from '@/components/custom/StatDiamond';
 import { RaceClassCard } from '@/components/custom/RaceClassCard';
 import { FanCardGroup } from '@/components/custom/FanCardGroup';
-import { Package, Sword, Shield, FlaskConical, Wrench } from 'lucide-react';
+import { Package, Sword, Shield, FlaskConical, Wrench, Target } from 'lucide-react';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 
 interface ReviewStepProps {
@@ -28,6 +29,15 @@ const ABILITY_NAMES: Record<string, string> = {
   intelligence: 'Intelligenza',
   wisdom: 'Saggezza',
   charisma: 'Carisma',
+};
+
+const ABILITY_SHORT: Record<string, string> = {
+  strength: 'FOR',
+  dexterity: 'DES',
+  constitution: 'COS',
+  intelligence: 'INT',
+  wisdom: 'SAG',
+  charisma: 'CAR',
 };
 
 // Icona per tipo di oggetto
@@ -48,8 +58,26 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
     data.abilityScores ?? null,
   );
   const { data: campaign } = useCampaign(data.campaignId ?? null);
+  const { data: allSkills } = useSkillList();
 
-  const proficiencyBonus = 2; // Livello 1
+  // Trova i dettagli delle skill selezionate
+  const selectedSkillsDetails = data.skills?.map(skillId => {
+    const skill = allSkills?.find(s => String(s.id) === skillId);
+    if (!skill) return null;
+    
+    const abilityScore = data.abilityScores?.[skill.ability as keyof typeof data.abilityScores] || 10;
+    const abilityModifier = calculateModifier(abilityScore);
+    const proficiencyBonus = 2; // Livello 1
+    
+    return {
+      id: skill.id,
+      name: skill.name_it,
+      ability: skill.ability,
+      abilityShort: ABILITY_SHORT[skill.ability] || skill.ability.slice(0,3).toUpperCase(),
+      abilityModifier: abilityModifier,
+      totalBonus: abilityModifier + proficiencyBonus,
+    };
+  }).filter(Boolean) || [];
 
   // Raggruppa l'equipaggiamento per tipo
   const equipmentByType = data.equipment?.reduce((acc, item) => {
@@ -121,7 +149,7 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
                 })}
               </div>
 
-              {/* Mobile: compact list with value and modifier */}
+              {/* Mobile: compact list */}
               <div className="flex flex-col md:hidden gap-2">
                 {Object.entries(data.abilityScores).map(([key, value]) => {
                   const bonus = (calculations?.raceData?.ability_bonuses?.[key] || 0);
@@ -140,6 +168,37 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
                 })}
               </div>
             </div>
+          )}
+
+          {/* 🆕 COMPETENZE SELEZIONATE CON DETTAGLI */}
+          {selectedSkillsDetails.length > 0 && (
+            <AncientCardContainer className="p-4">
+              <h3 className="font-serif font-bold text-amber-900 mb-3 flex items-center gap-2">
+                <Target className="w-4 h-4" />
+                Competenze di Classe
+                <span className="text-sm font-normal text-amber-500 ml-2">
+                  (Bonus competenza: +{calculations?.proficiencyBonus || 2})
+                </span>
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {selectedSkillsDetails.map((skill, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-2 bg-amber-50 rounded">
+                    <div>
+                      <span className="font-medium text-amber-900">{skill.name}</span>
+                      <p className="text-xs text-amber-600">
+                        {skill.abilityShort} ({skill.abilityModifier >= 0 ? `+${skill.abilityModifier}` : skill.abilityModifier})
+                      </p>
+                    </div>
+                    <Badge className="bg-amber-200 text-amber-900">
+                      +{skill.totalBonus}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-amber-500 mt-3 text-center">
+                Bonus totale = modificatore di {selectedSkillsDetails[0]?.abilityShort} + bonus competenza (+2)
+              </p>
+            </AncientCardContainer>
           )}
 
           {/* Statistiche di combattimento (calcolate) */}
@@ -170,7 +229,7 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
             </FanCardGroup>
           )}
 
-          {/* 🆕 EQUIPAGGIAMENTO SELEZIONATO */}
+          {/* Equipaggiamento */}
           {data.equipment && data.equipment.length > 0 && (
             <AncientCardContainer className="p-4">
               <h3 className="font-serif font-bold text-amber-900 mb-3 flex items-center gap-2">
@@ -205,7 +264,7 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
             </AncientCardContainer>
           )}
 
-          {/* Se non c'è equipaggiamento selezionato */}
+          {/* Se non c'è equipaggiamento */}
           {(!data.equipment || data.equipment.length === 0) && (
             <AncientCardContainer className="p-4 text-center">
               <Package className="w-8 h-8 text-amber-400 mx-auto mb-2" />

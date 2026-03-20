@@ -4,6 +4,8 @@
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useCreateCharacter } from '@/hooks/mutations/useCharacterMutations';
+
+import { useSkillMutations } from '@/hooks/mutations/useSkillMutations';
 import { useCharacterCalculations } from '@/hooks/useCharacterCalculations';
 import { useCreationStore } from '@/store/useCreationStore';
 import type { EquipmentItem } from '@/types/equipment';
@@ -33,6 +35,8 @@ export interface CreationData {
     wisdom: number;
     charisma: number;
   } | null;
+  // Step 6 - Skills
+  skills?: string[];
   // Optional equipment selected during creation
   equipment?: EquipmentItem[];
 }
@@ -43,6 +47,7 @@ export type CreationStep =
   | 'class'
   | 'campaign'
   | 'abilities'
+  | 'skills'
   | 'equipment'
   | 'review';
   
@@ -50,6 +55,7 @@ export type CreationStep =
 export function useCharacterCreation() {
   const router = useRouter();
   const createCharacter = useCreateCharacter();
+  const skillMutations = useSkillMutations();
 
   const { currentStep, data, setStep, updateData, reset, _hasHydrated } = useCreationStore();
 
@@ -59,7 +65,7 @@ export function useCharacterCreation() {
     data.abilityScores ?? null,
   );
 
-  const steps: CreationStep[] = ['basic-info', 'race', 'class', 'campaign', 'abilities', 'equipment','review'];
+  const steps: CreationStep[] = ['basic-info', 'race', 'class', 'campaign', 'abilities', 'skills', 'equipment', 'review'];
   
   const nextStep = () => {
     const currentIndex = steps.indexOf(currentStep);
@@ -116,57 +122,70 @@ export function useCharacterCreation() {
         combatStats: calculations.calculations.combatStats,
       },
       {
-        onSuccess: (character) => {
+        onSuccess: async (character) => {
           toast.success('Personaggio creato!');
-          // If equipment was selected during creation, save inventory server-side
-          (async () => {
-            try {
-              if (data.equipment && data.equipment.length > 0) {
-                const itemsDetails = await Promise.all(
-                  data.equipment.map(async (item) => {
-                    const res = await fetch(`/api/items/${item.item_id}`);
-                    if (!res.ok) throw new Error('Errore caricamento item');
-                    const fullItem = await res.json();
-                    return {
-                      character_id: character.id,
-                      item_id: item.item_id,
-                      item_name: item.name || fullItem.name,
-                      item_type: fullItem.type,
-                      quantity: item.quantity,
-                      weight: fullItem.weight,
-                      equipped: fullItem.type === 'weapon' || fullItem.type === 'armor',
-                      properties: fullItem.properties ?? null,
-                    };
-                  })
-                );
 
-                  // Posta gli oggetti all'endpoint inventory server-side
-                  try {
-                    const res = await fetch(`/api/characters/${character.id}/inventory`, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ items: itemsDetails })
-                    });
+          try {
+            // 1) Save selected skills (if any) using mutations
+            if (data.skills && data.skills.length > 0) {
+              const skillsToInsert = data.skills.map((skillId) => ({
+                skill_name: skillId,
+                proficiency_type: 'proficient' as const,
+              }));
 
-                    if (!res.ok) {
-                      const err = await res.json().catch(() => ({ error: 'Unknown' }));
-                      console.error('Errore salvataggio inventario (API):', err);
-                    } else {
-                      const payload = await res.json().catch(() => null);
-                      console.log(`✅ Inventario salvato: ${payload?.inserted ?? 0} oggetti`);
-                    }
-                  } catch (e) {
-                    console.error('Errore salvataggio inventario (fetch):', e);
-                  }
+              try {
+                await skillMutations.create.mutateAsync({ characterId: character.id, skills: skillsToInsert });
+              } catch (e) {
+                console.error('Errore salvataggio skill (mutation):', e);
               }
-            } catch (e) {
-              console.error(e);
-              toast.error('Errore salvataggio inventario');
-            } finally {
-              reset();
-              router.push(`/dashboard/${character.id}`);
             }
-          })();
+
+            // 2) If equipment was selected during creation, save inventory server-side
+            if (data.equipment && data.equipment.length > 0) {
+              const itemsDetails = await Promise.all(
+                data.equipment.map(async (item) => {
+                  const res = await fetch(`/api/items/${item.item_id}`);
+                  if (!res.ok) throw new Error('Errore caricamento item');
+                  const fullItem = await res.json();
+                  return {
+                    character_id: character.id,
+                    item_id: item.item_id,
+                    item_name: item.name || fullItem.name,
+                    item_type: fullItem.type,
+                    quantity: item.quantity,
+                    weight: fullItem.weight,
+                    equipped: fullItem.type === 'weapon' || fullItem.type === 'armor',
+                    properties: fullItem.properties ?? null,
+                  };
+                })
+              );
+
+              // Post the items to the server inventory endpoint
+              try {
+                const res = await fetch(`/api/characters/${character.id}/inventory`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ items: itemsDetails })
+                });
+
+                if (!res.ok) {
+                  const err = await res.json().catch(() => ({ error: 'Unknown' }));
+                  console.error('Errore salvataggio inventario (API):', err);
+                } else {
+                  const payload = await res.json().catch(() => null);
+                  console.log(`✅ Inventario salvato: ${payload?.inserted ?? 0} oggetti`);
+                }
+              } catch (e) {
+                console.error('Errore salvataggio inventario (fetch):', e);
+              }
+            }
+          } catch (e) {
+            console.error(e);
+            toast.error('Errore durante il salvataggio aggiuntivo');
+          } finally {
+            reset();
+            router.push(`/dashboard/${character.id}`);
+          }
         },
         onError: (err) => {
           toast.error(err instanceof Error ? err.message : 'Errore durante il salvataggio');

@@ -10,6 +10,7 @@ import { AbilityScoresStep } from './steps/AbilityScoresStep';
 import { ReviewStep } from './steps/ReviewStep';
 import { CampaignStep } from './steps/CampaignStep';
 import { EquipmentStep } from './steps/EquipmentStep';
+import { SkillsStep } from './steps/SkillsStep';
 import Loading from '@/components/custom/Loading';
 import type { Race } from '@/types/race';
 
@@ -106,6 +107,19 @@ export function CreationWizard() {
             }}
           />
         );
+      case 'skills':
+        return (
+          <SkillsStep
+            classId={data.classId!}
+            abilityScores={data.abilityScores!}
+            onBack={prevStep}
+            onConfirm={(selectedSkills) => {
+              updateData({ skills: selectedSkills });
+              nextStep();
+            }}
+          />
+        );
+
       case 'equipment':
         return (
           <EquipmentStep
@@ -148,11 +162,13 @@ export function CreationWizard() {
               <div
                 className="h-full bg-amber-700 rounded-full transition-all"
                 style={{
-                  width: `${currentStep === 'basic-info' ? 16 :
-                      currentStep === 'race' ? 32 :
-                        currentStep === 'class' ? 48 :
-                          currentStep === 'campaign' ? 64 :
-                            currentStep === 'abilities' ? 80 : 100
+                  width: `${currentStep === 'basic-info' ? 12 :
+                      currentStep === 'race' ? 25 :
+                        currentStep === 'class' ? 37 :
+                          currentStep === 'campaign' ? 50 :
+                            currentStep === 'abilities' ? 62 :
+                              currentStep === 'skills' ? 75 :
+                                currentStep === 'equipment' ? 87 : 100
                     }%`
                 }}
               />
