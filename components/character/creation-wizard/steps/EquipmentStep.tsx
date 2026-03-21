@@ -11,7 +11,7 @@ import type {
 } from '@/types/equipment';
 import { Button } from '@/components/ui/button';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
-import { Check, Package, Shield, Sword, X } from 'lucide-react';
+import { Check, Package, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import Loading from '@/components/custom/Loading';
@@ -45,9 +45,8 @@ interface EquipmentStepProps {
 export function EquipmentStep({ classId, onConfirm, onChange, initialSelectedItems, onBack }: EquipmentStepProps) {
   const { data: presets, isLoading: presetsLoading, error: presetsError } = useEquipmentPresets(classId);
   const { data: items } = useItems();
-  // selectionMap[idx] = array of user-picked items for that choice
-  const [selectionMap, setSelectionMap] = useState<Record<number, EquipmentItem[]>>({});
 
+  // Calcola il preset una volta
   const selectedPreset = useMemo<MappedPreset | null>(() => {
     if (!presets || presets.length === 0 || !items) return null;
     const defaultPreset = presets.find(p => p.is_default) ?? presets[0];
@@ -75,16 +74,33 @@ export function EquipmentStep({ classId, onConfirm, onChange, initialSelectedIte
     return { ...defaultPreset, items: mappedItems, choices: mappedChoices };
   }, [presets, items]);
 
-  // Derive choices: user explicit selections first, then restore from saved, then empty
+  // Calcola la selezione iniziale UNA VOLTA (useMemo, senza useEffect)
+  const initialSelection = useMemo(() => {
+    if (!selectedPreset?.choices || !initialSelectedItems?.length) return {};
+    
+    const newSelectionMap: Record<number, EquipmentItem[]> = {};
+    
+    selectedPreset.choices.forEach((choice, idx) => {
+      const selectedForThisChoice = initialSelectedItems.filter(savedItem => 
+        choice.items.some(choiceItem => choiceItem.item_id === savedItem.item_id)
+      );
+      const limitedSelection = selectedForThisChoice.slice(0, choice.count);
+      newSelectionMap[idx] = limitedSelection;
+    });
+    
+    return newSelectionMap;
+  }, [selectedPreset, initialSelectedItems]);
+
+  // Stato per modifiche manuali — inizializzato una sola volta usando la selezione iniziale
+  const [selectionMap, setSelectionMap] = useState<Record<number, EquipmentItem[]>>(() => initialSelection);
+
   const choices = useMemo<EquipmentChoice[]>(() => {
     if (!selectedPreset?.choices) return [];
     return selectedPreset.choices.map((choice, idx) => ({
       ...choice,
-      selectedItems: selectionMap[idx] !== undefined
-        ? selectionMap[idx]
-        : (initialSelectedItems ?? []).filter(si => choice.items.some(it => it.item_id === si.item_id)),
+      selectedItems: selectionMap[idx] ?? [],
     }));
-  }, [selectedPreset, selectionMap, initialSelectedItems]);
+  }, [selectedPreset, selectionMap]);
 
   const [isConfirming, setIsConfirming] = useState(false);
 
@@ -112,9 +128,11 @@ export function EquipmentStep({ classId, onConfirm, onChange, initialSelectedIte
     setSelectionMap(newSelectionMap);
 
     if (onChange) {
+      // Costruisci l'elenco completo in base alla nuova mappa di selezione per evitare incoerenze
+      const allChoiceItems = (selectedPreset?.choices ?? []).map((_, i) => newSelectionMap[i] ?? []).flat();
       const allItems: EquipmentItem[] = [
         ...(selectedPreset?.items ?? []),
-        ...choices.flatMap((c, i) => i === choiceIndex ? newSelected : (c.selectedItems ?? [])),
+        ...allChoiceItems,
       ];
       onChange(allItems);
     }
@@ -145,9 +163,7 @@ export function EquipmentStep({ classId, onConfirm, onChange, initialSelectedIte
   const allChoicesComplete = choices.length === 0 || choices.every(isChoiceComplete);
 
   if (presetsLoading) {
-    return (
-      <Loading />
-    );
+    return <Loading />;
   }
 
   if (presetsError) {
@@ -193,10 +209,10 @@ export function EquipmentStep({ classId, onConfirm, onChange, initialSelectedIte
             {selectedPreset.items.map((item: EquipmentItem, idx: number) => (
               <div key={idx} className="flex items-center gap-2 p-2 bg-amber-50 rounded">
                 <Check className="w-4 h-4 text-green-600" />
-                <span className="text-amber-900">{item.name}</span>
-                {item.quantity > 1 && (
-                  <span className="text-sm text-amber-600">x{item.quantity}</span>
-                )}
+                <span className="text-amber-900">
+                  {item.name}
+                  {item.quantity > 1 && <span className="ml-1 text-sm text-amber-600">x{item.quantity}</span>}
+                </span>
               </div>
             ))}
           </div>
@@ -241,22 +257,18 @@ export function EquipmentStep({ classId, onConfirm, onChange, initialSelectedIte
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          {item.name.includes('Spada') && <Sword className="w-4 h-4 text-amber-700" />}
-                          {item.name.includes('Armatura') && <Shield className="w-4 h-4 text-amber-700" />}
-                          <span className={cn(
-                            "font-medium",
-                            isSelected ? "text-amber-900" : "text-amber-800"
-                          )}>
-                            {item.name}
-                          </span>
-                        </div>
-                        {item.quantity > 1 && (
-                          <span className="text-xs text-amber-600">x{item.quantity}</span>
-                        )}
+                        <span className={cn(
+                          "font-medium",
+                          isSelected ? "text-amber-900" : "text-amber-800"
+                        )}>
+                          {item.name}
+                          {item.quantity > 1 && (
+                            <span className="ml-1 text-sm text-amber-600">x{item.quantity}</span>
+                          )}
+                        </span>
                       </div>
                       {isSelected && (
-                        <div className="bg-green-500 rounded-full p-0.5">
+                        <div className="bg-green-500 rounded-full p-0.5 ml-2 flex-shrink-0">
                           <Check className="w-4 h-4 text-white" />
                         </div>
                       )}
@@ -283,8 +295,6 @@ export function EquipmentStep({ classId, onConfirm, onChange, initialSelectedIte
           </AncientCardContainer>
         );
       })}
-
-      {/* Pulsanti navigazione */}
     </WizardStep>
   );
 }

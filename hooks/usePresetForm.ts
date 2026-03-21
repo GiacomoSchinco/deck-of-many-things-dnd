@@ -142,11 +142,15 @@ export function usePresetForm(initialData?: EquipmentPreset) {
         name: preset.name,
         class_id: parseInt(preset.class_id, 10),
         description: preset.description || null,
-        items: preset.items.map(({ item_id, quantity, name }) => ({ item_id, quantity, name })),
+        items: preset.items
+          .filter(({ item_id }) => item_id > 0)
+          .map(({ item_id, quantity, name }) => ({ item_id, quantity, name })),
         choices: preset.choices.map(({ description, count, items }) => ({
           description,
           count,
-          items: items.map(({ item_id, quantity, name }) => ({ item_id, quantity, name })),
+          items: items
+            .filter(({ item_id }) => item_id > 0)
+            .map(({ item_id, quantity, name }) => ({ item_id, quantity, name })),
         })),
         is_default: preset.is_default,
       }

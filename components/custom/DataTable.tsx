@@ -24,6 +24,7 @@ export type DataTableProps<T extends AnyRecord> = {
     onRowClick?: (id: unknown, row: T) => void;
     pagination?: boolean;
     title?: string;
+    customRenderers?: Partial<Record<string, (value: any, row?: T) => React.ReactNode>>;
 };
 
 function toLabel(key: string) {
@@ -44,6 +45,7 @@ export default function DataTable<T extends AnyRecord>({
     onRowClick,
     pagination = false,
     title,
+    customRenderers,
 }: DataTableProps<T>) {
     "use no memo"; // TanStack Table returns functions that can't be safely memoized by React 19 Compiler
     const [data, setData] = useState<T[]>(initialData);
@@ -100,6 +102,9 @@ export default function DataTable<T extends AnyRecord>({
                     },
                     cell: (info: CellContext<T, unknown>) => {
                         const v = info.getValue();
+                        const row = info.row.original;
+                        const renderer = customRenderers && customRenderers[key];
+                        if (renderer) return renderer(v, row);
                         return typeof v === "boolean" ? (v ? "✓" : "✗") : String(v ?? "");
                     },
                 } as ColumnDef<T, unknown>;
@@ -108,10 +113,13 @@ export default function DataTable<T extends AnyRecord>({
             return {
                 accessorKey: key as keyof T & string,
                 header: headerLabel,
-                cell: (info: CellContext<T, unknown>) => {
-                    const v = info.getValue();
-                    return typeof v === "boolean" ? (v ? "✓" : "✗") : String(v ?? "");
-                },
+                    cell: (info: CellContext<T, unknown>) => {
+                        const v = info.getValue();
+                        const row = info.row.original;
+                        const renderer = customRenderers && customRenderers[key];
+                        if (renderer) return renderer(v, row);
+                        return typeof v === "boolean" ? (v ? "✓" : "✗") : String(v ?? "");
+                    },
             } as ColumnDef<T, unknown>;
         });
 

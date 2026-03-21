@@ -187,6 +187,30 @@ export function useCharacterCreation() {
                 console.error('Errore salvataggio inventario (mutation):', e);
               }
             }
+
+            // 3) Save class saving throws
+            const savingThrows = calculations.calculations?.classData?.saving_throws;
+            if (savingThrows && savingThrows.length > 0) {
+              try {
+                const res = await fetch(`/api/characters/${character.id}/saving-throws`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    saving_throws: savingThrows.map((ability: string) => ({
+                      ability,
+                      proficient: true,
+                    })),
+                  }),
+                });
+                if (!res.ok) {
+                  const err = await res.json();
+                  throw new Error(err.error || 'Errore salvataggio tiri salvezza');
+                }
+                console.log(`✅ Tiri salvezza salvati: ${savingThrows.join(', ')}`);
+              } catch (e) {
+                console.error('Errore salvataggio tiri salvezza:', e);
+              }
+            }
           } catch (e) {
             console.error(e);
             toast.error('Errore durante il salvataggio aggiuntivo');
