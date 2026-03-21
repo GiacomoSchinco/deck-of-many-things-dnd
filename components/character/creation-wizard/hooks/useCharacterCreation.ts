@@ -192,7 +192,7 @@ export function useCharacterCreation() {
             toast.error('Errore durante il salvataggio aggiuntivo');
           } finally {
             reset();
-            router.push(`/dashboard/${character.id}`);
+            router.push(`/characters/${character.id}`);
           }
         },
         onError: (err) => {
