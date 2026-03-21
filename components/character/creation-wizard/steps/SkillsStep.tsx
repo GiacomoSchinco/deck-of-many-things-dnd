@@ -3,14 +3,16 @@
 
 import { useState, useMemo } from 'react';
 import { useClass } from '@/hooks/queries/useClasses';
-import { useSkillList} from '@/hooks/queries/useSkills'; // ← usa useAllSkills
+import { useSkillList } from '@/hooks/queries/useSkills';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
-import { Loader2, Info, CheckCircle2 } from 'lucide-react';
+import { Info, CheckCircle2 } from 'lucide-react';
+import { WizardStep } from '../WizardStep';
 import { cn } from '@/lib/utils';
 import type { Skill } from '@/types/skill';
+import Loading from '@/components/custom/Loading';
 
 interface SkillsStepProps {
   classId: number;
@@ -23,6 +25,8 @@ interface SkillsStepProps {
     charisma: number;
   };
   onConfirm: (selectedSkills: string[]) => void;
+  onChange?: (selectedSkills: string[]) => void;
+  initialSelectedSkills?: string[];
   onBack: () => void;
 }
 
@@ -36,10 +40,11 @@ const abilityShortNames: Record<string, string> = {
   charisma: 'CAR',
 };
 
-export function SkillsStep({ classId, abilityScores, onConfirm, onBack }: SkillsStepProps) {
+export function SkillsStep({ classId, abilityScores, onConfirm, onChange, initialSelectedSkills, onBack }: SkillsStepProps) {
   const { data: classData, isLoading: classLoading } = useClass(classId);
   const { data: allSkills, isLoading: skillsLoading } = useSkillList();
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const [selectedSkills, setSelectedSkills] = useState<string[]>(initialSelectedSkills ?? []);
+
 
   const { maxChoices, availableSkills } = useMemo(() => {
     if (!classData?.skill_choices || !allSkills) {
@@ -61,17 +66,16 @@ export function SkillsStep({ classId, abilityScores, onConfirm, onBack }: Skills
   }, [classData, allSkills]);
 
   const toggleSkill = (skillId: number) => {
-    setSelectedSkills(prev => {
-      const skillIdStr = String(skillId);
-      if (prev.includes(skillIdStr)) {
-        return prev.filter(id => id !== skillIdStr);
-      } else {
-        if (prev.length < maxChoices) {
-          return [...prev, skillIdStr];
-        }
-        return prev;
-      }
-    });
+    const skillIdStr = String(skillId);
+    let next: string[];
+    if (selectedSkills.includes(skillIdStr)) {
+      next = selectedSkills.filter(id => id !== skillIdStr);
+    } else {
+      if (selectedSkills.length >= maxChoices) return;
+      next = [...selectedSkills, skillIdStr];
+    }
+    setSelectedSkills(next);
+    onChange?.(next);
   };
 
   const getModifier = (ability: string) => {
@@ -87,10 +91,7 @@ export function SkillsStep({ classId, abilityScores, onConfirm, onBack }: Skills
 
   if (classLoading || skillsLoading) {
     return (
-      <div className="text-center py-12">
-        <Loader2 className="w-8 h-8 animate-spin text-amber-700 mx-auto mb-4" />
-        <p className="text-amber-700">Caricamento competenze...</p>
-      </div>
+      <Loading />
     );
   }
 
@@ -117,19 +118,17 @@ export function SkillsStep({ classId, abilityScores, onConfirm, onBack }: Skills
   }
 
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-serif font-bold text-amber-900 mb-2">
-          🎯 Competenze di Classe
-        </h2>
-        <p className="text-amber-700 text-sm">
-          Scegli {maxChoices} competenze in cui essere addestrato
-        </p>
-        <p className="text-xs text-amber-500 mt-1">
-          {selectedSkills.length}/{maxChoices} selezionate
-        </p>
-      </div>
-
+    <WizardStep
+      title="🎯 Competenze di Classe"
+      subtitle={`Scegli ${maxChoices} competenze in cui essere addestrato`}
+      onBack={onBack}
+      onNext={handleConfirm}
+      nextDisabled={selectedSkills.length !== maxChoices}
+      nextLabel="Conferma Competenze →"
+    >
+      <p className="text-xs text-amber-500 text-center -mt-4">
+        {selectedSkills.length}/{maxChoices} selezionate
+      </p>
       <AncientCardContainer className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {availableSkills.map((skill) => {
@@ -190,25 +189,6 @@ export function SkillsStep({ classId, abilityScores, onConfirm, onBack }: Skills
           </div>
         </div>
       </div>
-
-      {/* Pulsanti navigazione */}
-      <div className="flex justify-between pt-4">
-        <Button
-          variant="outline"
-          onClick={onBack}
-          className="border-amber-700 text-amber-700"
-        >
-          ← Indietro
-        </Button>
-        
-        <Button
-          onClick={handleConfirm}
-          disabled={selectedSkills.length !== maxChoices}
-          className="bg-amber-700 hover:bg-amber-800 text-amber-50 disabled:opacity-50"
-        >
-          Conferma Competenze →
-        </Button>
-      </div>
-    </div>
+    </WizardStep>
   );
 }

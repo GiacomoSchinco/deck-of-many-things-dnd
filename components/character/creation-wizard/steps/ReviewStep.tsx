@@ -1,7 +1,6 @@
 // components/character/creation-wizard/steps/ReviewStep.tsx
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CreationData } from '../hooks/useCharacterCreation';
 import { calculateModifier } from '@/lib/calculations/abilityModifiers';
@@ -11,8 +10,9 @@ import { useSkillList } from '@/hooks/queries/useSkills';
 import StatDiamond from '@/components/custom/StatDiamond';
 import { RaceClassCard } from '@/components/custom/RaceClassCard';
 import { FanCardGroup } from '@/components/custom/FanCardGroup';
-import { Package, Sword, Shield, FlaskConical, Wrench, Target } from 'lucide-react';
+import { Package, Target } from 'lucide-react';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
+import { WizardStep } from '../WizardStep';
 
 interface ReviewStepProps {
   data: Partial<CreationData>;
@@ -38,17 +38,6 @@ const ABILITY_SHORT: Record<string, string> = {
   intelligence: 'INT',
   wisdom: 'SAG',
   charisma: 'CAR',
-};
-
-// Icona per tipo di oggetto
-const getItemIcon = (type: string) => {
-  switch (type) {
-    case 'weapon': return <Sword className="w-4 h-4" />;
-    case 'armor': return <Shield className="w-4 h-4" />;
-    case 'consumable': return <FlaskConical className="w-4 h-4" />;
-    case 'tool': return <Wrench className="w-4 h-4" />;
-    default: return <Package className="w-4 h-4" />;
-  }
 };
 
 export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
@@ -77,26 +66,20 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
       abilityModifier: abilityModifier,
       totalBonus: abilityModifier + proficiencyBonus,
     };
-  }).filter(Boolean) || [];
+  }).filter((s): s is NonNullable<typeof s> => s !== null) ?? [];
 
-  // Raggruppa l'equipaggiamento per tipo
-  const equipmentByType = data.equipment?.reduce((acc, item) => {
-    const type = item.type || 'gear';
-    if (!acc[type]) acc[type] = [];
-    acc[type].push(item);
-    return acc;
-  }, {} as Record<string, typeof data.equipment>);
+  const equipmentList = data.equipment ?? [];
 
   return (
-    <div>
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-serif text-amber-900 mb-2">
-          📜 Riepilogo Personaggio
-        </h2>
-        <p className="text-amber-700 text-sm">
-          Controlla i dati prima di creare il tuo eroe
-        </p>
-      </div>
+    <WizardStep
+      title="📜 Riepilogo Personaggio"
+      subtitle="Controlla i dati prima di creare il tuo eroe"
+      onBack={onBack}
+      onNext={onSave}
+      nextDisabled={loading || calcLoading}
+      nextLoading={loading}
+      nextLabel={loading ? 'Salvataggio...' : '✨ Crea Personaggio'}
+    >
 
       {/* Scheda di anteprima in stile carta */}
       <div className="p-6">
@@ -230,34 +213,20 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
           )}
 
           {/* Equipaggiamento */}
-          {data.equipment && data.equipment.length > 0 && (
+          {equipmentList.length > 0 && (
             <AncientCardContainer className="p-4">
               <h3 className="font-serif font-bold text-amber-900 mb-3 flex items-center gap-2">
                 <Package className="w-4 h-4" />
                 Equipaggiamento Iniziale
               </h3>
-              
-              <div className="space-y-3">
-                {Object.entries(equipmentByType || {}).map(([type, items]) => (
-                  <div key={type}>
-                    <h4 className="text-sm font-semibold text-amber-800 mb-2 capitalize">
-                      {type === 'weapon' && '⚔️ Armi'}
-                      {type === 'armor' && '🛡️ Armature'}
-                      {type === 'consumable' && '🧪 Consumabili'}
-                      {type === 'tool' && '🔧 Attrezzi'}
-                      {type === 'gear' && '🎒 Equipaggiamento'}
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {items?.map((item, idx) => (
-                        <div key={idx} className="flex items-center gap-2 p-2 bg-amber-50 rounded">
-                          {getItemIcon(type)}
-                          <span className="text-amber-900 flex-1">{item.name}</span>
-                          {item.quantity > 1 && (
-                            <span className="text-xs text-amber-600">x{item.quantity}</span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {equipmentList.map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-2 p-2 bg-amber-50 rounded">
+                    <Package className="w-4 h-4 text-amber-700" />
+                    <span className="text-amber-900 flex-1">{item.name ?? `Item #${item.item_id}`}</span>
+                    {item.quantity > 1 && (
+                      <span className="text-xs text-amber-600">x{item.quantity}</span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -265,7 +234,7 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
           )}
 
           {/* Se non c'è equipaggiamento */}
-          {(!data.equipment || data.equipment.length === 0) && (
+          {equipmentList.length === 0 && (
             <AncientCardContainer className="p-4 text-center">
               <Package className="w-8 h-8 text-amber-400 mx-auto mb-2" />
               <p className="text-amber-600">Nessun equipaggiamento selezionato</p>
@@ -280,26 +249,6 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
         <p>Verifica che tutti i dati siano corretti prima di procedere</p>
         <p>Potrai modificare il personaggio in seguito</p>
       </div>
-
-      {/* Pulsanti */}
-      <div className="flex justify-between pt-4">
-        <Button
-          variant="outline"
-          onClick={onBack}
-          disabled={loading}
-          className="border-amber-700 text-amber-700"
-        >
-          ← Indietro
-        </Button>
-
-        <Button
-          onClick={onSave}
-          disabled={loading || calcLoading}
-          className="bg-amber-700 hover:bg-amber-800 text-amber-50"
-        >
-          {loading ? 'Salvataggio...' : '✨ Crea Personaggio'}
-        </Button>
-      </div>
-    </div>
+    </WizardStep>
   );
 }

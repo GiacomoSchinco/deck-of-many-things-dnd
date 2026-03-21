@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
+import { WizardStep } from '../WizardStep';
 import { DndIcon } from '@/components/icons/DndIcon';
 import type { DndIconName } from '@/components/icons/DndIcon';
 import type { AbilityScores } from '@/types/character';
@@ -77,52 +78,33 @@ export function AbilityScoresStep({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-serif text-amber-900 mb-2">
-          🎲 Punteggi di Caratteristica
-        </h2>
-        <p className="text-amber-700 text-sm">
-          Tira 4d6 e droppa il risultato più basso per ogni caratteristica
-        </p>
-              {/* Pulsanti di navigazione */}
-      <div className="flex justify-between pt-4">
-        <Button
-          variant="outline"
-          onClick={onBack}
-          className="border-amber-700 text-amber-700"
-        >
-          ← Indietro
-        </Button>
-
-        <Button
-          onClick={handleConfirm}
-          className="bg-amber-700 hover:bg-amber-800 text-amber-50"
-        >
-          Conferma Punteggi →
-        </Button>
-      </div>
-        {Object.keys(raceBonuses).length > 0 && (
-          <div className="bg-amber-100 p-2 rounded mt-2">
-            <p className="text-sm text-amber-800">
-              <span className="font-semibold">{raceName}:</span> bonus razziali applicati
-            </p>
-            <div className="flex flex-wrap justify-center gap-2 mt-1">
-              {Object.entries(raceBonuses).map(([stat, bonus]) => {
-                const statMap: Record<string, string> = {
-                  strength: 'FOR', dexterity: 'DES', constitution: 'COS',
-                  intelligence: 'INT', wisdom: 'SAG', charisma: 'CAR'
-                };
-                return (
-                  <span key={stat} className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
-                    {statMap[stat]}+{bonus}
-                  </span>
-                );
-              })}
-            </div>
+    <WizardStep
+      title="🎲 Punteggi di Caratteristica"
+      subtitle="Tira 4d6 e droppa il risultato più basso per ogni caratteristica"
+      onBack={onBack}
+      onNext={handleConfirm}
+      nextLabel="Conferma Punteggi →"
+    >
+      {Object.keys(raceBonuses).length > 0 && (
+        <div className="bg-amber-100 p-2 rounded mb-4">
+          <p className="text-sm text-amber-800">
+            <span className="font-semibold">{raceName}:</span> bonus razziali applicati
+          </p>
+          <div className="flex flex-wrap justify-center gap-2 mt-1">
+            {Object.entries(raceBonuses).map(([stat, bonus]) => {
+              const statMap: Record<string, string> = {
+                strength: 'FOR', dexterity: 'DES', constitution: 'COS',
+                intelligence: 'INT', wisdom: 'SAG', charisma: 'CAR'
+              };
+              return (
+                <span key={stat} className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                  {statMap[stat]}+{bonus}
+                </span>
+              );
+            })}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Pulsante per tiro globale */}
       <div className="flex justify-center mb-6">
@@ -210,8 +192,6 @@ export function AbilityScoresStep({
           );
         })}
       </div>
-
-
-    </div>
+    </WizardStep>
   );
 }

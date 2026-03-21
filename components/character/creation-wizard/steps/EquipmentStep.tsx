@@ -1,95 +1,123 @@
 // components/character/creation-wizard/steps/EquipmentStep.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useEquipmentPresets } from '@/hooks/queries/useEquipmentPresets';
 import { useItems } from '@/hooks/queries/useItems';
+import type {
+  EquipmentPreset as ApiEquipmentPreset,
+  EquipmentItem as ApiEquipmentItem,
+  EquipmentChoice as ApiEquipmentChoice,
+} from '@/types/equipment';
 import { Button } from '@/components/ui/button';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
-import { Check, Package, Shield, Sword, Loader2, X } from 'lucide-react';
+import { Check, Package, Shield, Sword, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import Loading from '@/components/custom/Loading';
+import { WizardStep } from '../WizardStep';
 
-interface EquipmentItem {
-  item_id: number;
-  quantity: number;
+/** EquipmentItem con name sempre valorizzato (dopo il mapping). */
+interface EquipmentItem extends ApiEquipmentItem {
   name: string;
 }
 
-interface EquipmentChoice {
-  description: string;
+/** EquipmentChoice arricchita con selectedItems per la selezione locale. */
+interface EquipmentChoice extends Omit<ApiEquipmentChoice, 'items'> {
   items: EquipmentItem[];
-  count: number;
   selectedItems?: EquipmentItem[];
 }
+
+/** Preset mappato: items e choices con nomi sempre presenti. */
+type MappedPreset = Omit<ApiEquipmentPreset, 'items' | 'choices'> & {
+  items: EquipmentItem[];
+  choices: EquipmentChoice[];
+};
 
 interface EquipmentStepProps {
   classId: number;
   onConfirm: (selectedItems: EquipmentItem[]) => void;
+  onChange?: (selectedItems: EquipmentItem[]) => void;
+  initialSelectedItems?: EquipmentItem[];
   onBack: () => void;
 }
 
-export function EquipmentStep({ classId, onConfirm, onBack }: EquipmentStepProps) {
+export function EquipmentStep({ classId, onConfirm, onChange, initialSelectedItems, onBack }: EquipmentStepProps) {
   const { data: presets, isLoading: presetsLoading, error: presetsError } = useEquipmentPresets(classId);
   const { data: items } = useItems();
-  const [selectedPreset, setSelectedPreset] = useState<any>(null);
-  const [choices, setChoices] = useState<EquipmentChoice[]>([]);
-  const [isConfirming, setIsConfirming] = useState(false);
+  // selectionMap[idx] = array of user-picked items for that choice
+  const [selectionMap, setSelectionMap] = useState<Record<number, EquipmentItem[]>>({});
 
-  useEffect(() => {
-    if (presets && presets.length > 0 && items) {
-      const defaultPreset = presets.find(p => p.is_default) || presets[0];
-      setSelectedPreset(defaultPreset);
-      
-      if (defaultPreset?.choices) {
-        const initializedChoices = defaultPreset.choices.map((choice: any) => ({
-          ...choice,
-          items: choice.items.map((item: any) => {
-            const itemDetails = items.find(i => i.id === item.item_id);
-            return {
-              ...item,
-              name: itemDetails?.name || item.name || 'Oggetto sconosciuto'
-            };
-          }),
-          selectedItems: []
-        }));
-        setChoices(initializedChoices);
-      }
-    }
+  const selectedPreset = useMemo<MappedPreset | null>(() => {
+    if (!presets || presets.length === 0 || !items) return null;
+    const defaultPreset = presets.find(p => p.is_default) ?? presets[0];
+
+    const mapItem = (it: ApiEquipmentItem): EquipmentItem => {
+      const itemDetails = items.find(i => i.id === it.item_id);
+      return {
+        item_id: it.item_id,
+        quantity: it.quantity,
+        name: itemDetails?.name ?? it.name ?? 'Oggetto sconosciuto',
+      };
+    };
+
+    const mappedItems: EquipmentItem[] = (defaultPreset.items ?? []).map(mapItem);
+
+    const mappedChoices: EquipmentChoice[] = (defaultPreset.choices ?? []).map(
+      (c: ApiEquipmentChoice) => ({
+        description: c.description,
+        count: c.count,
+        items: c.items.map(mapItem),
+        selectedItems: [],
+      })
+    );
+
+    return { ...defaultPreset, items: mappedItems, choices: mappedChoices };
   }, [presets, items]);
 
+  // Derive choices: user explicit selections first, then restore from saved, then empty
+  const choices = useMemo<EquipmentChoice[]>(() => {
+    if (!selectedPreset?.choices) return [];
+    return selectedPreset.choices.map((choice, idx) => ({
+      ...choice,
+      selectedItems: selectionMap[idx] !== undefined
+        ? selectionMap[idx]
+        : (initialSelectedItems ?? []).filter(si => choice.items.some(it => it.item_id === si.item_id)),
+    }));
+  }, [selectedPreset, selectionMap, initialSelectedItems]);
+
+  const [isConfirming, setIsConfirming] = useState(false);
+
   const updateChoiceSelection = (choiceIndex: number, item: EquipmentItem) => {
-    const newChoices = [...choices];
-    const choice = newChoices[choiceIndex];
-    const currentSelected = choice.selectedItems || [];
-    
-    // Verifica se l'item è già selezionato
+    const choice = choices[choiceIndex];
+    if (!choice) return;
+    const currentSelected = choice.selectedItems ?? [];
     const isAlreadySelected = currentSelected.some(s => s.item_id === item.item_id);
     
+    let newSelected: EquipmentItem[];
     if (choice.count === 1) {
-      // Selezione singola: se clicchi sullo stesso, deseleziona
-      if (isAlreadySelected) {
-        choice.selectedItems = [];
-      } else {
-        choice.selectedItems = [item];
-      }
+      newSelected = isAlreadySelected ? [] : [item];
     } else {
-      // Selezione multipla
       if (isAlreadySelected) {
-        // Deseleziona
-        choice.selectedItems = currentSelected.filter(s => s.item_id !== item.item_id);
+        newSelected = currentSelected.filter(s => s.item_id !== item.item_id);
+      } else if (currentSelected.length < choice.count) {
+        newSelected = [...currentSelected, item];
       } else {
-        // Aggiungi se non si è raggiunto il limite
-        if (currentSelected.length < choice.count) {
-          choice.selectedItems = [...currentSelected, item];
-        } else {
-          toast.warning(`Puoi selezionare al massimo ${choice.count} oggetto/i per "${choice.description}"`);
-          return;
-        }
+        toast.warning(`Puoi selezionare al massimo ${choice.count} oggetto/i per "${choice.description}"`);
+        return;
       }
     }
-    
-    setChoices(newChoices);
+
+    const newSelectionMap = { ...selectionMap, [choiceIndex]: newSelected };
+    setSelectionMap(newSelectionMap);
+
+    if (onChange) {
+      const allItems: EquipmentItem[] = [
+        ...(selectedPreset?.items ?? []),
+        ...choices.flatMap((c, i) => i === choiceIndex ? newSelected : (c.selectedItems ?? [])),
+      ];
+      onChange(allItems);
+    }
   };
 
   const handleConfirm = () => {
@@ -118,10 +146,7 @@ export function EquipmentStep({ classId, onConfirm, onBack }: EquipmentStepProps
 
   if (presetsLoading) {
     return (
-      <div className="text-center py-12">
-        <Loader2 className="w-8 h-8 animate-spin text-amber-700 mx-auto mb-4" />
-        <p className="text-amber-700">Caricamento equipaggiamento...</p>
-      </div>
+      <Loading />
     );
   }
 
@@ -148,16 +173,15 @@ export function EquipmentStep({ classId, onConfirm, onBack }: EquipmentStepProps
   }
 
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-serif font-bold text-amber-900 mb-2">
-          ⚔️ Equipaggiamento Iniziale
-        </h2>
-        <p className="text-amber-700 text-sm">
-          Scegli l&apos;equipaggiamento con cui iniziare l&apos;avventura
-        </p>
-      </div>
-
+    <WizardStep
+      title="⚔️ Equipaggiamento Iniziale"
+      subtitle="Scegli l'equipaggiamento con cui iniziare l'avventura"
+      onBack={onBack}
+      onNext={handleConfirm}
+      nextDisabled={!allChoicesComplete || isConfirming}
+      nextLoading={isConfirming}
+      nextLabel={isConfirming ? 'Salvataggio...' : 'Conferma Equipaggiamento →'}
+    >
       {/* Oggetti fissi */}
       {selectedPreset.items && selectedPreset.items.length > 0 && (
         <AncientCardContainer className="p-4">
@@ -261,30 +285,6 @@ export function EquipmentStep({ classId, onConfirm, onBack }: EquipmentStepProps
       })}
 
       {/* Pulsanti navigazione */}
-      <div className="flex justify-between pt-4">
-        <Button
-          variant="outline"
-          onClick={onBack}
-          className="border-amber-700 text-amber-700"
-        >
-          ← Indietro
-        </Button>
-        
-        <Button
-          onClick={handleConfirm}
-          disabled={!allChoicesComplete || isConfirming}
-          className="bg-amber-700 hover:bg-amber-800 text-amber-50 disabled:opacity-50"
-        >
-          {isConfirming ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Salvataggio...
-            </>
-          ) : (
-            'Conferma Equipaggiamento →'
-          )}
-        </Button>
-      </div>
-    </div>
+    </WizardStep>
   );
 }

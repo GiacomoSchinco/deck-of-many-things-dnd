@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import Loading from '@/components/custom/Loading';
 import { AncientScroll } from '@/components/custom/AncientScroll';
+import { WizardStep } from '../WizardStep';
 
 interface CampaignStepProps {
   initialCampaignId?: string | null;
@@ -50,43 +51,19 @@ export function CampaignStep({ initialCampaignId, onBack, onSelect }: CampaignSt
   }
 
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-serif text-amber-900 mb-2">
-          🏰 Scegli la Campagna
-        </h2>
-        <p className="text-amber-700 text-sm">
-          Seleziona una campagna per il tuo personaggio
-        </p>
-      </div>
-      {/* Pulsanti navigazione */}
-      <div className="flex justify-between pt-4">
-        <Button 
-          variant="outline"
-          onClick={onBack}
-          className="border-amber-700 text-amber-700"
-        >
-          ← Indietro
+    <WizardStep
+      title="🏰 Scegli la Campagna"
+      subtitle="Seleziona una campagna per il tuo personaggio"
+      onBack={onBack}
+      onNext={handleContinue}
+      nextDisabled={!selectedCampaignId}
+      nextLabel="Avanti →"
+      extraActions={
+        <Button variant="ghost" onClick={handleSkip} className="text-amber-600">
+          Salta (nessuna campagna)
         </Button>
-        
-        <div className="flex gap-2">
-          <Button 
-            variant="ghost"
-            onClick={handleSkip}
-            className="text-amber-600"
-          >
-            Salta (nessuna campagna)
-          </Button>
-          
-          <Button 
-            onClick={handleContinue}
-            disabled={!selectedCampaignId}
-            className="bg-amber-700 hover:bg-amber-800 text-amber-50"
-          >
-            Avanti →
-          </Button>
-        </div>
-      </div>
+      }
+    >
       {/* Lista campagne esistenti */}
       {campaigns && campaigns.length > 0 ? (
         <div className="space-y-4">
@@ -127,8 +104,6 @@ export function CampaignStep({ initialCampaignId, onBack, onSelect }: CampaignSt
           </p>
         </AncientCardContainer>
       )}
-
-
-    </div>
+    </WizardStep>
   );
 }

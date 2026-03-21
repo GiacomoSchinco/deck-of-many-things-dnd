@@ -9,6 +9,7 @@ import { RaceClassCard } from '../../../custom/RaceClassCard';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import Loading from '@/components/custom/Loading';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { WizardStep } from '../WizardStep';
 import type { ClassFeature } from '@/types/class';
 
 interface ClassStepProps {
@@ -19,8 +20,12 @@ interface ClassStepProps {
 
 export function ClassStep({ initialClassId, onBack, onSelect }: ClassStepProps) {
   const { data: classes, isLoading, error } = useClasses();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedClassId, setSelectedClassId] = useState<number | null>(initialClassId || null);
+  const [selectedClassId, setSelectedClassId] = useState<number | null>(initialClassId ?? null);
+  const [currentIndex, setCurrentIndex] = useState(() => {
+    if (!initialClassId || !classes) return 0;
+    const idx = classes.findIndex(c => c.id === initialClassId);
+    return idx >= 0 ? idx : 0;
+  });
 
   const selectedClass = classes?.[currentIndex];
   const totalClasses = classes?.length || 0;
@@ -69,33 +74,14 @@ export function ClassStep({ initialClassId, onBack, onSelect }: ClassStepProps) 
   const isSelected = selectedClassId === selectedClass.id;
 
   return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <h2 className="text-3xl font-serif text-amber-900 mb-2">
-          ⚔️ Scegli la tua Classe
-        </h2>
-        <p className="text-amber-700">
-          Sfoglia le carte con le frecce e seleziona la tua classe
-        </p>
-      </div>
-      {/* Pulsanti navigazione */}
-      <div className="flex justify-between pt-4">
-        <Button
-          variant="outline"
-          onClick={onBack}
-          className="border-amber-700 text-amber-700"
-        >
-          ← Indietro
-        </Button>
-
-        <Button
-          onClick={handleConfirm}
-          disabled={!selectedClassId}
-          className="bg-amber-700 hover:bg-amber-800 text-amber-50 disabled:opacity-50"
-        >
-          Avanti: Punteggi →
-        </Button>
-      </div>
+    <WizardStep
+      title="⚔️ Scegli la tua Classe"
+      subtitle="Sfoglia le carte con le frecce e seleziona la tua classe"
+      onBack={onBack}
+      onNext={handleConfirm}
+      nextDisabled={!selectedClassId}
+      nextLabel="Avanti: Punteggi →"
+    >
       {/* Carosello principale */}
       <div className="relative flex items-center justify-center gap-4">
         {/* Freccia sinistra */}
@@ -219,8 +205,6 @@ export function ClassStep({ initialClassId, onBack, onSelect }: ClassStepProps) 
           </div>
         </div>
       </AncientCardContainer>
-
-
-    </div>
+    </WizardStep>
   );
 }

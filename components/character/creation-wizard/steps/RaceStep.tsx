@@ -9,6 +9,7 @@ import { RaceClassCard } from '../../../custom/RaceClassCard';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import Loading from '@/components/custom/Loading';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { WizardStep } from '../WizardStep';
 
 interface RaceStepProps {
   initialRaceId?: number | null;
@@ -18,8 +19,12 @@ interface RaceStepProps {
 
 export function RaceStep({ initialRaceId, onBack, onSelect }: RaceStepProps) {
   const { data: races, isLoading, error } = useRaces();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedRaceId, setSelectedRaceId] = useState<number | null>(initialRaceId || null);
+  const [selectedRaceId, setSelectedRaceId] = useState<number | null>(initialRaceId ?? null);
+  const [currentIndex, setCurrentIndex] = useState(() => {
+    if (!initialRaceId || !races) return 0;
+    const idx = races.findIndex(r => r.id === initialRaceId);
+    return idx >= 0 ? idx : 0;
+  });
 
   const selectedRace = races?.[currentIndex];
   const totalRaces = races?.length || 0;
@@ -78,33 +83,14 @@ export function RaceStep({ initialRaceId, onBack, onSelect }: RaceStepProps) {
   const isSelected = selectedRaceId === selectedRace.id;
 
   return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <h2 className="text-3xl font-serif text-amber-900 mb-2">
-          🧝 Scegli la tua Razza
-        </h2>
-        <p className="text-amber-700">
-          Sfoglia le carte con le frecce e seleziona la tua razza
-        </p>
-      </div>
-      {/* Pulsanti navigazione */}
-      <div className="flex justify-between pt-4">
-        <Button
-          variant="outline"
-          onClick={onBack}
-          className="border-amber-700 text-amber-700"
-        >
-          ← Indietro
-        </Button>
-
-        <Button
-          onClick={handleConfirm}
-          disabled={!selectedRaceId}
-          className="bg-amber-700 hover:bg-amber-800 text-amber-50 disabled:opacity-50"
-        >
-          Avanti: Scegli Classe →
-        </Button>
-      </div>
+    <WizardStep
+      title="🧝 Scegli la tua Razza"
+      subtitle="Sfoglia le carte con le frecce e seleziona la tua razza"
+      onBack={onBack}
+      onNext={handleConfirm}
+      nextDisabled={!selectedRaceId}
+      nextLabel="Avanti: Scegli Classe →"
+    >
       {/* Carosello principale */}
       <div className="relative flex items-center justify-center gap-4">
         {/* Freccia sinistra */}
@@ -200,8 +186,6 @@ export function RaceStep({ initialRaceId, onBack, onSelect }: RaceStepProps) {
           )}
         </div>
       </AncientCardContainer>
-
-
-    </div>
+    </WizardStep>
   );
 }

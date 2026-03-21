@@ -4,10 +4,10 @@
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CreationData } from '../hooks/useCharacterCreation';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
+import { WizardStep } from '../WizardStep';
 
 // Lista allineamenti D&D
 const ALIGNMENTS = [
@@ -64,27 +64,14 @@ export function BasicInfoStep({ initialData, onNext }: BasicInfoStepProps) {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-serif text-amber-900 mb-2">
-          🎴 Info Personaggio
-        </h2>
-        <p className="text-amber-700 text-sm">
-          Completa i dati base del tuo eroe
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Pulsanti */}
-        <div className="flex justify-end pt-4">
-          <Button
-            type="submit"
-            variant={"default"}
-            size="lg"
-          >
-            Avanti: Scegli Razza →
-          </Button>
-        </div>
+    <WizardStep
+      title="🎴 Info Personaggio"
+      subtitle="Completa i dati base del tuo eroe"
+      asForm
+      onFormSubmit={handleSubmit}
+      nextLabel="Avanti: Scegli Razza →"
+    >
+      <div className="space-y-4">
         {/* Nome Personaggio */}
         <div className="space-y-2">
           <Label htmlFor="name" className="text-amber-900">
@@ -179,12 +166,12 @@ export function BasicInfoStep({ initialData, onNext }: BasicInfoStepProps) {
         )}
 
 
-      </form>
+      </div>
 
       {/* Note decorative */}
       <p className="text-xs text-center text-amber-500 mt-4">
         * Nome e Background sono obbligatori
       </p>
-    </div>
+    </WizardStep>
   );
 }

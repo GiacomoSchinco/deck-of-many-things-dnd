@@ -4,9 +4,10 @@
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useCreateCharacter } from '@/hooks/mutations/useCharacterMutations';
-
 import { useSkillMutations } from '@/hooks/mutations/useSkillMutations';
 import { useCharacterCalculations } from '@/hooks/useCharacterCalculations';
+import { useInventoryMutations } from '@/hooks/mutations/useInventoryMutations';
+import { useItems } from '@/hooks/queries/useItems';
 import { useCreationStore } from '@/store/useCreationStore';
 import type { EquipmentItem } from '@/types/equipment';
 
@@ -56,6 +57,8 @@ export function useCharacterCreation() {
   const router = useRouter();
   const createCharacter = useCreateCharacter();
   const skillMutations = useSkillMutations();
+  const inventoryMutations = useInventoryMutations();
+  const { data: items } = useItems();
 
   const { currentStep, data, setStep, updateData, reset, _hasHydrated } = useCreationStore();
 
@@ -144,39 +147,44 @@ export function useCharacterCreation() {
             if (data.equipment && data.equipment.length > 0) {
               const itemsDetails = await Promise.all(
                 data.equipment.map(async (item) => {
-                  const res = await fetch(`/api/items/${item.item_id}`);
-                  if (!res.ok) throw new Error('Errore caricamento item');
-                  const fullItem = await res.json();
+                  // Use cached items from `useItems` hook when available.
+                  const fullItem = items?.find((i) => i.id === item.item_id) ?? null;
+
+                  if (!fullItem) {
+                    // If item details are not in cache, proceed with best-effort defaults
+                    // to avoid synchronous fetches here. This keeps behavior offline-friendly
+                    // and relies on server-side reconciliation later if needed.
+                    console.warn(`Item ${item.item_id} not found in cache; using defaults.`);
+                    return {
+                      character_id: character.id,
+                      item_id: item.item_id,
+                      item_name: item.name || 'Oggetto sconosciuto',
+                      item_type: 'gear' as const,
+                      quantity: item.quantity,
+                      weight: 0,
+                      equipped: false,
+                      properties: undefined,
+                    };
+                  }
+
                   return {
                     character_id: character.id,
                     item_id: item.item_id,
                     item_name: item.name || fullItem.name,
-                    item_type: fullItem.type,
+                    item_type: fullItem.type === 'currency' ? 'gear' as const : fullItem.type,
                     quantity: item.quantity,
                     weight: fullItem.weight,
                     equipped: fullItem.type === 'weapon' || fullItem.type === 'armor',
-                    properties: fullItem.properties ?? null,
+                    properties: (fullItem.properties ?? undefined) as Record<string, unknown> | undefined,
                   };
                 })
               );
 
-              // Post the items to the server inventory endpoint
               try {
-                const res = await fetch(`/api/characters/${character.id}/inventory`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ items: itemsDetails })
-                });
-
-                if (!res.ok) {
-                  const err = await res.json().catch(() => ({ error: 'Unknown' }));
-                  console.error('Errore salvataggio inventario (API):', err);
-                } else {
-                  const payload = await res.json().catch(() => null);
-                  console.log(`✅ Inventario salvato: ${payload?.inserted ?? 0} oggetti`);
-                }
+                const payload = await inventoryMutations.create.mutateAsync({ characterId: character.id, items: itemsDetails });
+                console.log(`✅ Inventario salvato: ${payload?.inserted ?? 0} oggetti`);
               } catch (e) {
-                console.error('Errore salvataggio inventario (fetch):', e);
+                console.error('Errore salvataggio inventario (mutation):', e);
               }
             }
           } catch (e) {

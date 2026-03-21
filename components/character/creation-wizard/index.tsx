@@ -113,6 +113,8 @@ export function CreationWizard() {
             classId={data.classId!}
             abilityScores={data.abilityScores!}
             onBack={prevStep}
+            initialSelectedSkills={data.skills || []}
+            onChange={(selectedSkills) => updateData({ skills: selectedSkills })}
             onConfirm={(selectedSkills) => {
               updateData({ skills: selectedSkills });
               nextStep();
@@ -125,6 +127,8 @@ export function CreationWizard() {
           <EquipmentStep
             classId={data.classId!}
             onBack={prevStep}
+            initialSelectedItems={data.equipment || []}
+            onChange={(selectedItems) => updateData({ equipment: selectedItems })}
             onConfirm={(selectedItems) => {
               updateData({ equipment: selectedItems });
               nextStep();
