@@ -14,7 +14,6 @@ export function useCampaigns() {
     staleTime: 1000 * 60 * 5,
   });
 }
-//test
 export function useCampaign(id: string | null) {
   return useQuery({
     queryKey: ['campaign', id],   
