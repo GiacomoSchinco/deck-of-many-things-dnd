@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🃏 Deck of Many Things
 
-## Getting Started
+<div align="center">
+  <img src="/public/images/logo.png" alt="Deck of Many Things Logo" width="200" />
+  <br />
+  <strong>Gestione Schede Personaggio D&D 5e</strong>
+  <br />
+  <em>Il destino è nelle carte</em>
+</div>
 
-First, run the development server:
+---
+
+## 📖 **Descrizione**
+
+**Deck of Many Things** è un'applicazione web per la gestione di schede personaggio di Dungeons & Dragons 5ª edizione. L'app permette di creare, visualizzare e gestire personaggi con un'interfaccia ispirata alle carte antiche, offrendo un'esperienza immersiva per giocatori e dungeon master.
+
+## ✨ **Caratteristiche**
+
+- 🎴 **Interfaccia a carte antiche** - Design unico ispirato ai tarocchi e alle pergamene
+- ⚔️ **Creazione personaggio wizard** - Guida passo-passo per creare il tuo eroe
+- 📊 **Gestione completa** - Caratteristiche, competenze, incantesimi, inventario
+- 🎲 **Tiri automatici** - Calcola bonus e tira i dadi direttamente dalla scheda
+- 🏰 **Campagne** - Organizza i personaggi per campagne
+- 📦 **Catalogo oggetti** - Oltre 300 oggetti predefiniti
+- 📜 **Libro degli incantesimi** - Oltre 350 incantesimi SRD in italiano
+- 👥 **Gestione utenti** - Login/registrazione con Supabase Auth
+
+## 🚀 **Tecnologie**
+
+| Tecnologia | Utilizzo |
+|------------|----------|
+| [Next.js 15](https://nextjs.org/) | Framework React con App Router |
+| [TypeScript](https://www.typescriptlang.org/) | Tipizzazione statica |
+| [Tailwind CSS](https://tailwindcss.com/) | Styling utility-first |
+| [shadcn/ui](https://ui.shadcn.com/) | Componenti UI riutilizzabili |
+| [TanStack Query](https://tanstack.com/query) | Gestione stato server |
+| [TanStack Table](https://tanstack.com/table) | Tabelle dati avanzate |
+| [Zustand](https://github.com/pmndrs/zustand) | Gestione stato client |
+| [Supabase](https://supabase.com/) | Database e autenticazione |
+
+## 📋 **Prerequisiti**
+
+- Node.js 18+
+- npm o yarn
+- Account Supabase (gratuito)
+
+## 🔧 **Installazione**
+
+### 1. Clona il repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+git clone https://github.com/tuo-username/deck-of-many-things.git
+cd deck-of-many-things
