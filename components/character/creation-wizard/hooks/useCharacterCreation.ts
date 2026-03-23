@@ -7,58 +7,14 @@ import { useCreateCharacter } from '@/hooks/mutations/useCharacterMutations';
 import { useSkillMutations } from '@/hooks/mutations/useSkillMutations';
 import { useCharacterCalculations } from '@/hooks/useCharacterCalculations';
 import { useInventoryMutations } from '@/hooks/mutations/useInventoryMutations';
-import { useItems } from '@/hooks/queries/useItems';
 import { useCreationStore } from '@/store/useCreationStore';
-import type { EquipmentItem } from '@/types/equipment';
-
-export interface CreationData {
-  // Step 1 - Basic Info
-  name: string;
-  playerName: string;
-  alignment: string;
-  background: string;
-  
-  // Step 2 - Race
-  raceId: number | null;
-  
-  // Step 3 - Class
-  classId: number | null;
-
-  // Step 4 - Campaign
-  campaignId: string | null;  // UUID della campagna
-
-  // Step 5 - Ability Scores
-  abilityScores: {
-    strength: number;
-    dexterity: number;
-    constitution: number;
-    intelligence: number;
-    wisdom: number;
-    charisma: number;
-  } | null;
-  // Step 6 - Skills
-  skills?: string[];
-  // Optional equipment selected during creation
-  equipment?: EquipmentItem[];
-}
-
-export type CreationStep = 
-  | 'basic-info'
-  | 'race'
-  | 'class'
-  | 'campaign'
-  | 'abilities'
-  | 'skills'
-  | 'equipment'
-  | 'review';
-  
+import type { CreationStep } from '@/types/creation';
 
 export function useCharacterCreation() {
   const router = useRouter();
   const createCharacter = useCreateCharacter();
   const skillMutations = useSkillMutations();
   const inventoryMutations = useInventoryMutations();
-  const { data: items } = useItems();
 
   const { currentStep, data, setStep, updateData, reset, _hasHydrated } = useCreationStore();
 
@@ -144,41 +100,19 @@ export function useCharacterCreation() {
             }
 
             // 2) If equipment was selected during creation, save inventory server-side
+            // Il server legge tutti i dati (name, description, properties, type, weight) dal catalogo items
             if (data.equipment && data.equipment.length > 0) {
-              const itemsDetails = await Promise.all(
-                data.equipment.map(async (item) => {
-                  // Use cached items from `useItems` hook when available.
-                  const fullItem = items?.find((i) => i.id === item.item_id) ?? null;
-
-                  if (!fullItem) {
-                    // If item details are not in cache, proceed with best-effort defaults
-                    // to avoid synchronous fetches here. This keeps behavior offline-friendly
-                    // and relies on server-side reconciliation later if needed.
-                    console.warn(`Item ${item.item_id} not found in cache; using defaults.`);
-                    return {
-                      character_id: character.id,
-                      item_id: item.item_id,
-                      item_name: item.name || 'Oggetto sconosciuto',
-                      item_type: 'gear' as const,
-                      quantity: item.quantity,
-                      weight: 0,
-                      equipped: false,
-                      properties: undefined,
-                    };
-                  }
-
-                  return {
-                    character_id: character.id,
-                    item_id: item.item_id,
-                    item_name: item.name || fullItem.name,
-                    item_type: fullItem.type === 'currency' ? 'gear' as const : fullItem.type,
-                    quantity: item.quantity,
-                    weight: fullItem.weight,
-                    equipped: fullItem.type === 'weapon' || fullItem.type === 'armor',
-                    properties: (fullItem.properties ?? undefined) as Record<string, unknown> | undefined,
-                  };
+              const itemsDetails = data.equipment
+                .map((item) => {
+                  const itemObj = item as Record<string, unknown>;
+                  const rawId = itemObj['item_id'];
+                  const itemId: number | null = typeof rawId === 'string'
+                    ? (rawId.trim() === '' ? null : parseInt(rawId, 10))
+                    : (typeof rawId === 'number' ? rawId : null);
+                  const qty = Math.max(1, Math.trunc(Number(itemObj['quantity'] ?? 1) || 1));
+                  return itemId !== null ? { item_id: itemId, quantity: qty } : null;
                 })
-              );
+                .filter((i): i is { item_id: number; quantity: number } => i !== null);
 
               try {
                 const payload = await inventoryMutations.create.mutateAsync({ characterId: character.id, items: itemsDetails });

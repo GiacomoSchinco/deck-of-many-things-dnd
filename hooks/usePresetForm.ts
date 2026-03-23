@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useCreateEquipmentPreset, useUpdateEquipmentPreset } from '@/hooks/mutations/useEquipmentPresetMutations'
 import { useClasses } from '@/hooks/queries/useClasses'
-import { useItems } from '@/hooks/queries/useItems'
 import type { EquipmentPreset, CreateEquipmentPresetDTO } from '@/types/equipment'
 import type { PresetFormState, EquipmentItemForm, EquipmentChoiceForm } from '@/types/preset-form'
 import {
@@ -49,7 +48,6 @@ function buildInitialState(initialData?: EquipmentPreset): PresetFormState {
 export function usePresetForm(initialData?: EquipmentPreset) {
   const router = useRouter()
   const { data: classes } = useClasses()
-  const { data: items } = useItems()
   const createPreset = useCreateEquipmentPreset()
   const updatePreset = useUpdateEquipmentPreset()
 
@@ -65,9 +63,6 @@ export function usePresetForm(initialData?: EquipmentPreset) {
     setPreset((p) => {
       const newItems = [...p.items]
       newItems[index] = { ...newItems[index], [field]: value }
-      if (field === 'item_id') {
-        newItems[index].name = items?.find((i) => i.id === value)?.name
-      }
       return { ...p, items: newItems }
     })
   }
@@ -113,9 +108,6 @@ export function usePresetForm(initialData?: EquipmentPreset) {
       const newChoices = [...p.choices]
       const newItems = [...newChoices[choiceIndex].items]
       newItems[itemIndex] = { ...newItems[itemIndex], [field]: value }
-      if (field === 'item_id') {
-        newItems[itemIndex].name = items?.find((i) => i.id === value)?.name
-      }
       newChoices[choiceIndex] = { ...newChoices[choiceIndex], items: newItems }
       return { ...p, choices: newChoices }
     })

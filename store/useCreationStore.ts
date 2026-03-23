@@ -1,7 +1,7 @@
 // store/useCreationStore.ts
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { CreationData, CreationStep } from '@/components/character/creation-wizard/hooks/useCharacterCreation';
+import type { CreationData, CreationStep } from '@/types/creation';
 
 interface CreationState {
   currentStep: CreationStep;

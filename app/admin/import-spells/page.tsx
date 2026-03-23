@@ -4,8 +4,8 @@
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
-import AncientCardContainer from '@/components/custom/AncientCardContainer';
-import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+import AncientContainer from '@/components/custom/AncientContainer';
+import { AlertCircle, CheckCircle, Loader2, BookOpen, Database, Sparkles } from 'lucide-react';
 
 export default function ImportSpellsPage() {
   const [loading, setLoading] = useState(false);
@@ -144,7 +144,7 @@ export default function ImportSpellsPage() {
     switch(type) {
       case 'success': return 'text-green-400';
       case 'error': return 'text-red-400';
-      default: return 'text-gray-300';
+      default: return 'text-amber-300';
     }
   };
 
@@ -152,114 +152,142 @@ export default function ImportSpellsPage() {
     switch(type) {
       case 'success': return <CheckCircle className="w-4 h-4 inline mr-2 text-green-400" />;
       case 'error': return <AlertCircle className="w-4 h-4 inline mr-2 text-red-400" />;
-      default: return null;
+      default: return <Sparkles className="w-4 h-4 inline mr-2 text-amber-400" />;
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-parchment-100 to-parchment-200 p-6">
-      <div className="container mx-auto max-w-3xl">
-        <AncientCardContainer className="p-6">
-          <h1 className="text-3xl font-serif font-bold text-amber-900 mb-2">
-            📜 Import Incantesimi
-          </h1>
-          <p className="text-amber-700 mb-6">
-            Importa tutti gli incantesimi SRD in italiano nella tabella `spells`
-          </p>
-
-          {/* Statistiche */}
-          {stats.success > 0 && (
-            <div className="grid grid-cols-3 gap-3 mb-6">
-              <div className="bg-green-100 p-3 rounded-lg text-center">
-                <p className="text-xs text-green-700">Inseriti</p>
-                <p className="text-2xl font-bold text-green-800">{stats.success}</p>
-              </div>
-              <div className="bg-yellow-100 p-3 rounded-lg text-center">
-                <p className="text-xs text-yellow-700">Già presenti</p>
-                <p className="text-2xl font-bold text-yellow-800">{stats.skipped}</p>
-              </div>
-              <div className="bg-red-100 p-3 rounded-lg text-center">
-                <p className="text-xs text-red-700">Errori</p>
-                <p className="text-2xl font-bold text-red-800">{stats.errors}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Progresso */}
-          {progress.total > 0 && (
-            <div className="mb-6">
-              <div className="flex justify-between text-sm text-amber-700 mb-1">
-                <span>Progresso</span>
-                <span>{progress.current}/{progress.total}</span>
-              </div>
-              <div className="h-2 bg-amber-200 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-amber-700 transition-all duration-300"
-                  style={{ width: `${(progress.current / progress.total) * 100}%` }}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Pulsanti */}
-          <div className="flex gap-3 mb-6">
-            <Button
-              onClick={importSpells}
-              disabled={loading}
-              className="flex-1 bg-amber-700 hover:bg-amber-800"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Import in corso...
-                </>
-              ) : (
-                '🚀 Avvia Import'
-              )}
-            </Button>
-            
-            {logs.length > 0 && (
-              <Button
-                onClick={clearLogs}
-                variant="outline"
-                className="border-amber-700 text-amber-700"
-              >
-                🧹 Pulisci Log
-              </Button>
-            )}
+  // Azioni (statistiche e pulsante clear)
+  const actions = (
+    <div className="flex gap-2">
+      {stats.success > 0 && (
+        <div className="flex gap-2 mr-2">
+          <div className="bg-green-100/80 px-3 py-1.5 rounded-lg text-center">
+            <p className="text-xs text-green-700">✅ {stats.success}</p>
           </div>
+          <div className="bg-yellow-100/80 px-3 py-1.5 rounded-lg text-center">
+            <p className="text-xs text-yellow-700">⏭️ {stats.skipped}</p>
+          </div>
+          <div className="bg-red-100/80 px-3 py-1.5 rounded-lg text-center">
+            <p className="text-xs text-red-700">❌ {stats.errors}</p>
+          </div>
+        </div>
+      )}
+      {logs.length > 0 && (
+        <Button
+          onClick={clearLogs}
+          variant="outline"
+          size="sm"
+          className="border-amber-600 text-amber-700 hover:bg-amber-100"
+        >
+          🧹 Pulisci
+        </Button>
+      )}
+    </div>
+  );
 
-          {/* Logs */}
-          {logs.length > 0 && (
-            <AncientCardContainer className="p-4 bg-gray-900">
-              <div className="flex items-center gap-2 mb-3 text-gray-400 border-b border-gray-700 pb-2">
-                <span className="text-sm font-mono">Console Log</span>
-                <span className="text-xs">({logs.length} messaggi)</span>
-              </div>
-              <div className="font-mono text-sm h-96 overflow-y-auto space-y-1">
-                {logs.map((log, i) => (
-                  <div key={i} className={`${getLogColor(log.type)} flex items-start`}>
-                    {getLogIcon(log.type)}
-                    <span>{log.message}</span>
-                  </div>
-                ))}
-              </div>
-            </AncientCardContainer>
-          )}
+  // Progress bar (se in corso)
+  const progressBar = progress.total > 0 && (
+    <div className="mb-6">
+      <div className="flex justify-between text-sm text-amber-700 mb-1">
+        <span className="flex items-center gap-2">
+          <Database className="w-4 h-4" />
+          Progresso import
+        </span>
+        <span>{progress.current}/{progress.total}</span>
+      </div>
+      <div className="h-2 bg-amber-200 rounded-full overflow-hidden">
+        <div 
+          className="h-full bg-amber-700 transition-all duration-300 rounded-full"
+          style={{ width: `${(progress.current / progress.total) * 100}%` }}
+        />
+      </div>
+    </div>
+  );
 
-          {/* Note di sicurezza */}
-          <div className="mt-6 text-xs text-amber-600 border-t border-amber-200 pt-4">
+  // Pulsante import principale
+  const importButton = (
+    <Button
+      onClick={importSpells}
+      disabled={loading}
+      className="w-full bg-amber-700 hover:bg-amber-800 text-white shadow-md hover:shadow-lg transition-all"
+      size="lg"
+    >
+      {loading ? (
+        <>
+          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+          Import in corso...
+        </>
+      ) : (
+        <>
+          <BookOpen className="w-5 h-5 mr-2" />
+          Avvia Import Incantesimi
+        </>
+      )}
+    </Button>
+  );
+
+  // Logs console
+  const logsConsole = logs.length > 0 && (
+    <div className="bg-gray-900 rounded-lg border border-amber-700/30 overflow-hidden">
+      <div className="flex items-center gap-2 px-4 py-2 bg-gray-800 border-b border-gray-700">
+        <span className="text-xs font-mono text-gray-400">📋 Console Log</span>
+        <span className="text-xs text-gray-500">({logs.length} messaggi)</span>
+      </div>
+      <div className="font-mono text-sm h-80 overflow-y-auto p-4 space-y-1">
+        {logs.map((log, i) => (
+          <div key={i} className={`${getLogColor(log.type)} flex items-start text-xs`}>
+            {getLogIcon(log.type)}
+            <span className="break-all">{log.message}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="container mx-auto p-4 md:p-6 max-w-4xl">
+      <AncientContainer
+        title="Import Incantesimi SRD"
+        subtitle="Importa tutti gli incantesimi SRD in italiano nella tabella spells"
+        icon={BookOpen}
+        action={actions}
+        footer={
+          <div className="text-xs text-amber-600/80 space-y-1">
             <p className="font-semibold mb-1">⚠️ Note importanti:</p>
-            <ul className="list-disc list-inside space-y-1">
-              <li>Assicurati che il file <code className="bg-amber-100 px-1">spells.json</code> sia nella cartella <code className="bg-amber-100 px-1">public/</code></li>
+            <ul className="list-disc list-inside space-y-0.5">
+              <li>Assicurati che il file <code className="bg-amber-100 px-1 rounded">spells.json</code> sia nella cartella <code className="bg-amber-100 px-1 rounded">public/</code></li>
               <li>L'import verifica i duplicati per nome</li>
               <li>Batch da 25 incantesimi per volta (più sicuro)</li>
               <li>Pausa di 100ms tra i batch</li>
               <li>Puoi eseguirlo più volte senza problemi</li>
             </ul>
           </div>
-        </AncientCardContainer>
-      </div>
+        }
+      >
+        {/* Progresso */}
+        {progressBar}
+        
+        {/* Pulsante import */}
+        <div className="mb-6">
+          {importButton}
+        </div>
+        
+        {/* Logs */}
+        {logsConsole}
+        
+        {/* Messaggio di benvenuto se non ci sono logs */}
+        {logs.length === 0 && !loading && (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4 opacity-50">📜</div>
+            <p className="text-amber-700 font-serif">
+              Premi &quot;Avvia Import Incantesimi&quot; per iniziare
+            </p>
+            <p className="text-amber-600/60 text-sm mt-2">
+              Verranno importati tutti gli incantesimi SRD in italiano
+            </p>
+          </div>
+        )}
+      </AncientContainer>
     </div>
   );
 }

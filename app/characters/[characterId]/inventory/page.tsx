@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Loading from '@/components/custom/Loading'
 import { Button } from '@/components/ui/button'
 import { useInventory } from '@/hooks/queries/useInventory'
+import InventoryTable from '@/components/custom/InventoryTable'
 
 export default function InventoryPage() {
   const params = useParams()
@@ -28,7 +29,7 @@ export default function InventoryPage() {
           </Link>
         </div>
       </div>
-
+      <InventoryTable items={items} />
       {items.length === 0 ? (
         <p className="text-center text-amber-700">Inventario vuoto</p>
       ) : (
@@ -64,5 +65,6 @@ export default function InventoryPage() {
         </div>
       )}
     </div>
+    
   )
 }

@@ -1,30 +1,32 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import {
-    getCoreRowModel,
-    useReactTable,
-    ColumnDef,
-    flexRender,
-    CellContext,
-} from "@tanstack/react-table";
-import { AncientScroll } from "./AncientScroll";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
+import { Calendar, ChevronLeft, ChevronRight, Eye } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type AnyRecord = Record<string, unknown>;
 
+export type ColumnDef<T extends AnyRecord = AnyRecord> = {
+    key: string;
+    label: string;
+    render?: (value: unknown, row: T) => React.ReactNode;
+};
+
 export type DataTableProps<T extends AnyRecord> = {
     initialData: T[];
+    /** Shorthand: define columns in one place instead of visibleColumns + labels + customRenderers */
+    columns?: ColumnDef<T>[];
     idKey?: keyof T & string;
     hiddenColumns?: Array<keyof T & string>;
-    readOnlyColumns?: Array<keyof T & string>;
     labels?: Partial<Record<keyof T & string, string>>;
     visibleColumns?: Array<string>;
     onEdit?: (id: unknown, row: T) => void;
     onDelete?: (id: unknown, row: T) => void;
     onRowClick?: (id: unknown, row: T) => void;
     pagination?: boolean;
-    title?: string;
-    customRenderers?: Partial<Record<string, (value: any, row?: T) => React.ReactNode>>;
+    customRenderers?: Partial<Record<string, (value: unknown, row?: T) => React.ReactNode>>;
+    emptyMessage?: string;
+    className?: string;
 };
 
 function toLabel(key: string) {
@@ -36,22 +38,29 @@ function toLabel(key: string) {
 
 export default function DataTable<T extends AnyRecord>({
     initialData,
+    columns: columnDefs,
     idKey = "id" as keyof T & string,
     hiddenColumns = [],
-    labels = {},
-    visibleColumns,
+    labels: labelsRaw = {},
+    visibleColumns: visibleColumnsRaw,
     onEdit,
     onDelete,
     onRowClick,
     pagination = false,
-    title,
-    customRenderers,
+    customRenderers: customRenderersRaw,
+    emptyMessage = "Nessun record trovato",
+    className,
 }: DataTableProps<T>) {
-    "use no memo"; // TanStack Table returns functions that can't be safely memoized by React 19 Compiler
-    const [data, setData] = useState<T[]>(initialData);
-    useEffect(() => {
-        setData(initialData);
-    }, [initialData]);
+    // Resolve from `columns` shorthand or individual props
+    const labels = columnDefs
+        ? Object.fromEntries(columnDefs.map((c) => [c.key, c.label]))
+        : (labelsRaw as Record<string, string>);
+    const visibleColumns = columnDefs ? columnDefs.map((c) => c.key) : visibleColumnsRaw;
+    const customRenderers = columnDefs
+        ? Object.fromEntries(columnDefs.filter((c) => c.render).map((c) => [c.key, c.render!]))
+        : customRenderersRaw;
+    const [data, setData] = useState<T[]>(() => initialData);
+    useEffect(() => { Promise.resolve().then(() => setData(initialData)); }, [initialData]);
 
     const keys = useMemo(() => {
         const first = data[0] ?? initialData[0] ?? ({} as T);
@@ -70,83 +79,69 @@ export default function DataTable<T extends AnyRecord>({
     }, [data, page, rowsPerPage, pagination]);
 
     useEffect(() => {
-        if (pagination && page > totalPages) setPage(totalPages);
+        if (pagination && page > totalPages) Promise.resolve().then(() => setPage(totalPages));
     }, [totalPages, page, pagination]);
 
-    
     const visibleKeys = useMemo(() => {
         const idStr = idKey as string;
         if (visibleColumns && visibleColumns.length) {
-            const asStrings = visibleColumns as string[];
-            // keep provided visible columns but exclude idKey
-            return asStrings.filter((k) => k !== idStr && k !== idStr);
+            return (visibleColumns as string[]).filter((k) => k !== idStr && !(hiddenColumns as string[]).includes(k));
         }
         return keys.filter((k) => k !== idStr && !(hiddenColumns as string[]).includes(k));
     }, [keys, idKey, hiddenColumns, visibleColumns]);
 
-    const columns = useMemo<ColumnDef<T, unknown>[]>(() => {
-        const baseCols: ColumnDef<T, unknown>[] = visibleKeys.map((key) => {
+    const renderCellForKey = useCallback((key: string, v: unknown, row?: T) => {
+        const renderer = customRenderers && (customRenderers as Record<string, (v: unknown, r?: T) => React.ReactNode>)[key];
+        if (renderer) return renderer(v, row as T);
+        if (v === null || v === undefined) return <span className="text-amber-400/60">—</span>;
+        if (typeof v === "boolean") return v ? "✓" : "✗";
+        return String(v);
+    }, [customRenderers]);
+
+    type LocalCol = { id: string; header: string; cell: (row: T) => React.ReactNode };
+    const columns = useMemo(() => {
+        const baseCols: LocalCol[] = visibleKeys.map((key) => {
             const headerLabel = (labels as Partial<Record<string, string>>)[key] ?? toLabel(key);
             if (key.includes('.')) {
                 const path = key.split('.');
+                const accessor = (row: T) => path.reduce((acc: unknown, p: string) => {
+                    if (acc && typeof acc === 'object' && p in (acc as Record<string, unknown>)) return (acc as Record<string, unknown>)[p];
+                    return undefined;
+                }, row as unknown);
                 return {
                     id: key,
                     header: headerLabel,
-                    accessorFn: (row: T) => {
-                        return path.reduce((acc: unknown, p: string) => {
-                            if (acc && typeof acc === 'object' && p in (acc as Record<string, unknown>)) {
-                                return (acc as Record<string, unknown>)[p];
-                            }
-                            return undefined;
-                        }, row as unknown);
-                    },
-                    cell: (info: CellContext<T, unknown>) => {
-                        const v = info.getValue();
-                        const row = info.row.original;
-                        const renderer = customRenderers && customRenderers[key];
-                        if (renderer) return renderer(v, row);
-                        return typeof v === "boolean" ? (v ? "✓" : "✗") : String(v ?? "");
-                    },
-                } as ColumnDef<T, unknown>;
+                    cell: (row: T) => renderCellForKey(key, accessor(row), row),
+                };
             }
 
             return {
-                accessorKey: key as keyof T & string,
+                id: key,
                 header: headerLabel,
-                    cell: (info: CellContext<T, unknown>) => {
-                        const v = info.getValue();
-                        const row = info.row.original;
-                        const renderer = customRenderers && customRenderers[key];
-                        if (renderer) return renderer(v, row);
-                        return typeof v === "boolean" ? (v ? "✓" : "✗") : String(v ?? "");
-                    },
-            } as ColumnDef<T, unknown>;
+                cell: (row: T) => renderCellForKey(key, (row as Record<string, unknown>)[key], row),
+            };
         });
 
         if (onEdit || onDelete) {
             baseCols.push({
                 id: "actions",
                 header: "Azioni",
-                cell: ({ row }) => (
+                cell: (row: T) => (
                     <div className="flex gap-2">
                         {onEdit && (
                             <button
-                                className="relative px-3 py-1 text-xs font-serif text-amber-100 bg-amber-700 rounded-sm border border-amber-600 hover:bg-amber-800 transition-colors duration-200 shadow-md"
-                                onClick={(e) => { e.stopPropagation(); onEdit(row.original[idKey], row.original); }}
+                                className="px-3 py-1.5 text-xs font-serif text-amber-100 bg-amber-700 rounded-md border border-amber-600 hover:bg-amber-800 transition-all"
+                                onClick={(e) => { e.stopPropagation(); onEdit((row as Record<string, unknown>)[idKey], row); }}
                             >
-                                <span className="flex items-center gap-1">
-                                    Modifica
-                                </span>
+                                ✏️ Modifica
                             </button>
                         )}
                         {onDelete && idKey && (
                             <button
-                                className="relative px-3 py-1 text-xs font-serif text-amber-100 bg-amber-800 rounded-sm border border-amber-700 hover:bg-amber-900 transition-colors duration-200 shadow-md"
-                                onClick={(e) => { e.stopPropagation(); onDelete(row.original[idKey], row.original); }}
+                                className="px-3 py-1.5 text-xs font-serif text-amber-100 bg-amber-800 rounded-md border border-amber-700 hover:bg-amber-900 transition-all"
+                                onClick={(e) => { e.stopPropagation(); onDelete((row as Record<string, unknown>)[idKey], row); }}
                             >
-                                <span className="flex items-center gap-1">
-                                    Elimina
-                                </span>
+                                🗑️ Elimina
                             </button>
                         )}
                     </div>
@@ -155,146 +150,117 @@ export default function DataTable<T extends AnyRecord>({
         }
 
         return baseCols;
-    }, [visibleKeys, labels, idKey, onEdit, onDelete]);
-
-    const table = useReactTable<T>({
-        data: paginatedData,
-        columns,
-        getCoreRowModel: getCoreRowModel(),
-    });
+    }, [visibleKeys, labels, idKey, onEdit, onDelete, renderCellForKey]);
 
     return (
-        <div className="w-full p-4">
-            <AncientScroll className="w-full" >
-                <div className="relative z-10 p-6">
-                    {/* Titolo con decorazioni */}
-                    {title && (
-                        <div className="mb-6 text-center">
-                            <div className="flex items-center justify-center gap-4 mb-2">
-                                <div className="w-12 h-0.5 bg-gradient-to-r from-transparent via-amber-700 to-transparent" />
-                                <h2 className="text-3xl font-serif text-amber-900 tracking-wide">{title}</h2>
-                                <div className="w-12 h-0.5 bg-gradient-to-r from-transparent via-amber-700 to-transparent" />
-                            </div>
-                        </div>
-                    )}
-
-                    <div className="overflow-x-auto">
-                        <table className="w-full border-collapse">
-                            <thead>
-                                {table.getHeaderGroups().map((headerGroup) => (
-                                    <tr key={headerGroup.id} className="border-b-2 border-amber-800/50">
-                                        {headerGroup.headers.map((header) => (
-                                            <th key={header.id} className="px-4 py-3 text-left">
-                                                <span className="font-serif text-amber-900 font-bold text-sm uppercase tracking-wider">
-                                                    {header.isPlaceholder
-                                                        ? null
-                                                        : flexRender(header.column.columnDef.header, header.getContext())}
-                                                </span>
-                                            </th>
-                                        ))}
-                                    </tr>
-                                ))}
-                            </thead>
-                            <tbody>
-                                {table.getRowModel().rows.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={columns.length} className="text-center py-12">
-                                            <div className="flex flex-col items-center gap-3">
-                                                <p className="text-amber-700 font-serif text-lg">Nessun record trovato</p>
-                                                <p className="text-amber-600/50 text-sm italic">La pergamena è vuota...</p>
+        <div className={cn("w-full", className)}>
+            {/* Tabella */}
+            <div className="overflow-x-auto rounded-lg border border-amber-900/20 bg-amber-50/30">
+                <table className="w-full border-collapse">
+                    <thead>
+                        <tr className="border-b-2 border-amber-800/50 bg-amber-100/50">
+                            {columns.map((col) => (
+                                <th key={col.id} className="px-4 py-3 text-left">
+                                    <span className="font-serif text-amber-900 font-semibold text-sm uppercase tracking-wider">
+                                        {col.header}
+                                    </span>
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {paginatedData.length === 0 ? (
+                            <tr>
+                                <td colSpan={columns.length} className="text-center py-16">
+                                    <div className="flex flex-col items-center gap-4">
+                                        <div className="text-6xl opacity-30">📜</div>
+                                        <p className="text-amber-700 font-serif text-lg">{emptyMessage}</p>
+                                        <p className="text-amber-600/50 text-sm italic">La pergamena è vuota...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        ) : (
+                            paginatedData.map((row, index) => (
+                                <tr
+                                    key={String((row as Record<string, unknown>)[idKey] ?? index)}
+                                    onClick={() => onRowClick && onRowClick((row as Record<string, unknown>)[idKey], row)}
+                                    className={`
+                                        border-b border-amber-700/20 transition-all duration-200
+                                        ${index % 2 === 0 ? 'bg-amber-100/20' : 'bg-transparent'}
+                                        ${onRowClick ? 'cursor-pointer hover:bg-amber-200/40' : ''}
+                                    `}
+                                >
+                                    {columns.map((col) => (
+                                        <td key={col.id} className="px-4 py-3">
+                                            <div className="font-serif text-amber-800">
+                                                {col.cell(row)}
                                             </div>
                                         </td>
-                                    </tr>
-                                ) : (
-                                    table.getRowModel().rows.map((row, index) => (
-                                        <tr
-                                            key={row.id}
-                                            onClick={() => onRowClick && onRowClick(row.original[idKey], row.original)}
-                                            className={`
-                                                border-b border-amber-700/20 transition-all duration-200
-                                                ${index % 2 === 0 ? 'bg-amber-100/30' : 'bg-transparent'}
-                                                ${onRowClick ? 'cursor-pointer hover:bg-amber-200/50' : ''}
-                                                hover:shadow-inner
-                                            `}
-                                        >
-                                            {row.getVisibleCells().map((cell) => (
-                                                <td key={cell.id} className="px-4 py-3">
-                                                    <span className="font-serif text-amber-800">
-                                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                                    </span>
-                                                </td>
-                                            ))}
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
+                                    ))}
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Paginazione */}
+            {pagination && totalPages > 1 && (
+                <div className="mt-6">
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                            <span className="text-sm font-serif text-amber-800 flex items-center gap-1">
+                                <Eye className="w-4 h-4" />
+                                Righe:
+                            </span>
+                            <select
+                                className="px-3 py-1.5 bg-amber-50 border-2 border-amber-700 rounded-lg text-amber-900 font-serif text-sm"
+                                value={rowsPerPage}
+                                onChange={e => { setRowsPerPage(Number(e.target.value)); setPage(1); }}
+                            >
+                                {[5, 10, 20, 50].map(n => (
+                                    <option key={n} value={n}>{n}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                            <button
+                                className="px-4 py-1.5 bg-amber-700 text-amber-100 font-serif rounded-lg disabled:opacity-50 hover:bg-amber-800 transition-all flex items-center gap-2"
+                                disabled={page === 1}
+                                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                            >
+                                <ChevronLeft className="w-4 h-4" />
+                                Prec
+                            </button>
+                            
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm font-serif text-amber-800">Pag.</span>
+                                <span className="px-3 py-1.5 bg-amber-50 border-2 border-amber-700 rounded-lg text-amber-900 font-bold min-w-[60px] text-center">
+                                    {page}
+                                </span>
+                                <span className="text-sm font-serif text-amber-800">di {totalPages}</span>
+                            </div>
+                            
+                            <button
+                                className="px-4 py-1.5 bg-amber-700 text-amber-100 font-serif rounded-lg disabled:opacity-50 hover:bg-amber-800 transition-all flex items-center gap-2"
+                                disabled={page === totalPages}
+                                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                            >
+                                Succ
+                                <ChevronRight className="w-4 h-4" />
+                            </button>
+                        </div>
                     </div>
 
-                    {/* Paginazione in stile antico */}
-                    {pagination && (
-                        <div className="mt-8">
-                            {/* Linea decorativa */}
-                            <div className="relative mb-6">
-                                <div className="absolute inset-0 flex items-center">
-                                    <div className="w-full border-t-2 border-amber-700/30"></div>
-                                </div>
-                                <div className="relative flex justify-center">
-                                    <span className="bg-parchment-100 px-4 text-amber-700/50 text-xl">⚜️</span>
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                                {/* Selettore righe per pagina */}
-                                <div className="flex items-center gap-3 bg-amber-200/30 p-2 rounded-lg border border-amber-700/30">
-                                    <span className="text-sm font-serif text-amber-800">📏 Righe:</span>
-                                    <select
-                                        className="px-3 py-1 bg-parchment-100 border-2 border-amber-700 rounded text-amber-900 font-serif text-sm focus:outline-none focus:border-amber-900"
-                                        value={rowsPerPage}
-                                        onChange={e => { setRowsPerPage(Number(e.target.value)); setPage(1); }}
-                                    >
-                                        {[5, 10, 20, 50].map(n => (
-                                            <option key={n} value={n}>{n}</option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                {/* Controlli pagina */}
-                                <div className="flex items-center gap-4 bg-amber-200/30 p-2 rounded-lg border border-amber-700/30">
-                                    <button
-                                        className="px-4 py-1 bg-amber-700 text-amber-100 font-serif rounded border border-amber-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-800 transition-colors flex items-center gap-2"
-                                        disabled={page === 1}
-                                        onClick={() => setPage((p) => Math.max(1, p - 1))}
-                                    >
-                                        <span>←</span> Prev
-                                    </button>
-                                    
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm font-serif text-amber-800">Pag.</span>
-                                        <span className="px-3 py-1 bg-parchment-100 border-2 border-amber-700 rounded text-amber-900 font-bold">
-                                            {page}
-                                        </span>
-                                        <span className="text-sm font-serif text-amber-800">di {totalPages}</span>
-                                    </div>
-                                    
-                                    <button
-                                        className="px-4 py-1 bg-amber-700 text-amber-100 font-serif rounded border border-amber-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-800 transition-colors flex items-center gap-2"
-                                        disabled={page === totalPages}
-                                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                                    >
-                                        Next <span>→</span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Info pagina */}
-                            <div className="mt-4 text-center text-xs text-amber-600/50 font-serif">
-                                Mostrati {((page-1)*rowsPerPage)+1} - {Math.min(page*rowsPerPage, totalRows)} di {totalRows} elementi
-                            </div>
-                        </div>
-                    )}
+                    <div className="mt-3 text-center">
+                        <p className="text-xs text-amber-600/60 font-serif flex items-center justify-center gap-2">
+                            <Calendar className="w-3 h-3" />
+                            Mostrati {((page-1)*rowsPerPage)+1} - {Math.min(page*rowsPerPage, totalRows)} di {totalRows} elementi
+                        </p>
+                    </div>
                 </div>
-            </AncientScroll>
+            )}
         </div>
     );
 }

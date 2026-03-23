@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { createServerSupabase } from '@/lib/supabase/server'
+import type { UpdateInventoryItemDTO } from '@/types/inventory'
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string; invId: string }> }) {
   const cookieStore = await cookies()
@@ -25,25 +26,19 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   const { id, invId } = await params
   const supabase = createServerSupabase(cookieStore)
 
-  const body = await request.json()
-  const allowed = {
-    item_name: body.item_name,
-    item_id: body.item_id ?? null,
-    item_type: body.item_type ?? null,
-    quantity: body.quantity != null ? Math.max(1, Math.trunc(Number(body.quantity))) : undefined,
-    weight: body.weight != null ? Number(body.weight) : undefined,
-    equipped: body.equipped != null ? !!body.equipped : undefined,
-    description: body.description ?? undefined,
-    notes: body.notes ?? undefined,
-    // per-row `value` and `currency` are not stored on inventory rows
-    properties: body.properties ?? undefined,
-  }
+  const body = (await request.json()) as UpdateInventoryItemDTO
 
-  // remove undefined keys
-  const payload: any = {}
-  Object.keys(allowed).forEach((k) => {
-    if (allowed[k as keyof typeof allowed] !== undefined) payload[k] = (allowed as any)[k]
-  })
+  const payload: Partial<UpdateInventoryItemDTO> = {}
+
+  if (body.item_id !== undefined) payload.item_id = body.item_id ?? null
+  if (body.item_type !== undefined) payload.item_type = body.item_type ?? null
+  if (body.item_name !== undefined) payload.item_name = body.item_name
+  if (body.quantity != null) payload.quantity = Math.max(1, Math.trunc(Number(body.quantity)))
+  if (body.weight != null) payload.weight = Number(body.weight)
+  if (body.equipped != null) payload.equipped = !!body.equipped
+  if (body.description !== undefined) payload.description = body.description ?? null
+  if (body.notes !== undefined) payload.notes = body.notes ?? null
+  if (body.properties !== undefined) payload.properties = body.properties
 
   const { data, error } = await supabase
     .from('inventory')
