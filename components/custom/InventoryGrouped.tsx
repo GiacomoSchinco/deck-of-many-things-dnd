@@ -96,7 +96,7 @@ export default function InventoryGrouped({ items = [], onRowClick, onEdit, onDel
                 </AccordionTrigger>
                 <AccordionContent className="px-4 pb-4 pt-0">
                   <div className="border-t border-amber-700/20 pt-4 mt-2">
-                    <InventoryTable items={groups[t]} onRowClick={onRowClick} onEdit={onEdit} onDelete={onDelete} pagination />
+                    <InventoryTable items={groups[t]} onRowClick={onRowClick} onEdit={onEdit} onDelete={onDelete} pagination hideType />
                   </div>
                 </AccordionContent>
               </AccordionItem>

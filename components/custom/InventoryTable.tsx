@@ -17,9 +17,10 @@ type Props = {
   onEdit?: (item: InventoryItem) => void;
   onDelete?: (item: InventoryItem) => void;
   pagination?: boolean;
+  hideType?: boolean;
 };
 
-export default function InventoryTable({ items = [], onRowClick, onEdit, onDelete, pagination }: Props) {
+export default function InventoryTable({ items = [], onRowClick, onEdit, onDelete, pagination, hideType = false }: Props) {
   const [localData, setLocalData] = useState<Record<string, unknown>[]>(() => (items as unknown as Record<string, unknown>[]));
   const params = useParams();
   const routeCharacterId = params?.characterId as string | undefined;
@@ -135,7 +136,7 @@ export default function InventoryTable({ items = [], onRowClick, onEdit, onDelet
           key: 'quantity', label: 'Quantità',
           render: (_v, row) => <QuantityEditor row={row as Record<string, unknown>} />,
         },
-        { key: 'item_type', label: 'Tipo', render: (v) => getItalianItemType(String(v ?? '')) },
+        ...(!hideType ? [{ key: 'item_type', label: 'Tipo', render: (v: unknown) => getItalianItemType(String(v ?? '')) }] : []),
         {
           key: 'info', label: 'Info',
           render: (_v, row) => {
