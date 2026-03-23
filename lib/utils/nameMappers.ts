@@ -115,3 +115,15 @@ export const itemTypeItalianNames: Record<string, string> = {
 export function getItalianItemType(type: string): string {
   return itemTypeItalianNames[type.toLowerCase()] ?? type
 }
+
+export const currencyItalianNames: Record<string, string> = {
+  'po': "Pezzo d'oro",
+  'pa': "Pezzo d'argento",
+  'pr': "Pezzo di rame",
+  'pe': 'Electrum',
+  'mo': 'Moneta',
+}
+
+export function getItalianCurrency(c: string): string {
+  return currencyItalianNames[c.toLowerCase()] ?? c
+}

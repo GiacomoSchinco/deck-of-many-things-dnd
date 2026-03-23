@@ -7,6 +7,8 @@ export default function AdminIndexPage() {
 		{ href: '/admin/equipment-presets', title: 'Equipment Presets', description: 'Crea, modifica e gestisci preset di equipaggiamento' },
 		{ href: '/admin/import-items', title: 'Import Items', description: 'Importa oggetti dal json di riferimento' },
 		{ href: '/admin/import-spells', title: 'Import Spells', description: 'Importa incantesimi dal json di riferimento' },
+		{ href: '/admin/items', title: 'Catalogo Oggetti', description: 'Visualizza, modifica e gestisci il catalogo oggetti' },
+		{ href: '/admin/spells', title: 'Catalogo Incantesimi', description: 'Visualizza, modifica e gestisci il catalogo incantesimi' },
 	]
 
 	return (
