@@ -39,64 +39,104 @@ export type DamageType =
   | 'forza';
 
 // ===========================================
+// ===========================================
 // PROPRIETÀ SPECIFICHE PER TIPO
 // ===========================================
 
-export interface WeaponProperties {
-  itemType: 'weapon';
-  damage: string;                    // "1d8", "2d6"
-  damageType: DamageType;
-  range?: {
-    normal: number;                  // gittata normale in metri
-    long?: number;                   // gittata lunga in metri
-  };
-  properties?: string[];             // ['accurata', 'versatile', 'pesante']
-  versatileDamage?: string;          // "1d10" per armi versatili
-  magicBonus?: number;               // +1, +2, +3
+// Proprietà base per tutti gli oggetti
+export interface BaseItemProperties {
+  itemType: string;
+  description?: string;
+  special?: string[];
+  magicBonus?: number;
 }
 
-export interface ArmorProperties {
+// Proprietà per le armi
+export interface WeaponDamageEntry {
+  dice: string;        // es. "1d6"
+  type: DamageType;    // es. "fuoco"
+}
+
+export interface WeaponProperties extends BaseItemProperties {
+  itemType: 'weapon';
+  damage: string;           // es. "1d8"
+  damageType: DamageType;
+  damageAbility?: 'strength' | 'dexterity' | null; // statistica che scala il danno
+  extraDamage?: WeaponDamageEntry[]; // danni aggiuntivi (es. 1d6 fuoco)
+  properties: string[];     // es. ["versatile", "leggera", "pesante"]
+  versatileDamage?: string; // es. "1d10"
+  range?: {
+    normal: number;         // metri
+    long?: number;
+  };
+  ammunition?: boolean;
+  loading?: boolean;
+  finesse?: boolean;
+  heavy?: boolean;
+  light?: boolean;
+  reach?: boolean;
+  special?: string[];
+}
+
+// Proprietà per le armature
+export interface ArmorProperties extends BaseItemProperties {
   itemType: 'armor';
-  armorClass: number;                // CA base
+  armorClass: number;
   armorType: 'light' | 'medium' | 'heavy' | 'shield';
-  addsDexModifier?: boolean;         // se aggiunge modificatore DES
-  maxDexBonus?: number;              // max DES applicabile (armature medie)
+  addsDexModifier?: boolean;
+  maxDexBonus?: number;     // per armature medie
   stealthDisadvantage?: boolean;
   strengthRequirement?: number;
-  magicBonus?: number;               // +1, +2, +3
 }
 
-export interface AmmunitionProperties {
+// Proprietà per le munizioni
+export interface AmmunitionProperties extends BaseItemProperties {
   itemType: 'ammunition';
-  ammunitionType: 'arrow' | 'bolt' | 'bullet' | 'needle';
-  damageBonus?: number;              // bonus al danno
-  magicBonus?: number;               // +1, +2, +3
-  quantity?: number;                 // quantità per confezione
+  ammunitionType: 'arrow' | 'bolt' | 'bullet';
+  quantity: number;
+  magicBonus?: number;
+  damageBonus?: string;
+  specialEffect?: string;
 }
 
-export interface ConsumableProperties {
+// Proprietà per i consumabili
+export interface ConsumableProperties extends BaseItemProperties {
   itemType: 'consumable';
-  effect: string;                    // effetto principale
-  duration?: string;                 // durata
-  uses?: number;                     // utilizzi rimasti
-  usesMax?: number;                  // utilizzi massimi
-  recharge?: 'short' | 'long' | 'dawn' | 'dusk';
+  effect: string;
+  duration?: string;
+  savingThrow?: {
+    ability: string;
+    dc: number;
+  };
+  damage?: string;
+  healing?: string;
+  charges?: number;
+  recharge?: string;
+  usesMax?: number;
 }
 
-export interface ToolProperties {
+// Proprietà per gli attrezzi
+export interface ToolProperties extends BaseItemProperties {
   itemType: 'tool';
-  toolType?: string;                 // tipo specifico
-  skill?: string;                    // abilità associata
-  proficiency?: boolean;             // se richiede competenza
+  toolType: string;
+  skill?: string;
+  proficiency?: boolean;
+  uses?: number;
 }
 
-export interface GearProperties {
+// Proprietà per l'equipaggiamento generico
+export interface GearProperties extends BaseItemProperties {
   itemType: 'gear';
-  capacity?: number;                 // capacità in kg (per contenitori)
+  capacity?: number;
+  material?: string;
+  uses?: number;
 }
 
-export interface CurrencyProperties {
+// Proprietà per le monete
+export interface CurrencyProperties extends BaseItemProperties {
   itemType: 'currency';
+  valueInCopper: number;
+  symbol: string;
 }
 
 // ===========================================

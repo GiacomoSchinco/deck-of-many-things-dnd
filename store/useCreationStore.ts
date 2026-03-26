@@ -23,6 +23,8 @@ const initialData: Partial<CreationData> = {
   classId: null,
   campaignId: null,
   abilityScores: null,
+  skills: [],
+  equipment: [],
 };
 
 export const useCreationStore = create<CreationState>()(

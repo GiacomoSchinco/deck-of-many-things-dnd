@@ -8,6 +8,8 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const classFilter = searchParams.get('class')
   const levelFilter = searchParams.get('level')
+  const schoolFilter = searchParams.get('school')
+  const searchFilter = searchParams.get('search')
 
   const supabase = createServerSupabase(cookieStore)
   
@@ -23,6 +25,13 @@ export async function GET(request: Request) {
 
   if (levelFilter) {
     query = query.eq('level', parseInt(levelFilter))
+  }
+  if (schoolFilter) {
+    query = query.eq('school', schoolFilter)
+  }
+  if (searchFilter) {
+    const s = `%${searchFilter}%`
+    query = query.or(`name.ilike.${s},description.ilike.${s}`)
   }
 
   const { data: spells, error } = await query
