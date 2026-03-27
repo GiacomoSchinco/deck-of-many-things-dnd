@@ -1,7 +1,7 @@
 // components/ui/ItemPicker.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useItems , useItem } from '@/hooks/queries/useItems';
 import type {
   Item,
@@ -35,7 +35,7 @@ type ItemTypeFilter = ItemType | 'all';
 interface ItemPickerProps {
   value?: number | null;
   name?: string;
-  onSelect: (item: { id: number; name: string; type: string; weight: number; value: number; currency: string }) => void;
+  onSelect: (item: { id: number; name: string; type: string; weight: number; value: number; currency: string; description?: string | null; properties?: Record<string, unknown> | null }) => void;
   type?: ItemTypeFilter;
   placeholder?: string;
   disabled?: boolean;
@@ -83,6 +83,13 @@ export function ItemPicker({
   const [itemType, setItemType] = useState<ItemTypeFilter>(type);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 
+  // Reset internal selection when controlled `value` becomes null/0
+  useEffect(() => {
+    if (value == null || value === 0) {
+      setSelectedItem(null)
+    }
+  }, [value]);
+
   const { data: items, isLoading } = useItems({
     type: itemType === 'all' ? undefined : (itemType as ItemType),
     search: search || undefined,
@@ -106,7 +113,9 @@ export function ItemPicker({
       type: item.type,
       weight: item.weight,
       value: item.value,
-      currency: item.currency
+      currency: item.currency,
+      description: item.description ?? null,
+      properties: (item.properties as Record<string, unknown> | null | undefined) ?? null,
     });
     setOpen(false);
   };

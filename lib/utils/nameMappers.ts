@@ -71,7 +71,6 @@ export const classItalianNames: Record<string, string> = {
   'sorcerer': 'Stregone',
   'warlock':  'Warlock',
 }
-
 /** Restituisce il nome italiano di una classe. Accetta inglese lowercase o Title Case. */
 export function getItalianClass(name: string): string {
   return classItalianNames[name.toLowerCase()] ?? name
@@ -102,4 +101,29 @@ export const schoolItalianNames: Record<string, string> = {
 
 export function getItalianSchool(name: string): string {
   return schoolItalianNames[name.toLowerCase()] ?? name
+}
+
+export const itemTypeItalianNames: Record<string, string> = {
+  'weapon':     'Arma',
+  'armor':      'Armatura',
+  'gear':       'Equipaggiamento',
+  'consumable': 'Consumabile',
+  'ammunition': 'Munizione',
+  'tool':       'Attrezzo',
+  'currency':   'Moneta',
+}
+export function getItalianItemType(type: string): string {
+  return itemTypeItalianNames[type.toLowerCase()] ?? type
+}
+
+export const currencyItalianNames: Record<string, string> = {
+  'po': "Pezzo d'oro",
+  'pa': "Pezzo d'argento",
+  'pr': "Pezzo di rame",
+  'pe': 'Electrum',
+  'mo': 'Moneta',
+}
+
+export function getItalianCurrency(c: string): string {
+  return currencyItalianNames[c.toLowerCase()] ?? c
 }

@@ -27,7 +27,9 @@ export async function proxy(req: NextRequest) {
     req.nextUrl.pathname === '/login' ||
     req.nextUrl.pathname === '/register' ||
     req.nextUrl.pathname.startsWith('/forgot-password') ||
-    req.nextUrl.pathname.startsWith('/auth/')
+    req.nextUrl.pathname.startsWith('/auth/') ||
+    req.nextUrl.pathname.startsWith('/public/images/') ||
+    req.nextUrl.pathname.startsWith('/images')
 
   if (!session && !isPublicRoute) {
     const redirectUrl = new URL('/login', req.url)
@@ -43,5 +45,5 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|images).*)'],
 }

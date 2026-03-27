@@ -87,90 +87,66 @@ export async function POST(
     const body = await request.json()
     const newItems = body?.items
 
-    if (!Array.isArray(newItems)) {
-      return NextResponse.json({ error: 'items deve essere un array' }, { status: 400 })
+    if (!Array.isArray(newItems) || !newItems.every((i) => typeof i.item_id === 'number')) {
+      return NextResponse.json({ error: 'items deve essere un array di { item_id, quantity }' }, { status: 400 })
     }
 
-    const allowedTypes = ['weapon', 'armor', 'gear', 'magic', 'consumable', 'ammunition', 'tool']
+    // 1. Aggrega quantità per item_id (gestisce duplicati nel payload)
+    const qtyMap = new Map<number, number>()
+    for (const item of newItems) {
+      const qty = Math.max(1, Math.trunc(Number(item.quantity) || 1))
+      qtyMap.set(item.item_id, (qtyMap.get(item.item_id) ?? 0) + qty)
+    }
 
-    // 1. Recupera l'inventario esistente
+    const itemIds = [...qtyMap.keys()]
+
+    // 2. Fetch dati completi dal catalogo items
+    const { data: catalogItems, error: catalogError } = await supabase
+      .from('items')
+      .select('id, name, type, weight, value, currency, description, properties')
+      .in('id', itemIds)
+
+    if (catalogError) {
+      return NextResponse.json({ error: catalogError.message }, { status: 500 })
+    }
+
+    const catalogMap = new Map((catalogItems ?? []).map((i) => [i.id as number, i]))
+
+    // 3. Recupera inventario esistente per gestire duplicati
     const { data: existingItems } = await supabase
       .from('inventory')
       .select('item_id, quantity')
       .eq('character_id', id)
+      .in('item_id', itemIds)
 
-    const existingMap = new Map()
-    existingItems?.forEach((item: any) => {
-      existingMap.set(item.item_id, item.quantity)
-    })
+    const existingMap = new Map((existingItems ?? []).map((i) => [i.item_id as number, i.quantity as number]))
 
-    // 2. Raggruppa i nuovi items per item_id (somma quantità)
-    const itemsToAdd = new Map()
-    for (const item of newItems) {
-      let quantity = 1
-      if (typeof item.quantity === 'number') {
-        quantity = Math.max(1, Math.trunc(item.quantity))
-      } else if (typeof item.quantity === 'string' && item.quantity.trim() !== '') {
-        quantity = Math.max(1, Math.trunc(Number(item.quantity)))
-      }
-      
-      const itemId = item.item_id
-      const current = itemsToAdd.get(itemId) || 0
-      itemsToAdd.set(itemId, current + quantity)
-    }
-
-    // 3. Prepara le operazioni
+    // 4. Prepara insert / update
     const toInsert = []
     const toUpdate = []
 
-    for (const [itemId, quantityToAdd] of itemsToAdd.entries()) {
+    for (const [itemId, quantityToAdd] of qtyMap.entries()) {
+      const cat = catalogMap.get(itemId)
+      if (!cat) continue // item_id non trovato nel catalogo — skip
+
       if (existingMap.has(itemId)) {
-        // Esiste già → aggiorna quantità
-        toUpdate.push({
-          item_id: itemId,
-          new_quantity: existingMap.get(itemId) + quantityToAdd
-        })
+        toUpdate.push({ item_id: itemId, new_quantity: existingMap.get(itemId)! + quantityToAdd })
       } else {
-        // Non esiste → inserisci nuovo
-        const itemData = newItems.find(i => i.item_id === itemId)
-        
-        // Determina item_type
-        let itemType = null
-        if (typeof itemData?.item_type === 'string' && allowedTypes.includes(itemData.item_type)) {
-          itemType = itemData.item_type
-        } else if (typeof itemData?.type === 'string' && allowedTypes.includes(itemData.type)) {
-          itemType = itemData.type
-        }
-
-        // Determina item_name
-        let itemName = null
-        if (typeof itemData?.item_name === 'string') {
-          itemName = itemData.item_name
-        } else if (typeof itemData?.name === 'string') {
-          itemName = itemData.name
-        }
-
-        // Gestisci peso
-        let weight = 0
-        if (typeof itemData?.weight === 'number') {
-          weight = itemData.weight
-        } else if (typeof itemData?.weight === 'string' && itemData.weight.trim() !== '') {
-          weight = Number(itemData.weight)
-        }
-
+        const props = cat.properties as Record<string, unknown> | null
+        const itemType = (props?.itemType as string | undefined) ?? (cat.type as string) ?? 'gear'
         toInsert.push({
           character_id: id,
           item_id: itemId,
-          item_name: itemName,
+          item_name: cat.name,
           item_type: itemType,
           quantity: quantityToAdd,
-          weight: weight,
-          equipped: Boolean(itemData?.equipped),
-          description: typeof itemData?.description === 'string' ? itemData.description : null,
-          notes: typeof itemData?.notes === 'string' ? itemData.notes : null,
-          cost: typeof itemData?.cost === 'number' ? itemData.cost : (typeof itemData?.value === 'number' ? itemData.value : null),
-          cost_unit: typeof itemData?.cost_unit === 'string' ? itemData.cost_unit : (typeof itemData?.currency === 'string' ? itemData.currency : 'po'),
-          properties: typeof itemData?.properties === 'object' && itemData.properties !== null ? itemData.properties : {},
+          weight: cat.weight ?? 0,
+          equipped: false,
+          description: cat.description ?? null,
+          notes: null,
+          cost: cat.value ?? null,
+          cost_unit: cat.currency ?? 'po',
+          properties: props ?? {},
         })
       }
     }

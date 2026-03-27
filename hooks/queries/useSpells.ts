@@ -1,10 +1,12 @@
 // hooks/queries/useSpells.ts
 import { useQuery } from '@tanstack/react-query';
 
-export function useSpells(filters?: { class?: string; level?: number }) {
+export function useSpells(filters?: { class?: string; level?: string | number; school?: string; search?: string }) {
   const params = new URLSearchParams()
   if (filters?.class) params.set('class', filters.class)
-  if (filters?.level) params.set('level', String(filters.level))
+  if (filters?.level !== undefined && filters.level !== '') params.set('level', String(filters.level))
+  if (filters?.school) params.set('school', filters.school)
+  if (filters?.search) params.set('search', filters.search)
   
   return useQuery({
     queryKey: ['spells', filters],
@@ -14,6 +16,18 @@ export function useSpells(filters?: { class?: string; level?: number }) {
       return res.json()
     },
     staleTime: 1000 * 60 * 60, // 1 ora
+  })
+}
+
+export function useSpell(id: number | null) {
+  return useQuery({
+    queryKey: ['spell', id],
+    queryFn: async () => {
+      const res = await fetch(`/api/spells/${id}`)
+      if (!res.ok) throw new Error('Errore caricamento incantesimo')
+      return res.json()
+    },
+    enabled: id !== null,
   })
 }
 

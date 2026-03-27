@@ -46,10 +46,11 @@ export async function PUT(
       type:                body.type,
       description:         body.description ?? null,
       weight:              body.weight,
-      cost:                body.cost ?? null,
-      cost_unit:           body.cost_unit,
+      value:               body.value ?? 0,
+      currency:            body.currency ?? 'po',
       rarity:              body.rarity,
       requires_attunement: body.requires_attunement,
+      category:            body.category ?? null,
       properties:          body.properties ?? null,
     })
     .eq('id', parseInt(id))

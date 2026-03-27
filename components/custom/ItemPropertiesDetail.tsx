@@ -94,12 +94,25 @@ export function ItemPropertiesDetail({ item, className }: ItemPropertiesDetailPr
           {a.ammunitionType}
         </span>
         {a.quantity && <span className="text-amber-500">x{a.quantity}</span>}
-        {a.damageBonus && a.damageBonus > 0 && (
+        {a.damageBonus && (
           <span className="text-red-500">+{a.damageBonus} danno</span>
         )}
         {a.magicBonus && a.magicBonus > 0 && (
           <span className="text-purple-600 font-medium">+{a.magicBonus} magico</span>
         )}
+      </div>
+    );
+  }
+
+  if (p.itemType === 'currency') {
+    const c = p as CurrencyProperties;
+    return (
+      <div className={base}>
+        <span className="flex items-center gap-1 text-amber-600">
+          <Coins className="w-3 h-3" />
+          {c.symbol}
+        </span>
+        <span className="text-amber-500">Valore base: {c.valueInCopper} cp</span>
       </div>
     );
   }

@@ -48,10 +48,11 @@ export async function POST(request: Request) {
       type:        body.type,
       description: body.description ?? null,
       weight:      body.weight ?? 0,
-      cost:        body.cost ?? null,
-      cost_unit:   body.cost_unit ?? 'po',
+      value:       body.value ?? 0,
+      currency:    body.currency ?? 'po',
       rarity:      body.rarity ?? 'common',
       requires_attunement: body.requires_attunement ?? false,
+      category:    body.category ?? null,
       properties:  body.properties ?? null,
     })
     .select()

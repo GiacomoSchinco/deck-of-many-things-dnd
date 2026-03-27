@@ -8,7 +8,7 @@ import AncientCardContainer from '@/components/custom/AncientCardContainer'
 import StatDiamond from '@/components/custom/StatDiamond'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Scroll, Package, Zap, Heart, Shield, Footprints, Zap as InitiativeIcon, Target } from 'lucide-react'
+import { Scroll, Package, Zap, Heart, Shield, Footprints, Zap as InitiativeIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useCharacter } from '@/hooks/queries/useCharacter'
 import { useSkills, useSkillList } from '@/hooks/queries/useSkills'
@@ -17,16 +17,20 @@ import { FanCardGroup } from '@/components/custom/FanCardGroup'
 import { RaceClassCard } from '@/components/custom/RaceClassCard'
 import { AncientScroll } from '@/components/custom/AncientScroll'
 import { SkillsDisplay } from '@/components/custom/SkillsDisplay'
+import { useInventory } from '@/hooks/queries/useInventory'
 import type { Skill } from '@/types/skill'
+import InventoryGrouped from '@/components/custom/InventoryGrouped'
+
 export default function CharacterPage() {
   const params = useParams()
   const characterId = params.characterId as string
 
   const { data: character, isLoading, error } = useCharacter(characterId)
   const { data: characterSkills } = useSkills(characterId)
-  const { data: allSkills, isLoading: skillsLoading } = useSkillList() // ← NUOVO
+  const { data: allSkills, isLoading: skillsLoading } = useSkillList() 
+  const { data: inventory, isLoading: inventoryLoading } = useInventory(characterId) // ← NUOVO
 
-  if (isLoading || skillsLoading) {
+  if (isLoading || skillsLoading || inventoryLoading) {
     return <Loading />
   }
 
@@ -52,7 +56,6 @@ export default function CharacterPage() {
     ?.forEach((skill) => {
       skillsMap.set(Number(skill.skill_id), skill.proficiency_type)
     })
-
   return (
     <div className="container mx-auto p-4 md:p-6 space-y-6">
       {/* Header */}
@@ -211,10 +214,7 @@ export default function CharacterPage() {
       {/* Tabs */}
       <Tabs defaultValue="skills" className="w-full">
         <TabsList className="grid grid-cols-1 md:grid-cols-3 w-full mb-4 border-b border-amber-200">
-          <TabsTrigger className="w-full text-center" value="skills">
-            <Target className="w-4 h-4 mr-2" />
-            Abilità
-          </TabsTrigger>
+          <TabsTrigger className="w-full text-center" value="skills">Abilità</TabsTrigger>
           <TabsTrigger className="w-full text-center" value="spells">Incantesimi</TabsTrigger>
           <TabsTrigger className="w-full text-center" value="inventory">Inventario</TabsTrigger>
         </TabsList>
@@ -249,15 +249,11 @@ export default function CharacterPage() {
         <TabsContent value="inventory">
           <AncientCardContainer className="p-6">
             <h3 className="text-xl font-serif font-bold text-amber-900 mb-4">
-              Inventario
+              Inventario  
             </h3>
-            <div className="flex justify-center">
-              <Link href={`/characters/${characterId}/inventory`}>
-                <Button>Gestisci Inventario</Button>
-              </Link>
-            </div>
-            <p className="text-amber-700 text-center mt-4">Prossimamente...</p>
-          </AncientCardContainer>
+            <InventoryGrouped items={inventory?.items} />
+            </AncientCardContainer>
+        
         </TabsContent>
       </Tabs>
     </div>

@@ -15,7 +15,7 @@ export interface InventoryItem {
 }
 
 export type CreateInventoryItemDTO = Omit<Partial<InventoryItem>, 'id' | 'created_at' | 'character_id'> & {
-  item_name: string
+  item_name?: string   // opzionale: se omesso il server lo legge dal catalogo items
   quantity?: number
 }
 

@@ -68,7 +68,6 @@ export default function CharactersPage() {
 
       {/* Tabella dei personaggi */}
       <DataTable
-        title="📜 Elenco Personaggi"
         initialData={tableData}
         visibleColumns={[
           'name',

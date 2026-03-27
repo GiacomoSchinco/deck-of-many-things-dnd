@@ -126,11 +126,11 @@ export default function EquipmentPresetsPage() {
             };
 
             const dtProps: DataTableProps<Row> = {
-              title: "Preset di equipaggiamento",
+              
               initialData: tableData,
               visibleColumns: ['name', 'class_name', 'is_default', 'items_count', 'choices_count', 'created_at'],
               labels: {
-                name: 'Nome Preset',
+                name: 'Set',
                 class_name: 'Classe',
                 is_default: 'Default',
                 items_count: 'Oggetti',
