@@ -42,3 +42,15 @@ export function useCharacterSpells(characterId: string | null) {
     enabled: !!characterId,
   })
 }
+
+export function useCharacterSpellSlots(characterId: string | null) {
+  return useQuery({
+    queryKey: ['character', characterId, 'spell-slots'],
+    queryFn: async () => {
+      const res = await fetch(`/api/characters/${characterId}/spell-slots`)
+      if (!res.ok) throw new Error('Errore caricamento slot incantesimi')
+      return res.json()
+    },
+    enabled: !!characterId,
+  })
+}

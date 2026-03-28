@@ -19,6 +19,7 @@ export interface CreationData {
 
   abilityScores: CreationAbilityScores | null;
   skills?: string[];
+  spells?: string[];        // spell IDs scelti (cantrip + incantesimi)
   equipment?: Array<Record<string, unknown>>;
 }
 
@@ -30,6 +31,7 @@ export type CreationStep =
   | 'abilities'
   | 'skills'
   | 'equipment'
+  | 'spells'
   | 'review';
 
 export default CreationData;

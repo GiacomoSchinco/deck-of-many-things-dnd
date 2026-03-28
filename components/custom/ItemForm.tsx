@@ -34,6 +34,7 @@ import {
   Dice6
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getItalianItemType, getItalianRarity, getItalianCurrency } from '@/lib/utils/nameMappers';
 import type { 
   CreateItemDTO, 
   ItemType, 
@@ -61,30 +62,30 @@ type ItemFormProps = {
 };
 
 const itemTypes: { value: ItemType; label: string; icon: ComponentType<Record<string, unknown>> }[] = [
-  { value: 'weapon', label: 'Arma', icon: Sword },
-  { value: 'armor', label: 'Armatura', icon: Shield },
-  { value: 'gear', label: 'Equipaggiamento', icon: Package },
-  { value: 'consumable', label: 'Consumabile', icon: FlaskConical },
-  { value: 'ammunition', label: 'Munizione', icon: ArrowUpDown },
-  { value: 'tool', label: 'Attrezzo', icon: Wrench },
-  { value: 'currency', label: 'Moneta', icon: Coins },
+  { value: 'weapon',     label: getItalianItemType('weapon'),     icon: Sword },
+  { value: 'armor',      label: getItalianItemType('armor'),      icon: Shield },
+  { value: 'gear',       label: getItalianItemType('gear'),       icon: Package },
+  { value: 'consumable', label: getItalianItemType('consumable'), icon: FlaskConical },
+  { value: 'ammunition', label: getItalianItemType('ammunition'), icon: ArrowUpDown },
+  { value: 'tool',       label: getItalianItemType('tool'),       icon: Wrench },
+  { value: 'currency',   label: getItalianItemType('currency'),   icon: Coins },
 ];
 
 const rarities: { value: Rarity; label: string; color: string }[] = [
-  { value: 'common', label: 'Comune', color: 'text-gray-500' },
-  { value: 'uncommon', label: 'Non Comune', color: 'text-green-600' },
-  { value: 'rare', label: 'Raro', color: 'text-blue-600' },
-  { value: 'very rare', label: 'Molto Raro', color: 'text-purple-600' },
-  { value: 'legendary', label: 'Leggendario', color: 'text-orange-600' },
-  { value: 'artifact', label: 'Artefatto', color: 'text-red-600' },
+  { value: 'common',    label: getItalianRarity('common'),    color: 'text-gray-500' },
+  { value: 'uncommon',  label: getItalianRarity('uncommon'),  color: 'text-green-600' },
+  { value: 'rare',      label: getItalianRarity('rare'),      color: 'text-blue-600' },
+  { value: 'very rare', label: getItalianRarity('very rare'), color: 'text-purple-600' },
+  { value: 'legendary', label: getItalianRarity('legendary'), color: 'text-orange-600' },
+  { value: 'artifact',  label: getItalianRarity('artifact'),  color: 'text-red-600' },
 ];
 
 const currencies: { value: CurrencyType; label: string; symbol: string }[] = [
-  { value: 'po', label: 'Moneta d\'Oro', symbol: '🪙' },
-  { value: 'pa', label: 'Moneta di Platino', symbol: '💎' },
-  { value: 'pr', label: 'Moneta d\'Elettro', symbol: '✨' },
-  { value: 'pe', label: 'Moneta d\'Argento', symbol: '🥈' },
-  { value: 'mo', label: 'Moneta di Rame', symbol: '🥉' },
+  { value: 'po', label: getItalianCurrency('po'), symbol: '🪙' },
+  { value: 'pa', label: getItalianCurrency('pa'), symbol: '💎' },
+  { value: 'pr', label: getItalianCurrency('pr'), symbol: '✨' },
+  { value: 'pe', label: getItalianCurrency('pe'), symbol: '🥈' },
+  { value: 'mo', label: getItalianCurrency('mo'), symbol: '🥉' },
 ];
 
 // ===========================================

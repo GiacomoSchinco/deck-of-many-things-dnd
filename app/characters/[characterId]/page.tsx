@@ -20,6 +20,7 @@ import { SkillsDisplay } from '@/components/custom/SkillsDisplay'
 import { useInventory } from '@/hooks/queries/useInventory'
 import type { Skill } from '@/types/skill'
 import InventoryGrouped from '@/components/custom/InventoryGrouped'
+import Spellbook from '@/components/character/sheet/Spellbook'
 
 export default function CharacterPage() {
   const params = useParams()
@@ -234,15 +235,7 @@ export default function CharacterPage() {
 
         <TabsContent value="spells">
           <AncientCardContainer className="p-6">
-            <h3 className="text-xl font-serif font-bold text-amber-900 mb-4">
-              Incantesimi
-            </h3>
-            <div className="flex justify-center">
-              <Link href={`/characters/${characterId}/spells`}>
-                <Button>Gestisci Incantesimi</Button>
-              </Link>
-            </div>
-            <p className="text-amber-700 text-center mt-4">Prossimamente...</p>
+            <Spellbook characterId={characterId} />
           </AncientCardContainer>
         </TabsContent>
 

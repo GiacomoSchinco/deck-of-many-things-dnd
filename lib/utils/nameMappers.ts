@@ -117,13 +117,28 @@ export function getItalianItemType(type: string): string {
 }
 
 export const currencyItalianNames: Record<string, string> = {
-  'po': "Pezzo d'oro",
-  'pa': "Pezzo d'argento",
-  'pr': "Pezzo di rame",
-  'pe': 'Electrum',
-  'mo': 'Moneta',
+  'po': "Moneta d'Oro",
+  'pa': "Moneta di Platino",
+  'pr': "Moneta d'Elettro",
+  'pe': "Moneta d'Argento",
+  'mo': "Moneta di Rame",
 }
 
 export function getItalianCurrency(c: string): string {
   return currencyItalianNames[c.toLowerCase()] ?? c
+}
+
+// ─── RARITÀ ───────────────────────────────────────────────────────────────────
+
+export const rarityItalianNames: Record<string, string> = {
+  'common':    'Comune',
+  'uncommon':  'Non Comune',
+  'rare':      'Raro',
+  'very rare': 'Molto Raro',
+  'legendary': 'Leggendario',
+  'artifact':  'Artefatto',
+}
+
+export function getItalianRarity(rarity: string): string {
+  return rarityItalianNames[rarity.toLowerCase()] ?? rarity
 }

@@ -11,6 +11,7 @@ import { ReviewStep } from './steps/ReviewStep';
 import { CampaignStep } from './steps/CampaignStep';
 import { EquipmentStep } from './steps/EquipmentStep';
 import { SkillsStep } from './steps/SkillsStep';
+import { SpellsStep } from './steps/SpellsStep';
 import Loading from '@/components/custom/Loading';
 import type { Race } from '@/types/race';
 
@@ -131,6 +132,21 @@ export function CreationWizard() {
             onChange={(selectedItems) => updateData({ equipment: selectedItems })}
             onConfirm={(selectedItems) => {
               updateData({ equipment: selectedItems });
+              nextStep();
+            }}
+          />
+        );
+
+      case 'spells':
+        return (
+          <SpellsStep
+            classId={data.classId!}
+            intelligenceScore={data.abilityScores?.intelligence ?? 10}
+            initialSelectedSpells={data.spells || []}
+            onBack={prevStep}
+            onChange={(spellIds) => updateData({ spells: spellIds })}
+            onConfirm={(spellIds) => {
+              updateData({ spells: spellIds });
               nextStep();
             }}
           />

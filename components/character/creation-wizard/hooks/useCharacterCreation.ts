@@ -18,13 +18,15 @@ export function useCharacterCreation() {
 
   const { currentStep, data, setStep, updateData, reset, _hasHydrated } = useCreationStore();
 
+  // 🔁 Passa anche il livello ai calcoli
   const calculations = useCharacterCalculations(
     data.raceId ?? null,
     data.classId ?? null,
     data.abilityScores ?? null,
+    data.level ?? 1,   // ← aggiunto
   );
 
-  const steps: CreationStep[] = ['basic-info', 'race', 'class', 'campaign', 'abilities', 'skills', 'equipment', 'review'];
+  const steps: CreationStep[] = ['basic-info', 'race', 'class', 'campaign', 'abilities', 'skills', 'equipment', 'spells', 'review'];
   
   const nextStep = () => {
     const currentIndex = steps.indexOf(currentStep);
@@ -62,7 +64,7 @@ export function useCharacterCreation() {
         campaignId: data.campaignId || undefined,
         raceId: String(data.raceId),
         classId: String(data.classId),
-        level: 1,
+        level: data.level ?? 1,               // ← usa il livello scelto
         experience: 0,
         background: data.background || undefined,
         alignment: data.alignment || undefined,
@@ -100,7 +102,6 @@ export function useCharacterCreation() {
             }
 
             // 2) If equipment was selected during creation, save inventory server-side
-            // Il server legge tutti i dati (name, description, properties, type, weight) dal catalogo items
             if (data.equipment && data.equipment.length > 0) {
               const itemsDetails = data.equipment
                 .map((item) => {
@@ -143,6 +144,82 @@ export function useCharacterCreation() {
                 console.log(`✅ Tiri salvezza salvati: ${savingThrows.join(', ')}`);
               } catch (e) {
                 console.error('Errore salvataggio tiri salvezza:', e);
+              }
+            }
+
+            // 4) Save spells selected in SpellsStep
+            if (data.spells && data.spells.length > 0) {
+              try {
+                const spellIds = data.spells.map((id) => parseInt(id, 10)).filter((id) => !isNaN(id));
+                if (spellIds.length > 0) {
+                  const res = await fetch(`/api/characters/${character.id}/spells`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ spell_ids: spellIds }),
+                  });
+                  if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.error || 'Errore salvataggio incantesimi');
+                  }
+                  const payload = await res.json();
+                  console.log(`✅ Incantesimi salvati: ${payload.inserted ?? 0}`);
+                }
+              } catch (e) {
+                console.error('Errore salvataggio incantesimi:', e);
+              }
+            }
+
+            // 5) Initialize spell_slots from spellcasting progression using the actual character level
+            const spellcastingAbility = calculations.calculations?.classData?.spellcasting?.spellcasting_ability;
+            const characterLevel = data.level ?? 1;
+            if (spellcastingAbility && calculations.calculations?.classData) {
+              try {
+                const englishClass = calculations.calculations.classData.name?.toLowerCase();
+                // Usa il livello effettivo del personaggio
+                const progressionRes = await fetch(
+                  `/api/spellcasting-progression?class=${englishClass}&level=${characterLevel}`
+                );
+                if (progressionRes.ok) {
+                  const progression = await progressionRes.json();
+                  const slots: Record<string, number> = progression?.spell_slots ?? {};
+                  const pactSlots: number = progression?.pact_slots ?? 0;
+                  const pactLevel: string | null = progression?.pact_slot_level ?? null;
+
+                  const rows: { character_id: string; spell_level: number; total_slots: number; used_slots: number }[] = [];
+
+                  const levelMap: Record<string, number> = {
+                    '1st': 1, '2nd': 2, '3rd': 3, '4th': 4, '5th': 5,
+                    '6th': 6, '7th': 7, '8th': 8, '9th': 9,
+                  };
+                  for (const [key, count] of Object.entries(slots)) {
+                    const lvl = levelMap[key];
+                    if (lvl && (count as number) > 0) {
+                      rows.push({ character_id: character.id, spell_level: lvl, total_slots: count as number, used_slots: 0 });
+                    }
+                  }
+
+                  if (pactSlots > 0 && pactLevel) {
+                    const pactLvl = levelMap[pactLevel];
+                    if (pactLvl) {
+                      rows.push({ character_id: character.id, spell_level: pactLvl, total_slots: pactSlots, used_slots: 0 });
+                    }
+                  }
+
+                  if (rows.length > 0) {
+                    const slotsRes = await fetch(`/api/characters/${character.id}/spell-slots`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ slots: rows }),
+                    });
+                    if (!slotsRes.ok) {
+                      console.error('Errore inizializzazione spell slots');
+                    } else {
+                      console.log(`✅ Spell slots inizializzati per livello ${characterLevel}`);
+                    }
+                  }
+                }
+              } catch (e) {
+                console.error('Errore inizializzazione spell slots:', e);
               }
             }
           } catch (e) {

@@ -8,14 +8,30 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { getItalianClass, getItalianRace } from '@/lib/utils/nameMappers';
+
+// Utility per estrarre il nome da strutture nested
+function extractName(value: unknown): string {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && value !== null) {
+    const obj = value as Record<string, unknown>;
+    return String(obj.name ?? obj.slug ?? obj.class ?? '');
+  }
+  return String(value);
+}
+
+function extractNames(value: unknown): string[] {
+  if (Array.isArray(value)) return value.map(extractName).filter(Boolean);
+  const name = extractName(value);
+  return name ? [name] : [];
+}
 
 export default function CharactersPage() {
   const router = useRouter();
   const { data: characters, isLoading, error } = useCharacters();
 
-  if (isLoading) {
-    return <Loading />;
-  }
+  if (isLoading) return <Loading />;
 
   if (error) {
     return (
@@ -27,27 +43,18 @@ export default function CharactersPage() {
     );
   }
 
-  const handleRowClick = (id: unknown) => {
-    router.push(`/characters/${id}`);
+  const formatDate = (iso?: string) => {
+    if (!iso) return '';
+    return new Intl.DateTimeFormat('it-IT', { dateStyle: 'medium' }).format(new Date(iso));
   };
 
-  function formatDate(iso?: string) {
-    if (!iso) return '';
-    try {
-      return new Intl.DateTimeFormat('it-IT', { dateStyle: 'medium' }).format(new Date(iso));
-    } catch {
-      return iso;
-    }
-  }
-
-  const tableData = (characters ?? []).map((c: Record<string, unknown>) => ({
+  const tableData = (characters ?? []).map((c) => ({
     ...c,
-    created_at_formatted: formatDate(String(c['created_at'] ?? '')),
+    created_at_formatted: formatDate(c.created_at),
   }));
 
   return (
     <div className="container mx-auto p-4 md:p-6 space-y-6">
-      {/* Header con titolo e pulsante nuovo personaggio */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-4xl font-serif font-bold text-amber-900">
@@ -66,17 +73,9 @@ export default function CharactersPage() {
         </Link>
       </div>
 
-      {/* Tabella dei personaggi */}
       <DataTable
         initialData={tableData}
-        visibleColumns={[
-          'name',
-          'classes.name',
-          'races.name',
-          'level',
-          'alignment',
-          'created_at_formatted'
-        ]}
+        visibleColumns={['name', 'classes.name', 'races.name', 'level', 'alignment', 'created_at_formatted']}
         labels={{
           name: 'Nome',
           'classes.name': 'Classe',
@@ -85,8 +84,12 @@ export default function CharactersPage() {
           alignment: 'Allineamento',
           created_at_formatted: 'Creazione'
         }}
-        onRowClick={(id) => handleRowClick(id)}
-        pagination={true}
+        customRenderers={{
+          'classes.name': (_v, row: any) => extractNames(row.classes).map(getItalianClass).join(', '),
+          'races.name': (_v, row: any) => extractNames(row.races).map(getItalianRace).join(', '),
+        }}
+        onRowClick={(id) => router.push(`/characters/${id}`)}
+        pagination
       />
     </div>
   );
