@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { CreationData } from '../hooks/useCharacterCreation';
+import type { CreationData } from '@/types/creation';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import { Plus, Minus } from 'lucide-react';
 import { WizardStep } from '../WizardStep';
@@ -22,8 +22,6 @@ const ALIGNMENTS = [
   'Neutrale Malvagio',
   'Caotico Malvagio',
 ];
-
-const LEVELS = Array.from({ length: 20 }, (_, i) => i + 1);
 
 interface BasicInfoStepProps {
   initialData?: Partial<CreationData>;

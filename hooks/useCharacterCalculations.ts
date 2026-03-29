@@ -8,7 +8,8 @@ import type { AbilityScores } from '@/types/character';
 export function useCharacterCalculations(
   raceId: number | null, 
   classId: number | null, 
-  abilityScores: AbilityScores | null
+  abilityScores: AbilityScores | null,
+  level: number,
 ) {
   const { data: raceData, isLoading: raceLoading } = useRace(raceId);
   const { data: classData, isLoading: classLoading } = useClass(classId);
@@ -34,31 +35,41 @@ export function useCharacterCalculations(
     // Calcoli (puramente derivati!)
     const conMod = calculateModifier(effectiveScores.constitution);
     const dexMod = calculateModifier(effectiveScores.dexterity);
-    
+
     const hitDieMap: Record<string, number> = {
       'd6': 6, 'd8': 8, 'd10': 10, 'd12': 12
     };
     const hitDieValue = hitDieMap[classData?.hit_die || 'd8'] || 8;
-    const hp = hitDieValue + conMod;
+
+    // HP: 1st level gets hit die + CON, subsequent levels get average die + CON per level
+    const lvl = Math.max(1, Math.trunc(level || 1));
+    const perLevelHpAvg = (hitDieValue / 2) + 0.5 + conMod; // (N+1)/2 + conMod
+    const max_hp = Math.max(1, Math.floor((hitDieValue + conMod) + (lvl - 1) * perLevelHpAvg));
+
+    // Hit dice total equals level
+    const hit_dice_total = Math.max(1, lvl);
+
+    // Proficiency bonus progression: +2 at level 1-4, +3 at 5-8, etc.
+    const proficiencyBonus = Math.floor((lvl - 1) / 4) + 2;
 
     return {
       combatStats: {
-        max_hp: hp,
-        current_hp: hp,
+        max_hp: max_hp,
+        current_hp: max_hp,
         temp_hp: 0,
         hit_dice_type: classData.hit_die,
-        hit_dice_total: 1,
+        hit_dice_total: hit_dice_total,
         hit_dice_used: 0,
         armor_class: 10 + dexMod,
         initiative_bonus: dexMod,
         speed: raceData?.speed || 30,
         inspiration: false,
       },
-      proficiencyBonus: 2,
+      proficiencyBonus,
       raceData,
       classData
     };
-  }, [raceData, classData, abilityScores]); // 🔥 Dipendenze
+  }, [raceData, classData, abilityScores, level]); // 🔥 Dipendenze
 
   return {
     calculations,

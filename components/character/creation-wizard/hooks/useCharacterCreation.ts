@@ -26,7 +26,20 @@ export function useCharacterCreation() {
     data.level ?? 1,   // ← aggiunto
   );
 
-  const steps: CreationStep[] = ['basic-info', 'race', 'class', 'campaign', 'abilities', 'skills', 'equipment', 'spells', 'review'];
+  const steps: CreationStep[] = (() => {
+    const base: CreationStep[] = ['basic-info', 'race', 'class', 'campaign', 'abilities', 'skills', 'equipment', 'spells', 'review'];
+    const classData = calculations.calculations?.classData;
+
+    // Feature flag: NEXT_PUBLIC_SKIP_SPELLS_STEP=true will skip the spells step entirely
+    const skipSpellsFlag = (process.env.NEXT_PUBLIC_SKIP_SPELLS_STEP === '1' || process.env.NEXT_PUBLIC_SKIP_SPELLS_STEP === 'true');
+    if (skipSpellsFlag) return base.filter(s => s !== 'spells');
+
+    // If classData is available and class has no spellcasting, remove the spells step
+    if (classData && !classData.spellcasting) {
+      return base.filter(s => s !== 'spells');
+    }
+    return base;
+  })();
   
   const nextStep = () => {
     const currentIndex = steps.indexOf(currentStep);

@@ -12,7 +12,7 @@ export interface CreationData {
   playerName: string;
   alignment: string;
   background: string;
-
+  level: number;
   raceId: number | null;
   classId: number | null;
   campaignId: string | null;
