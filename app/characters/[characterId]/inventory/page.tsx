@@ -17,7 +17,9 @@ export default function InventoryPage() {
 
   if (isLoading) return <Loading />
   if (error) return <div className="container mx-auto p-4">Errore caricamento inventario</div>
-
+  const test =(argument: string)=> {
+    console.log(argument)
+  }
   const items = data?.items ?? []
 
   return (
@@ -35,7 +37,7 @@ export default function InventoryPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {items.map((it) => (
-            <ItemCard key={it.id} item={it as unknown as Item} showActions />
+            <ItemCard key={it.id} item={it as unknown as Item} showActions onEdit={() => test(it.id)}/>
           ))}
         </div>
       )}

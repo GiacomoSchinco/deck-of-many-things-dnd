@@ -39,8 +39,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   if (body.description !== undefined) payload.description = body.description ?? null
   if (body.notes !== undefined) payload.notes = body.notes ?? null
   if (body.properties !== undefined) payload.properties = body.properties
-  // se nel tipo usi cost per il valore
-  if (body.cost !== undefined) payload.cost = Number(body.cost)
+  if (body.value != null) payload.value = Number(body.value)
+  if (body.currency !== undefined) payload.currency = body.currency ?? null
 
   const { data, error } = await supabase
     .from('inventory')

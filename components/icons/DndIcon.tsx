@@ -49,7 +49,16 @@ export type DndIconName =
   | 'consumable'
   | 'ammunition'
   | 'tool'
-  | 'currency';
+  | 'currency'
+  | 'transmutation'
+  | 'abjuration'
+  | 'conjuration'
+  | 'divination'
+  | 'enchantment'
+  | 'evocation'
+  | 'illusion'
+  | 'necromancy'
+  | 'universal';
 
 interface DndIconProps {
   /** Nome del file SVG (senza .svg) */

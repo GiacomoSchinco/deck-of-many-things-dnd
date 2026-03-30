@@ -4,41 +4,31 @@
 import React from 'react';
 import AncientCardContainer from './AncientCardContainer';
 import { cn } from '@/lib/utils';
-import { 
-  Sword, 
-  Shield, 
-  Package, 
-  FlaskConical, 
-  ArrowUpDown, 
-  Wrench, 
-  Coins,
+import {
+  Shield,
+  ArrowUpDown,
   Weight,
-  DollarSign,
   Sparkles,
   Clock,
   Heart,
   Zap
+  ,
+  Info
 } from 'lucide-react';
-import { getItalianItemType, getItalianRarity, getItalianCurrency } from '@/lib/utils/nameMappers';
+import { DndIcon } from '../icons/DndIcon';
+import { getItalianItemType, getItalianRarity } from '@/lib/utils/nameMappers';
 import type { Item, WeaponProperties, ArmorProperties, ConsumableProperties, AmmunitionProperties } from '@/types/item';
 
+// Estende Item per supportare anche campi dell'inventario (quantity, equipped)
+type ItemLike = Item & { quantity?: number; equipped?: boolean };
+
 interface ItemCardProps {
-  item: Item;
+  item: ItemLike;
   showActions?: boolean;
   onEdit?: () => void;
   onDelete?: () => void;
   size?: 'sm' | 'md' | 'lg';
 }
-
-const typeIcons: Record<string, React.ElementType> = {
-  weapon: Sword,
-  armor: Shield,
-  gear: Package,
-  consumable: FlaskConical,
-  ammunition: ArrowUpDown,
-  tool: Wrench,
-  currency: Coins,
-};
 
 const rarityColors: Record<string, string> = {
   common: 'text-gray-500',
@@ -50,8 +40,8 @@ const rarityColors: Record<string, string> = {
 };
 
 export default function ItemCard({ item, showActions = false, onEdit, onDelete, size = 'md' }: ItemCardProps) {
-  const Icon = typeIcons[item.type] || Package;
   const rarityColor = rarityColors[item.rarity] || 'text-gray-500';
+  const [showDesc, setShowDesc] = React.useState(false);
 
   // Helper per formattare le proprietà specifiche in base al tipo
   const renderSpecificProperties = () => {
@@ -144,90 +134,104 @@ export default function ItemCard({ item, showActions = false, onEdit, onDelete, 
   };
 
   // Dimensioni responsive
-  const sizeClasses = {
-    sm: 'max-w-[200px]',
-    md: 'max-w-[280px]',
-    lg: 'max-w-[350px]',
-  };
+
 
   return (
-    <div className={cn("group", sizeClasses[size])}>
-      <AncientCardContainer className="w-full h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-        <div className="relative h-full flex flex-col p-4">
-          {/* Header con icona e tipo */}
-          <div className="flex items-center justify-between border-b-2 border-amber-700/30 pb-2">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-amber-100/50">
-                <Icon className="w-5 h-5 text-amber-700" />
-              </div>
-              <h2 className="text-lg font-bold text-amber-900 font-serif truncate">{item.name}</h2>
+    <AncientCardContainer size={size}>
+        {/* Quantity badge top-right */}
+        {item.quantity !== undefined && item.quantity > 1 && (
+          <div className="absolute top-4 right-4 z-10">
+            <span className="inline-flex items-center justify-center w-9 h-9 text-xs font-semibold bg-white text-amber-700 border border-amber-200 rounded-full shadow-sm">×{item.quantity}</span>
+          </div>
+        )}
+
+        {/* Description button top-left + modal */}
+        {item.description && (
+          <>
+            <div className="absolute top-4 left-4 z-10">
+              <button
+                onClick={() => setShowDesc(true)}
+                aria-label="Mostra descrizione"
+                className="inline-flex items-center justify-center w-8 h-8 text-xs font-semibold bg-white text-amber-700 border border-amber-200 rounded-full shadow-sm"
+              >
+                <Info className="w-4 h-4" />
+              </button>
             </div>
+
+            {showDesc && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center">
+                <div className="absolute inset-0 bg-black/40" onClick={() => setShowDesc(false)} />
+                <div className="bg-white p-4 rounded-lg max-w-lg mx-4 z-10 shadow-lg border border-amber-100">
+                  <div className="flex items-start justify-between gap-4">
+                    <h3 className="text-sm font-semibold text-amber-900">{item.name}</h3>
+                    <button onClick={() => setShowDesc(false)} className="text-xs text-amber-600 hover:underline">Chiudi</button>
+                  </div>
+                  <div className="mt-3 text-sm text-amber-700 whitespace-pre-wrap">{item.description}</div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+        {/* Header: nome centrato, rarità a dx, sintonizzazione a dx */}
+        <div className="border-b-2 border-amber-700/30 text-center">
+          <h2 className="text-lg font-bold text-amber-900 font-serif leading-tight">{item.name}</h2>
+          <div className="flex items-center justify-center gap-2 mt-1 flex-wrap">
+            {item.rarity && (
+              <span className={cn('text-xs font-medium', rarityColor)}>{getItalianRarity(item.rarity)}</span>
+            )}
             {item.requires_attunement && (
               <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">Sintonizzazione</span>
             )}
           </div>
-
-          {/* Rarità e tipo */}
-          <div className="flex justify-between items-center mt-2 text-xs">
-            <span className={cn("font-medium", rarityColor)}>{getItalianRarity(item.rarity)}</span>
-            <span className="text-amber-600">{getItalianItemType(item.type)}</span>
-          </div>
-
-          {/* Peso e Valore */}
-          <div className="grid grid-cols-2 gap-2 mt-3">
-            <div className="bg-amber-50/50 p-1.5 rounded text-center flex items-center justify-center gap-1">
-              <Weight className="w-3 h-3 text-amber-600" />
-              <span className="text-xs text-amber-800">{item.weight} kg</span>
-            </div>
-            <div className="bg-amber-50/50 p-1.5 rounded text-center flex items-center justify-center gap-1">
-              <DollarSign className="w-3 h-3 text-amber-600" />
-              <span className="text-xs text-amber-800">{item.value} {getItalianCurrency(item.currency)}</span>
-            </div>
-          </div>
-
-          {/* Categoria (opzionale) */}
-          {item.category && (
-            <div className="mt-2 text-center">
-              <span className="text-xs text-amber-500 italic">{item.category}</span>
-            </div>
-          )}
-
-          {/* Proprietà specifiche (danno, CA, ecc.) */}
-          {renderSpecificProperties()}
-
-          {/* Descrizione (limitata a 3 righe) */}
-          {item.description && (
-            <div className="mt-3 flex-1">
-              <p className="text-xs text-amber-700 line-clamp-3 leading-relaxed">{item.description}</p>
-            </div>
-          )}
-
-          {/* Azioni opzionali (modifica/elimina) */}
-          {showActions && (
-            <div className="flex justify-center gap-2 mt-4 pt-2 border-t border-amber-200">
-              {onEdit && (
-                <button
-                  onClick={onEdit}
-                  className="px-3 py-1 text-xs bg-amber-700 text-amber-100 rounded hover:bg-amber-800 transition-colors"
-                >
-                  Modifica
-                </button>
-              )}
-              {onDelete && (
-                <button
-                  onClick={onDelete}
-                  className="px-3 py-1 text-xs bg-red-700 text-white rounded hover:bg-red-800 transition-colors"
-                >
-                  Elimina
-                </button>
-              )}
-            </div>
-          )}
-
-          {/* Effetto hover decorativo */}
-          <div className="absolute inset-0 pointer-events-none border-2 border-transparent group-hover:border-amber-400/30 rounded-xl transition-all duration-300" />
         </div>
-      </AncientCardContainer>
-    </div>
+
+        {/* Icona tipo centrata */}
+        <div className="flex flex-col items-center justify-center mt-3 gap-1">
+          <DndIcon size={40} name={item.type} className="text-amber-700" />
+          <span className="text-xs text-amber-600 font-medium">{getItalianItemType(item.type)}</span>
+          {item.category && (
+            <span className="text-xs text-amber-400 italic">{item.category}</span>
+          )}
+        </div>
+
+        {/* Stats: peso (valore nascosto temporaneamente) */}
+        <div className={cn('grid gap-2 mt-3 grid-cols-1')}>
+          <div className="bg-amber-50/50 p-1.5 rounded text-center flex flex-col items-center gap-0.5">
+            <Weight className="w-3 h-3 text-amber-500" />
+            <span className="text-xs text-amber-800">{item.weight} kg</span>
+          </div>
+        </div>
+
+        {/* Proprietà specifiche (danno, CA, ecc.) */}
+        {item.type !== "ammunition" && renderSpecificProperties()}
+
+        {/* moved description above to keep card symmetric */}
+
+        {/* Azioni opzionali (modifica/elimina) */}
+        {showActions && (
+          <div className="flex justify-center gap-2 mt-4 pt-2 border-t border-amber-200">
+            {onEdit && (
+              <button
+                onClick={onEdit}
+                className="px-3 py-1 text-xs bg-amber-700 text-amber-100 rounded hover:bg-amber-800 transition-colors"
+              >
+                Modifica
+              </button>
+            )}
+            {onDelete && (
+              <button
+                onClick={onDelete}
+                className="px-3 py-1 text-xs bg-red-700 text-white rounded hover:bg-red-800 transition-colors"
+              >
+                Elimina
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Effetto hover decorativo */}
+        <div className="absolute inset-0 pointer-events-none border-2 border-transparent group-hover:border-amber-400/30 rounded-xl transition-all duration-300" />
+     
+    </AncientCardContainer>
   );
 }

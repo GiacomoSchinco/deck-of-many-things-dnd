@@ -16,7 +16,7 @@ export async function GET(
     .from('spells_known')
     .select(`
       *,
-      spells (*)
+      spell:spells (*)
     `)
     .eq('character_id', id)
 
