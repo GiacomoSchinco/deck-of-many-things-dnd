@@ -29,7 +29,8 @@ export const raceItalianNames: Record<string, string> = {
 }
 
 /** Restituisce il nome italiano di una razza. Accetta sia inglese lowercase che Title Case. */
-export function getItalianRace(name: string): string {
+export function getItalianRace(name?: string): string {
+  if (!name) return ''
   return raceItalianNames[name.toLowerCase()] ?? name
 }
 
@@ -72,7 +73,8 @@ export const classItalianNames: Record<string, string> = {
   'warlock':  'Warlock',
 }
 /** Restituisce il nome italiano di una classe. Accetta inglese lowercase o Title Case. */
-export function getItalianClass(name: string): string {
+export function getItalianClass(name?: string): string {
+  if (!name) return ''
   return classItalianNames[name.toLowerCase()] ?? name
 }
 
@@ -99,7 +101,8 @@ export const schoolItalianNames: Record<string, string> = {
   'transmutation':'Trasmutazione',
 }
 
-export function getItalianSchool(name: string): string {
+export function getItalianSchool(name?: string): string {
+  if (!name) return ''
   return schoolItalianNames[name.toLowerCase()] ?? name
 }
 
@@ -112,7 +115,8 @@ export const itemTypeItalianNames: Record<string, string> = {
   'tool':       'Attrezzo',
   'currency':   'Moneta',
 }
-export function getItalianItemType(type: string): string {
+export function getItalianItemType(type?: string): string {
+  if (!type) return ''
   return itemTypeItalianNames[type.toLowerCase()] ?? type
 }
 
@@ -124,7 +128,8 @@ export const currencyItalianNames: Record<string, string> = {
   'mo': "Moneta di Rame",
 }
 
-export function getItalianCurrency(c: string): string {
+export function getItalianCurrency(c?: string): string {
+  if (!c) return ''
   return currencyItalianNames[c.toLowerCase()] ?? c
 }
 
@@ -139,6 +144,7 @@ export const rarityItalianNames: Record<string, string> = {
   'artifact':  'Artefatto',
 }
 
-export function getItalianRarity(rarity: string): string {
+export function getItalianRarity(rarity?: string): string {
+  if (!rarity) return ''
   return rarityItalianNames[rarity.toLowerCase()] ?? rarity
 }

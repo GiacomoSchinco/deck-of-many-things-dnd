@@ -7,6 +7,8 @@ export interface CreationAbilityScores {
   charisma: number;
 }
 
+import type { EquipmentItem } from './equipment'
+
 export interface CreationData {
   name: string;
   playerName: string;
@@ -20,7 +22,7 @@ export interface CreationData {
   abilityScores: CreationAbilityScores | null;
   skills?: string[];
   spells?: string[];        // spell IDs scelti (cantrip + incantesimi)
-  equipment?: Array<Record<string, unknown>>;
+  equipment?: EquipmentItem[];
 }
 
 export type CreationStep =

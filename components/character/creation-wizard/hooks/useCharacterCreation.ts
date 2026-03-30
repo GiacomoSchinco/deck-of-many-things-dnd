@@ -118,12 +118,11 @@ export function useCharacterCreation() {
             if (data.equipment && data.equipment.length > 0) {
               const itemsDetails = data.equipment
                 .map((item) => {
-                  const itemObj = item as Record<string, unknown>;
-                  const rawId = itemObj['item_id'];
+                  const rawId = (item as any).item_id ?? (item as any).id;
                   const itemId: number | null = typeof rawId === 'string'
                     ? (rawId.trim() === '' ? null : parseInt(rawId, 10))
                     : (typeof rawId === 'number' ? rawId : null);
-                  const qty = Math.max(1, Math.trunc(Number(itemObj['quantity'] ?? 1) || 1));
+                  const qty = Math.max(1, Math.trunc(Number((item as any).quantity ?? 1) || 1));
                   return itemId !== null ? { item_id: itemId, quantity: qty } : null;
                 })
                 .filter((i): i is { item_id: number; quantity: number } => i !== null);

@@ -64,8 +64,10 @@ const levelIcons: Record<number, { icon: any, label: string }> = {
 export default function SpellDetailPage() {
     const { id } = useParams();
     const router = useRouter();
-    const { data: spell, isLoading } = useSpell(id as string);
-    const { deleteSpell } = useSpellMutations();
+    const spellId = id ? parseInt(String(id), 10) : null;
+    const { data: spell, isLoading } = useSpell(spellId);
+    const spellMutations = useSpellMutations();
+    const deleteSpell = spellMutations.delete;
 
     if (isLoading) return <Loading />;
     if (!spell) return <div className="text-center py-12 text-amber-600">Incantesimo non trovato</div>;
@@ -76,7 +78,7 @@ export default function SpellDetailPage() {
                 await deleteSpell.mutateAsync(spell.id);
                 toast.success('Incantesimo eliminato con successo');
                 router.push('/admin/spells');
-            } catch (error) {
+            } catch (_err) {
                 toast.error('Errore durante l\'eliminazione');
             }
         }

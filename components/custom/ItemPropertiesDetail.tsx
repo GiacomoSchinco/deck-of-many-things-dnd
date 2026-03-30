@@ -9,6 +9,7 @@ import type {
   ArmorProperties,
   AmmunitionProperties,
   ConsumableProperties,
+  CurrencyProperties,
   ToolProperties,
   GearProperties,
 } from '@/types/item';
@@ -18,6 +19,7 @@ import {
   Zap,
   FlaskConical,
   Wrench,
+  Coins,
 } from 'lucide-react';
 
 interface ItemPropertiesDetailProps {
@@ -128,7 +130,7 @@ export function ItemPropertiesDetail({ item, className }: ItemPropertiesDetailPr
         {c.duration && <span className="text-amber-500">⏱ {c.duration}</span>}
         {c.usesMax && (
           <span className="text-amber-500">
-            {c.uses ?? c.usesMax}/{c.usesMax} usi
+            {(c.charges ?? c.usesMax)}/{c.usesMax} usi
           </span>
         )}
       </div>

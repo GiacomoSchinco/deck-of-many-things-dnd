@@ -31,7 +31,7 @@ export default function InventoryTable({ items = [], onRowClick, onEdit, onDelet
 
   function DeleteButton({ row }: { row: Record<string, unknown> }) {
     const id = String(row['id'] ?? '')
-    const name = String(row['item_name'] ?? 'oggetto')
+    const name = String(row['name'] ?? 'oggetto')
     const [confirming, setConfirming] = useState(false)
 
     const handleDelete = async () => {
@@ -131,12 +131,12 @@ export default function InventoryTable({ items = [], onRowClick, onEdit, onDelet
     <DataTable
       initialData={localData}
       columns={[
-        { key: 'item_name', label: 'Nome' },
+        { key: 'name', label: 'Nome' },
         {
           key: 'quantity', label: 'Quantità',
           render: (_v, row) => <QuantityEditor row={row as Record<string, unknown>} />,
         },
-        ...(!hideType ? [{ key: 'item_type', label: 'Tipo', render: (v: unknown) => getItalianItemType(String(v ?? '')) }] : []),
+        ...(!hideType ? [{ key: 'type', label: 'Tipo', render: (v: unknown) => getItalianItemType(String(v ?? '')) }] : []),
         {
           key: 'info', label: 'Info',
           render: (_v, row) => {

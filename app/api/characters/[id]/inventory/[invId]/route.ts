@@ -30,15 +30,17 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
   const payload: Partial<UpdateInventoryItemDTO> = {}
 
+  if (body.name !== undefined) payload.name = body.name ?? null
+  if (body.type !== undefined) payload.type = body.type ?? null
   if (body.item_id !== undefined) payload.item_id = body.item_id ?? null
-  if (body.item_type !== undefined) payload.item_type = body.item_type ?? null
-  if (body.item_name !== undefined) payload.item_name = body.item_name
   if (body.quantity != null) payload.quantity = Math.max(1, Math.trunc(Number(body.quantity)))
   if (body.weight != null) payload.weight = Number(body.weight)
   if (body.equipped != null) payload.equipped = !!body.equipped
   if (body.description !== undefined) payload.description = body.description ?? null
   if (body.notes !== undefined) payload.notes = body.notes ?? null
   if (body.properties !== undefined) payload.properties = body.properties
+  // se nel tipo usi cost per il valore
+  if (body.cost !== undefined) payload.cost = Number(body.cost)
 
   const { data, error } = await supabase
     .from('inventory')

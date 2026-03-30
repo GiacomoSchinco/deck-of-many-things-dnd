@@ -68,3 +68,60 @@ export async function POST(
 
   return NextResponse.json({ inserted: data?.length ?? 0 })
 }
+
+// DELETE /api/characters/[id]/spells
+// Body: { known_ids?: number[], spell_ids?: number[] }
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const cookieStore = await cookies()
+  const { id } = await params
+
+  const supabase = createServerSupabase(cookieStore)
+
+  // Verifica autenticazione
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
+  }
+
+  const body = await request.json().catch(() => ({})) as { known_ids?: string[]; spell_ids?: number[] }
+  const { known_ids = [], spell_ids = [] } = body
+
+  if ((!Array.isArray(known_ids) || known_ids.length === 0) && (!Array.isArray(spell_ids) || spell_ids.length === 0)) {
+    return NextResponse.json({ error: 'known_ids or spell_ids richiesti' }, { status: 400 })
+  }
+
+  try {
+    let totalDeleted = 0
+
+    if (Array.isArray(known_ids) && known_ids.length > 0) {
+      const { data, error } = await supabase
+        .from('spells_known')
+        .delete()
+        .in('id', known_ids)
+        .eq('character_id', id)
+        .select()
+
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+      totalDeleted += data?.length ?? 0
+    }
+
+    if (Array.isArray(spell_ids) && spell_ids.length > 0) {
+      const { data, error } = await supabase
+        .from('spells_known')
+        .delete()
+        .in('spell_id', spell_ids)
+        .eq('character_id', id)
+        .select()
+
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+      totalDeleted += data?.length ?? 0
+    }
+
+    return NextResponse.json({ deleted: totalDeleted })
+  } catch (err) {
+    return NextResponse.json({ error: (err as Error).message || 'Errore eliminazione' }, { status: 500 })
+  }
+}

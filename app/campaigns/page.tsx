@@ -50,7 +50,6 @@ export default function CampaignsPage() {
         </Link>
       </div>
             <DataTable<Campaign>
-                title='Campagne'
                 initialData={tableData as Campaign[]}
                 visibleColumns={["name", "charactersCount"]}
                 labels={{

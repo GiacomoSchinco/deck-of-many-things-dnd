@@ -6,7 +6,8 @@ import Link from 'next/link'
 import Loading from '@/components/custom/Loading'
 import { Button } from '@/components/ui/button'
 import { useInventory } from '@/hooks/queries/useInventory'
-import InventoryTable from '@/components/custom/InventoryTable'
+import ItemCard from '@/components/custom/ItemCard'
+import type { Item } from '@/types/item'
 
 export default function InventoryPage() {
   const params = useParams()
@@ -29,39 +30,13 @@ export default function InventoryPage() {
           </Link>
         </div>
       </div>
-      <InventoryTable items={items} />
       {items.length === 0 ? (
         <p className="text-center text-amber-700">Inventario vuoto</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full table-auto border-collapse">
-            <thead>
-              <tr className="text-left text-sm text-amber-700 border-b">
-                <th className="py-2">Nome</th>
-                <th className="py-2">Tipo</th>
-                <th className="py-2">Q.tà</th>
-                <th className="py-2">Peso</th>
-                <th className="py-2">Equip.</th>
-                <th className="py-2">Azioni</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((it) => (
-                <tr key={it.id} className="border-b last:border-b-0">
-                  <td className="py-2">{it.item_name}</td>
-                  <td className="py-2">{it.item_type ?? '—'}</td>
-                  <td className="py-2">{it.quantity}</td>
-                  <td className="py-2">{it.weight}</td>
-                  <td className="py-2">{it.equipped ? 'Sì' : 'No'}</td>
-                  <td className="py-2">
-                    <Link href={`/characters/${characterId}/inventory/${it.id}`}>
-                      <Button variant="ghost" size="sm">Apri</Button>
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {items.map((it) => (
+            <ItemCard key={it.id} item={it as unknown as Item} showActions />
+          ))}
         </div>
       )}
     </div>

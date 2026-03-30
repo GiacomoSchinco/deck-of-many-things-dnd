@@ -1,0 +1,182 @@
+// lib/dnd/spellcasting.ts
+
+export type SpellCastingClass =
+  | 'wizard'
+  | 'sorcerer'
+  | 'bard'
+  | 'cleric'
+  | 'druid'
+  | 'paladin'
+  | 'ranger'
+  | 'warlock';
+
+export interface SpellProgression {
+  /** Numero di trucchetti (cantrips) conosciuti */
+  cantrips: number;
+  /**
+   * Numero di incantesimi conosciuti (spells known).
+   * - null significa che la classe prepara gli incantesimi (non li conosce fissi).
+   * - Per il mago, null indica che prepara, ma il grimorio ha una dimensione iniziale (vedi wizardSpellbookSize).
+   */
+  spellsKnown: number | null;
+  /** Solo per il mago: numero di incantesimi nel grimorio al momento della creazione (sempre 6 a livello 1) */
+  wizardSpellbookSize?: number;
+  /** Per classi che preparano: caratteristica usata per calcolare quanti preparare (es. 'int' per mago) */
+  preparedModifier?: 'int' | 'wis' | 'cha';
+  /** Slot incantesimi normali (per tutte le classi tranne warlock). La chiave è il livello dell'incantesimo (1-9). */
+  spellSlots: Record<number, number>;
+  /** Solo per warlock: informazioni sul Pact Magic */
+  pactMagic?: {
+    slots: number;      // numero di slot (es. 1,2,3,4)
+    level: number;      // livello dello slot (1-5)
+    mysticArcanum?: number[]; // livelli (6-9) per i misteri arcani
+  };
+}
+
+// --------------------------------------------------------------
+// 1. PROGRESSIONE TRUCCHETTI (cantrips) – valori corretti PHB
+// --------------------------------------------------------------
+const cantripsProgression: Record<SpellCastingClass, Record<number, number>> = {
+  wizard:   {1:3,2:3,3:3,4:4,5:4,6:4,7:4,8:4,9:4,10:5,11:5,12:5,13:5,14:5,15:5,16:5,17:5,18:5,19:5,20:5},
+  sorcerer: {1:4,2:4,3:4,4:5,5:5,6:5,7:5,8:5,9:5,10:6,11:6,12:6,13:6,14:6,15:6,16:6,17:6,18:6,19:6,20:6},
+  bard:     {1:2,2:2,3:2,4:3,5:3,6:3,7:3,8:3,9:3,10:4,11:4,12:4,13:4,14:4,15:4,16:4,17:4,18:4,19:4,20:4},
+  cleric:   {1:3,2:3,3:3,4:4,5:4,6:4,7:4,8:4,9:4,10:5,11:5,12:5,13:5,14:5,15:5,16:5,17:5,18:5,19:5,20:5},
+  druid:    {1:2,2:2,3:2,4:3,5:3,6:3,7:3,8:3,9:3,10:4,11:4,12:4,13:4,14:4,15:4,16:4,17:4,18:4,19:4,20:4},
+  paladin:  {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0,13:0,14:0,15:0,16:0,17:0,18:0,19:0,20:0},
+  ranger:   {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0,13:0,14:0,15:0,16:0,17:0,18:0,19:0,20:0},
+  warlock:  {1:2,2:2,3:2,4:3,5:3,6:3,7:3,8:3,9:3,10:4,11:4,12:4,13:4,14:4,15:4,16:4,17:4,18:4,19:4,20:4},
+};
+
+// --------------------------------------------------------------
+// 2. PROGRESSIONE INCANTESIMI CONOSCIUTI (spells known)
+//    Solo per classi che conoscono (non preparano)
+// --------------------------------------------------------------
+const spellsKnownProgression: Partial<Record<SpellCastingClass, Record<number, number>>> = {
+  bard: {
+    1:2,2:3,3:4,4:5,5:6,6:7,7:8,8:9,9:10,10:11,
+    11:12,12:12,13:13,14:13,15:14,16:14,17:15,18:15,19:15,20:15,
+  },
+  sorcerer: {
+    1:2,2:3,3:4,4:5,5:6,6:7,7:8,8:9,9:10,10:11,
+    11:12,12:12,13:13,14:13,15:14,16:14,17:15,18:15,19:15,20:15,
+  },
+  ranger: {
+    1:0,2:2,3:3,4:3,5:4,6:4,7:5,8:5,9:6,10:6,
+    11:7,12:7,13:8,14:8,15:9,16:9,17:10,18:10,19:11,20:11,
+  },
+  warlock: {
+    1:2,2:3,3:4,4:5,5:6,6:7,7:8,8:9,9:10,10:10,
+    11:11,12:11,13:12,14:12,15:13,16:13,17:14,18:14,19:15,20:15,
+  },
+  // wizard, cleric, druid, paladin non sono qui (preparano)
+};
+
+// --------------------------------------------------------------
+// 3. SLOT INCANTESIMI (per full caster, half caster)
+// --------------------------------------------------------------
+const fullCasterSlots: Record<number, Record<number, number>> = {
+  1: {1:2},
+  2: {1:3},
+  3: {1:4,2:2},
+  4: {1:4,2:3},
+  5: {1:4,2:3,3:2},
+  6: {1:4,2:3,3:3},
+  7: {1:4,2:3,3:3,4:1},
+  8: {1:4,2:3,3:3,4:2},
+  9: {1:4,2:3,3:3,4:3,5:1},
+  10:{1:4,2:3,3:3,4:3,5:2},
+  11:{1:4,2:3,3:3,4:3,5:2,6:1},
+  12:{1:4,2:3,3:3,4:3,5:2,6:1},
+  13:{1:4,2:3,3:3,4:3,5:2,6:1,7:1},
+  14:{1:4,2:3,3:3,4:3,5:2,6:1,7:1},
+  15:{1:4,2:3,3:3,4:3,5:2,6:1,7:1,8:1},
+  16:{1:4,2:3,3:3,4:3,5:2,6:1,7:1,8:1},
+  17:{1:4,2:3,3:3,4:3,5:2,6:1,7:1,8:1,9:1},
+  18:{1:4,2:3,3:3,4:3,5:2,6:1,7:1,8:1,9:1},
+  19:{1:4,2:3,3:3,4:3,5:3,6:2,7:1,8:1,9:1},
+  20:{1:4,2:3,3:3,4:3,5:3,6:2,7:2,8:1,9:1},
+};
+
+const halfCasterSlots: Record<number, Record<number, number>> = {
+  1: {},
+  2: {1:2},
+  3: {1:3},
+  4: {1:3},
+  5: {1:4,2:2},
+  6: {1:4,2:2},
+  7: {1:4,2:3},
+  8: {1:4,2:3},
+  9: {1:4,2:3,3:2},
+  10:{1:4,2:3,3:2},
+  11:{1:4,2:3,3:3},
+  12:{1:4,2:3,3:3},
+  13:{1:4,2:3,3:3,4:1},
+  14:{1:4,2:3,3:3,4:1},
+  15:{1:4,2:3,3:3,4:2},
+  16:{1:4,2:3,3:3,4:2},
+  17:{1:4,2:3,3:3,4:3},
+  18:{1:4,2:3,3:3,4:3},
+  19:{1:4,2:3,3:3,4:3,5:1},
+  20:{1:4,2:3,3:3,4:3,5:1},
+};
+
+// --------------------------------------------------------------
+// 4. FUNZIONE PRINCIPALE
+// --------------------------------------------------------------
+export function getSpellProgression(
+  className: SpellCastingClass,
+  level: number,
+  abilityModifier: number = 0
+): SpellProgression {
+  const progression: SpellProgression = {
+    cantrips: 0,
+    spellsKnown: null,
+    spellSlots: {},
+  };
+
+  // 1. Cantrips
+  progression.cantrips = cantripsProgression[className]?.[level] ?? 0;
+
+  // 2. Spells known / preparazione
+  if (className === 'wizard') {
+    progression.spellsKnown = null;
+    progression.wizardSpellbookSize = 6;   // a livello 1 il grimorio ha 6 incantesimi
+    progression.preparedModifier = 'int';
+  } else if (className === 'cleric' || className === 'druid') {
+    progression.spellsKnown = null;
+    progression.preparedModifier = className === 'cleric' ? 'wis' : 'wis'; // entrambi saggezza
+  } else if (className === 'paladin') {
+    progression.spellsKnown = null;
+    progression.preparedModifier = 'cha';
+  } else if (spellsKnownProgression[className]) {
+    progression.spellsKnown = spellsKnownProgression[className][level] ?? 0;
+  } else {
+    progression.spellsKnown = 0;
+  }
+
+  // 3. Slot incantesimi (normali o pact magic)
+  if (className === 'warlock') {
+    // Pact Magic
+    let pactSlots = 1;
+    let pactLevel = 1;
+    if (level >= 1 && level <= 2) { pactSlots = 1; pactLevel = 1; }
+    else if (level <= 4) { pactSlots = 2; pactLevel = 2; }
+    else if (level <= 6) { pactSlots = 2; pactLevel = 3; }
+    else if (level <= 8) { pactSlots = 2; pactLevel = 4; }
+    else if (level <= 10) { pactSlots = 2; pactLevel = 5; }
+    else if (level <= 16) { pactSlots = 3; pactLevel = 5; }
+    else { pactSlots = 4; pactLevel = 5; }
+
+    progression.pactMagic = { slots: pactSlots, level: pactLevel };
+    if (level >= 11) progression.pactMagic.mysticArcanum = [6];
+    if (level >= 13) progression.pactMagic.mysticArcanum!.push(7);
+    if (level >= 15) progression.pactMagic.mysticArcanum!.push(8);
+    if (level >= 17) progression.pactMagic.mysticArcanum!.push(9);
+  } else {
+    const isFullCaster = ['wizard','sorcerer','bard','cleric','druid'].includes(className);
+    const slotsTable = isFullCaster ? fullCasterSlots : halfCasterSlots;
+    progression.spellSlots = slotsTable[level] ?? {};
+  }
+
+  return progression;
+}

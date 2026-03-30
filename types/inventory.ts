@@ -2,8 +2,8 @@ export interface InventoryItem {
   id: string
   character_id: string
   item_id: number | null
-  item_name: string
-  item_type: 'weapon' | 'armor' | 'gear' | 'magic' | 'consumable' | 'ammunition' | 'tool' | null
+  name: string
+  type: 'weapon' | 'armor' | 'gear' | 'magic' | 'consumable' | 'ammunition' | 'tool' | null
   quantity: number
   weight: number
   equipped: boolean
@@ -15,8 +15,9 @@ export interface InventoryItem {
 }
 
 export type CreateInventoryItemDTO = Omit<Partial<InventoryItem>, 'id' | 'created_at' | 'character_id'> & {
-  item_name?: string   // opzionale: se omesso il server lo legge dal catalogo items
+  name?: string   // opzionale: se omesso il server lo legge dal catalogo items
   quantity?: number
+  cost?: number    // alias per value, se presente sovrascrive value
 }
 
 export type UpdateInventoryItemDTO = Partial<CreateInventoryItemDTO>

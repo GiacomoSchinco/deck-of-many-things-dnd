@@ -1,9 +1,13 @@
-'use client'
+ 'use client'
 
-import { useState } from 'react'
+import React, { useState, useCallback, memo } from 'react'
 import { useCharacterSpells, useCharacterSpellSlots } from '@/hooks/queries/useSpells'
+import { useCharacterSpellMutations } from '@/hooks/mutations/useCharacterSpellMutations'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import SpellDetailDialog from '@/components/custom/SpellDetailDialog'
+import { Trash } from 'lucide-react'
+import { toast } from 'sonner'
 import type { SpellKnown, Spell, SpellSchool, SpellSlot } from '@/types/spell'
 
 const schoolColors: Record<SpellSchool, string> = {
@@ -45,12 +49,12 @@ export default function Spellbook({ characterId }: SpellbookProps) {
     return <p className="text-amber-700 text-center py-4">Nessun incantesimo presente</p>
   }
 
-  const cantrips: SpellKnown[] = spellsKnown.filter((sk: SpellKnown) => sk.spells?.level === 0)
-  const leveledSpells: SpellKnown[] = spellsKnown.filter((sk: SpellKnown) => (sk.spells?.level ?? 0) > 0)
+  const cantrips: SpellKnown[] = spellsKnown.filter((sk: SpellKnown) => sk.spell?.level === 0)
+  const leveledSpells: SpellKnown[] = spellsKnown.filter((sk: SpellKnown) => (sk.spell?.level ?? 0) > 0)
 
   const byLevel: Record<number, SpellKnown[]> = {}
   for (const sk of leveledSpells) {
-    const lvl = sk.spells?.level ?? 1
+    const lvl = sk.spell?.level ?? 1
     if (!byLevel[lvl]) byLevel[lvl] = []
     byLevel[lvl].push(sk)
   }
@@ -71,8 +75,8 @@ export default function Spellbook({ characterId }: SpellbookProps) {
               Trucchetti
             </h4>
             <div className="space-y-2">
-              {cantrips.map((sk: SpellKnown) => sk.spells && (
-                <SpellRow key={sk.id} sk={sk} onClick={setSelectedSpell} />
+                  {cantrips.map((sk: SpellKnown) => sk.spell && (
+                <SpellRow key={sk.id} sk={sk} onClick={setSelectedSpell} characterId={characterId} />
               ))}
             </div>
           </section>
@@ -94,8 +98,8 @@ export default function Spellbook({ characterId }: SpellbookProps) {
                   )}
                 </div>
                 <div className="space-y-2">
-                  {byLevel[lvl].map((sk: SpellKnown) => sk.spells && (
-                    <SpellRow key={sk.id} sk={sk} onClick={setSelectedSpell} />
+                  {byLevel[lvl].map((sk: SpellKnown) => sk.spell && (
+                    <SpellRow key={sk.id} sk={sk} onClick={setSelectedSpell} characterId={characterId} />
                   ))}
                 </div>
               </section>
@@ -112,32 +116,72 @@ export default function Spellbook({ characterId }: SpellbookProps) {
   )
 }
 
-function SpellRow({ sk, onClick }: { sk: SpellKnown; onClick: (spell: Spell) => void }) {
-  const spell = sk.spells!
-  const schoolColor = schoolColors[spell.school] ?? 'bg-gray-100 text-gray-800'
-  const schoolName = schoolNames[spell.school] ?? spell.school
+const SpellRow = memo(function SpellRow({ sk, onClick, characterId, onDelete }: { sk: SpellKnown; onClick: (spell: Spell) => void; characterId: string; onDelete?: (knownIds: string[]) => Promise<void> | void }) {
+  const spell = sk.spell!
+  const schoolKey = spell.school as SpellSchool
+  const schoolColor = schoolColors[schoolKey] ?? 'bg-gray-100 text-gray-800'
+  const schoolName = schoolNames[schoolKey] ?? String(spell.school)
+  const { remove } = useCharacterSpellMutations()
+  const [deleting, setDeleting] = useState(false)
+  const [confirming, setConfirming] = useState(false)
+  const doDelete = useCallback(async (e?: React.MouseEvent<HTMLElement>) => {
+    if (e) e.stopPropagation()
+    try {
+      setDeleting(true)
+      if (onDelete) {
+        await Promise.resolve(onDelete([sk.id]))
+      } else if (remove) {
+        await remove.mutateAsync({ characterId, knownIds: [sk.id] })
+      } else {
+        throw new Error('Mutation non disponibile')
+      }
+      toast.success('Incantesimo rimosso')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Errore rimozione incantesimo')
+    } finally {
+      setDeleting(false)
+      setConfirming(false)
+    }
+  }, [characterId, onDelete, remove, sk.id])
 
   return (
-    <button
-      type="button"
+    <div
+      role="button"
       onClick={() => onClick(spell)}
-      className="w-full p-3 bg-amber-50 rounded-lg border border-amber-100 space-y-1 text-left hover:bg-amber-100 hover:border-amber-300 transition-colors cursor-pointer"
+      className="w-full p-3 bg-amber-50 rounded-lg border border-amber-100 space-y-1 text-left hover:bg-amber-100 hover:border-amber-300 transition-colors cursor-pointer flex items-start justify-between"
     >
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="font-semibold text-amber-900">{spell.name}</span>
-        <Badge className={`text-xs ${schoolColor}`}>{schoolName}</Badge>
-        {spell.ritual && (
-          <Badge className="text-xs bg-emerald-100 text-emerald-800">Rituale</Badge>
-        )}
-        {spell.concentration && (
-          <Badge className="text-xs bg-orange-100 text-orange-800">Concentrazione</Badge>
+      <div className="flex-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="font-semibold text-amber-900">{spell.name}</span>
+          <Badge className={`text-xs ${schoolColor}`}>{schoolName}</Badge>
+          {spell.ritual && (
+            <Badge className="text-xs bg-emerald-100 text-emerald-800">Rituale</Badge>
+          )}
+          {spell.concentration && (
+            <Badge className="text-xs bg-orange-100 text-orange-800">Concentrazione</Badge>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-amber-700 mt-1">
+          {spell.casting_time && <span>⏱ {spell.casting_time}</span>}
+          {spell.range && <span>🎯 {spell.range}</span>}
+          {spell.duration && <span>⏳ {spell.duration}</span>}
+        </div>
+      </div>
+
+      <div className="ml-4 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+        {confirming ? (
+          <div className="flex items-center gap-1">
+            <Button size="sm" variant="destructive" onClick={() => { void doDelete(); }} disabled={deleting}>Conferma</Button>
+            <Button size="sm" variant="ghost" onClick={() => setConfirming(false)}>Annulla</Button>
+          </div>
+        ) : (
+          <Button size="icon" variant="ghost" onClick={(e: React.MouseEvent<HTMLButtonElement>) => { e.stopPropagation(); setConfirming(true); }} disabled={deleting}>
+            <Trash className="w-4 h-4 text-red-500" />
+          </Button>
         )}
       </div>
-      <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-amber-700">
-        {spell.casting_time && <span>⏱ {spell.casting_time}</span>}
-        {spell.range && <span>🎯 {spell.range}</span>}
-        {spell.duration && <span>⏳ {spell.duration}</span>}
-      </div>
-    </button>
+    </div>
   )
-}
+})
+
+SpellRow.displayName = 'SpellRow'

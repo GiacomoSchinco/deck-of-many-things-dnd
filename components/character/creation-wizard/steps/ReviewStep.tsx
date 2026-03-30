@@ -1,8 +1,10 @@
 // components/character/creation-wizard/steps/ReviewStep.tsx
-'use client';
+ 'use client';
 
+import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { CreationData } from '../hooks/useCharacterCreation';
+import { Button } from '@/components/ui/button';
+import type { CreationData } from '@/types/creation';
 import { calculateModifier } from '@/lib/calculations/abilityModifiers';
 import { useCharacterCalculations } from '@/hooks/useCharacterCalculations';
 import { useCampaign } from '@/hooks/queries/useCampaigns';
@@ -41,10 +43,16 @@ const ABILITY_SHORT: Record<string, string> = {
 };
 
 export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
+  const [rollHp, setRollHp] = useState(true);
+  const [seed, setSeed] = useState(0);
+
   const { calculations, isLoading: calcLoading, isReady } = useCharacterCalculations(
     data.raceId ?? null,
     data.classId ?? null,
     data.abilityScores ?? null,
+    data.level ?? 1,
+    rollHp,
+    seed,
   );
   const { data: campaign } = useCampaign(data.campaignId ?? null);
   const { data: allSkills } = useSkillList();
@@ -186,7 +194,16 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
 
           {/* Statistiche di combattimento (calcolate) */}
           {isReady && calculations && (
-            <FanCardGroup size="sm">
+            <>
+              <div className="flex justify-center gap-2 mb-3">
+                <Button variant={rollHp ? 'default' : 'ghost'} size="sm" onClick={() => setRollHp(true)}>Tira HP</Button>
+                <Button variant={!rollHp ? 'default' : 'ghost'} size="sm" onClick={() => setRollHp(false)}>Usa media</Button>
+                {rollHp && (
+                  <Button variant="outline" size="sm" onClick={() => setSeed((s) => s + 1)}>Ritira</Button>
+                )}
+              </div>
+
+              <FanCardGroup size="sm">
               <div className="flex flex-col items-center justify-center h-full p-1 text-center">
                 <p className="text-xs text-amber-700">Punti ferita</p>
                 <p className="text-xl font-bold text-amber-900">{calculations.combatStats.max_hp}</p>
@@ -210,6 +227,7 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
                 <p className="text-xl font-bold text-amber-900">+{calculations.proficiencyBonus}</p>
               </div>
             </FanCardGroup>
+            </>
           )}
 
           {/* Equipaggiamento */}

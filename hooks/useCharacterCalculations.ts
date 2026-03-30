@@ -10,6 +10,8 @@ export function useCharacterCalculations(
   classId: number | null, 
   abilityScores: AbilityScores | null,
   level: number,
+  rollHp: boolean = true,
+  seed: number = 0,
 ) {
   const { data: raceData, isLoading: raceLoading } = useRace(raceId);
   const { data: classData, isLoading: classLoading } = useClass(classId);
@@ -41,10 +43,23 @@ export function useCharacterCalculations(
     };
     const hitDieValue = hitDieMap[classData?.hit_die || 'd8'] || 8;
 
-    // HP: 1st level gets hit die + CON, subsequent levels get average die + CON per level
+    // HP: 1st level gets hit die + CON.
+    // Subsequent levels: by default roll hit die per level (rollHp=true), otherwise use average.
     const lvl = Math.max(1, Math.trunc(level || 1));
-    const perLevelHpAvg = (hitDieValue / 2) + 0.5 + conMod; // (N+1)/2 + conMod
-    const max_hp = Math.max(1, Math.floor((hitDieValue + conMod) + (lvl - 1) * perLevelHpAvg));
+    let max_hp = hitDieValue + conMod;
+    if (lvl > 1) {
+      if (rollHp) {
+        let total = max_hp;
+        for (let i = 2; i <= lvl; i++) {
+          const roll = Math.floor(Math.random() * hitDieValue) + 1;
+          total += roll + conMod;
+        }
+        max_hp = Math.max(1, total);
+      } else {
+        const perLevelHpAvg = (hitDieValue / 2) + 0.5 + conMod; // (N+1)/2 + conMod
+        max_hp = Math.max(1, Math.floor((hitDieValue + conMod) + (lvl - 1) * perLevelHpAvg));
+      }
+    }
 
     // Hit dice total equals level
     const hit_dice_total = Math.max(1, lvl);
@@ -69,7 +84,7 @@ export function useCharacterCalculations(
       raceData,
       classData
     };
-  }, [raceData, classData, abilityScores, level]); // 🔥 Dipendenze
+  }, [raceData, classData, abilityScores, level, rollHp, seed]); // 🔥 Dipendenze
 
   return {
     calculations,

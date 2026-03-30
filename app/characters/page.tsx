@@ -48,9 +48,9 @@ export default function CharactersPage() {
     return new Intl.DateTimeFormat('it-IT', { dateStyle: 'medium' }).format(new Date(iso));
   };
 
-  const tableData = (characters ?? []).map((c) => ({
+  const tableData = (characters ?? []).map((c: Record<string, unknown>) => ({
     ...c,
-    created_at_formatted: formatDate(c.created_at),
+    created_at_formatted: formatDate(c.created_at as string | undefined),
   }));
 
   return (

@@ -57,7 +57,6 @@ export default function SpellsTablePage() {
   return (
     <div className="container mx-auto p-6">
       <DataTable
-        title="📜 Libro degli Incantesimi"
         initialData={tableData}
         visibleColumns={[
           'name',

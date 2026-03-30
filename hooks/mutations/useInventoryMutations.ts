@@ -26,8 +26,15 @@ export function useCreateInventory(characterId?: string | null) {
         body: JSON.stringify({ items: itemsToSend })
       })
       if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error || 'Errore creazione inventory')
+        const text = await res.text()
+        let message = text || res.statusText || 'Errore creazione inventory'
+        try {
+          const parsed = JSON.parse(text)
+          message = parsed?.error || parsed?.message || message
+        } catch (_) {
+          // not json, keep raw text
+        }
+        throw new Error(message)
       }
       return res.json() as Promise<{ inserted: number; items?: InventoryItem[] }>
     },

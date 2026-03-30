@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type PendingItem = { item_id: number; item_name: string; quantity: number };
+type PendingItem = { item_id: number; name: string; quantity: number };
 
 type Props = {
   items?: InventoryItem[];
@@ -49,7 +49,7 @@ const TYPE_COLORS: Record<string, string> = {
 
 export default function InventoryGrouped({ items = [], onRowClick, onEdit, onDelete }: Props) {
   const groups = items.reduce<Record<string, InventoryItem[]>>((acc, it) => {
-    const t = it.item_type ?? 'gear';
+    const t = (it as any).type ?? 'gear';
     (acc[t] ??= []).push(it);
     return acc;
   }, {});
@@ -134,7 +134,7 @@ function AddItemsModal({ characterIdFromItems }: { characterIdFromItems?: string
     setPending((prev) => {
       const existing = prev.find((p) => p.item_id === selectedId);
       if (existing) return prev.map((p) => p.item_id === selectedId ? { ...p, quantity: p.quantity + quantity } : p);
-      return [...prev, { item_id: selectedId, item_name: selectedName, quantity }];
+      return [...prev, { item_id: selectedId, name: selectedName, quantity }];
     });
     setSelectedId(null);
     setSelectedName('');
@@ -202,7 +202,7 @@ function AddItemsModal({ characterIdFromItems }: { characterIdFromItems?: string
               <div className="space-y-2">
                 {pending.map((p) => (
                   <div key={p.item_id} className="flex items-center gap-3 p-2 rounded border bg-amber-50/50">
-                    <span className="flex-1 font-medium text-amber-900">{p.item_name}</span>
+                    <span className="flex-1 font-medium text-amber-900">{p.name}</span>
                     <div className="w-24">
                       <Input type="number" value={String(p.quantity)} onChange={(e) => updateQty(p.item_id, Number(e.target.value || 1))} />
                     </div>

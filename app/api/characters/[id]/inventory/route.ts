@@ -19,6 +19,28 @@ export async function GET(
     const page = Number(searchParams.get('page') ?? '1')
     const pageSize = Number(searchParams.get('pageSize') ?? '50')
 
+    // Detect whether the inventory table uses the legacy `item_name`/`item_type` columns
+    // or the simplified `name`/`type` columns. We try `name` first and fall back.
+    let nameCol = 'name'
+    let typeCol = 'type'
+    try {
+      const test = await supabase.from('inventory').select('name').limit(1).maybeSingle()
+      if (test.error) {
+        nameCol = 'item_name'
+      }
+    } catch (e) {
+      nameCol = 'item_name'
+    }
+
+    try {
+      const test2 = await supabase.from('inventory').select('type').limit(1).maybeSingle()
+      if (test2.error) {
+        typeCol = 'item_type'
+      }
+    } catch (e) {
+      typeCol = 'item_type'
+    }
+
     let query = supabase
       .from('inventory')
       .select('*', { count: 'exact' })
@@ -30,12 +52,12 @@ export async function GET(
     }
 
     if (itemType) {
-      query = query.eq('item_type', itemType)
+      query = query.eq(typeCol, itemType)
     }
 
     if (search && search.trim()) {
       const like = `%${search}%`
-      query = query.or(`item_name.ilike.${like},description.ilike.${like}`)
+      query = query.or(`${nameCol}.ilike.${like},description.ilike.${like}`)
     }
 
     const from = (Math.max(1, page) - 1) * pageSize
@@ -87,15 +109,23 @@ export async function POST(
     const body = await request.json()
     const newItems = body?.items
 
-    if (!Array.isArray(newItems) || !newItems.every((i) => typeof i.item_id === 'number')) {
-      return NextResponse.json({ error: 'items deve essere un array di { item_id, quantity }' }, { status: 400 })
+    // Accept item identifiers in several shapes: { item_id }, { itemId }, { id }, numeric strings
+    const validShape = Array.isArray(newItems) && newItems.every((i) => {
+      const rawId = i?.item_id ?? i?.itemId ?? i?.id
+      return typeof rawId === 'number' || (typeof rawId === 'string' && /^\d+$/.test(rawId))
+    })
+
+    if (!validShape) {
+      return NextResponse.json({ error: 'items deve essere un array di { item_id|itemId|id, quantity }' }, { status: 400 })
     }
 
     // 1. Aggrega quantità per item_id (gestisce duplicati nel payload)
     const qtyMap = new Map<number, number>()
     for (const item of newItems) {
+      const rawId = item?.item_id ?? item?.itemId ?? item?.id
+      const itemId = typeof rawId === 'string' ? Number(rawId) : rawId
       const qty = Math.max(1, Math.trunc(Number(item.quantity) || 1))
-      qtyMap.set(item.item_id, (qtyMap.get(item.item_id) ?? 0) + qty)
+      qtyMap.set(itemId, (qtyMap.get(itemId) ?? 0) + qty)
     }
 
     const itemIds = [...qtyMap.keys()]
@@ -125,6 +155,29 @@ export async function POST(
     const toInsert = []
     const toUpdate = []
 
+    // Detect inventory column names once for the POST flow
+    let nameCol = 'name'
+    let typeCol = 'type'
+    let valueCol = 'value'
+    try {
+      const tn = await supabase.from('inventory').select('name').limit(1).maybeSingle()
+      if (tn.error) nameCol = 'item_name'
+    } catch (e) {
+      nameCol = 'item_name'
+    }
+    try {
+      const tt = await supabase.from('inventory').select('type').limit(1).maybeSingle()
+      if (tt.error) typeCol = 'item_type'
+    } catch (e) {
+      typeCol = 'item_type'
+    }
+    try {
+      const tv = await supabase.from('inventory').select('value').limit(1).maybeSingle()
+      if (tv.error) valueCol = 'cost'
+    } catch (e) {
+      valueCol = 'cost'
+    }
+
     for (const [itemId, quantityToAdd] of qtyMap.entries()) {
       const cat = catalogMap.get(itemId)
       if (!cat) continue // item_id non trovato nel catalogo — skip
@@ -134,20 +187,23 @@ export async function POST(
       } else {
         const props = cat.properties as Record<string, unknown> | null
         const itemType = (props?.itemType as string | undefined) ?? (cat.type as string) ?? 'gear'
-        toInsert.push({
+        const row: Record<string, unknown> = {
           character_id: id,
           item_id: itemId,
-          item_name: cat.name,
-          item_type: itemType,
           quantity: quantityToAdd,
           weight: cat.weight ?? 0,
           equipped: false,
           description: cat.description ?? null,
           notes: null,
-          cost: cat.value ?? null,
-          cost_unit: cat.currency ?? 'po',
           properties: props ?? {},
-        })
+        }
+
+        // Assign detected keys (nameCol/typeCol/valueCol detected once above)
+        ;(row as any)[nameCol] = cat.name
+        ;(row as any)[typeCol] = itemType
+        ;(row as any)[valueCol] = cat.value ?? null
+
+        toInsert.push(row)
       }
     }
 
@@ -163,9 +219,9 @@ export async function POST(
     // 5. Inserisci nuovi oggetti
     let inserted = []
     if (toInsert.length > 0) {
-      // Filtra righe valide (devono avere almeno item_name)
-      const validRows = toInsert.filter(row => row.item_name)
-      
+      // Filtra righe valide (devono avere almeno il nome nella colonna rilevata)
+      const validRows = toInsert.filter(row => Boolean((row as any)[nameCol]))
+
       if (validRows.length > 0) {
         const { data, error } = await supabase
           .from('inventory')

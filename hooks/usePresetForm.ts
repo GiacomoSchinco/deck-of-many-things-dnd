@@ -136,13 +136,13 @@ export function usePresetForm(initialData?: EquipmentPreset) {
         description: preset.description || null,
         items: preset.items
           .filter(({ item_id }) => item_id > 0)
-          .map(({ item_id, quantity, name }) => ({ item_id, quantity, name })),
+          .map(({ item_id, quantity, name }) => ({ item_id, quantity, name: name ?? 'Oggetto sconosciuto' })),
         choices: preset.choices.map(({ description, count, items }) => ({
           description,
           count,
           items: items
             .filter(({ item_id }) => item_id > 0)
-            .map(({ item_id, quantity, name }) => ({ item_id, quantity, name })),
+            .map(({ item_id, quantity, name }) => ({ item_id, quantity, name: name ?? 'Oggetto sconosciuto' })),
         })),
         is_default: preset.is_default,
       }

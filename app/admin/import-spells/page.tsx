@@ -59,9 +59,9 @@ export default function ImportSpellsPage() {
         const batch = spells.slice(i, i + BATCH_SIZE);
         
         // Prepara i dati
-        const formattedBatch = batch.map(spell => {
+        const formattedBatch = batch.map((spell: Record<string, any>) => {
           // Gestisci componenti
-          let components = spell.components || [];
+          const components = spell.components || [];
           if (spell.material && !components.includes('M')) {
             components.push('M');
           }
@@ -91,7 +91,7 @@ export default function ImportSpellsPage() {
         });
         
         // Filtra eventuali duplicati (controlla se già esiste)
-        const names = formattedBatch.map(s => s.name);
+        const names = formattedBatch.map((s: { name: string }) => s.name);
         const { data: existing } = await supabase
           .from('spells')
           .select('name')
@@ -99,7 +99,7 @@ export default function ImportSpellsPage() {
         
         const existingNames = new Set(existing?.map(e => e.name) || []);
         
-        const newSpells = formattedBatch.filter(s => !existingNames.has(s.name));
+        const newSpells = formattedBatch.filter((s: { name: string }) => !existingNames.has(s.name));
         skipped += formattedBatch.length - newSpells.length;
         
         if (newSpells.length === 0) {

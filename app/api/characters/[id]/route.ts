@@ -134,6 +134,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const cookieStore = await cookies()
+  const { id } = await params
   const supabase = createServerSupabase(cookieStore)
 
   const { data: { user } } = await supabase.auth.getUser()

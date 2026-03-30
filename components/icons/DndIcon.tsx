@@ -42,8 +42,14 @@ export type DndIconName =
   | 'icon_constitution'
   | 'icon_intelligence'
   | 'icon_wisdom'
-  | 'icon_charisma';
-
+  | 'icon_charisma'
+  | 'weapon'
+  | 'armor'
+  | 'gear'
+  | 'consumable'
+  | 'ammunition'
+  | 'tool'
+  | 'currency';
 
 interface DndIconProps {
   /** Nome del file SVG (senza .svg) */

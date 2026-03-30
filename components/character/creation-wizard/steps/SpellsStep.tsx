@@ -6,6 +6,7 @@ import { useClass } from '@/hooks/queries/useClasses';
 import { useSpells } from '@/hooks/queries/useSpells';
 import { useSpellcastingProgression } from '@/hooks/queries/useSpellcastingProgression';
 import { getEnglishClass } from '@/lib/utils/nameMappers';
+import { useCreationStore } from '@/store/useCreationStore';
 import { WizardStep } from '../WizardStep';
 import Loading from '@/components/custom/Loading';
 import { Badge } from '@/components/ui/badge';
@@ -53,14 +54,15 @@ export function SpellsStep({
   const [detailSpell, setDetailSpell] = useState<Spell | null>(null);
 
   const englishClassName  = classData ? getEnglishClass(classData.name) : null;
-  
+  const savedLevel = useCreationStore((s) => s.data?.level ?? 1);
+
   const isPreparerClass   = englishClassName ? PREPARER_CLASSES.includes(englishClassName) : false;
   const isWizard          = englishClassName === 'wizard';
   const hasSpellcasting   = !!classData?.spellcasting;
 
   const { data: progression, isLoading: progressionLoading } = useSpellcastingProgression(
     englishClassName,
-    1,
+    savedLevel, // fetch progression for the saved character level
   );
 
   const { data: allSpells, isLoading: spellsLoading } = useSpells(
@@ -92,60 +94,82 @@ export function SpellsStep({
     return false;
   }, [progression]);
 
-  const { cantrips, spells } = useMemo(() => {
-    if (!allSpells) return { cantrips: [] as Spell[], spells: [] as Spell[] };
+  const { cantrips, spellsByLevel, spellsAll } = useMemo(() => {
+    if (!allSpells) return { cantrips: [] as Spell[], spellsByLevel: {} as Record<number, Spell[]>, spellsAll: [] as Spell[] };
 
-    // Prefer progression data from the server (spell_slots / pact_slot_level)
-    // progression was fetched for the class at level 1 above.
-    const availableLevelsSet = new Set<number>();
+    // cantrips as before
+    const cantrips = allSpells.filter((s: Spell) => s.level === 0);
 
+    // Build spells grouped by level 1..5 (we fetch/consider levels 1 to 5)
+    const spellsByLevel: Record<number, Spell[]> = {} as Record<number, Spell[]>;
+    for (let lvl = 1; lvl <= 5; lvl++) {
+      spellsByLevel[lvl] = allSpells.filter((s: Spell) => s.level === lvl);
+    }
+
+    const spellsAll = Object.values(spellsByLevel).flat();
+
+    return { cantrips, spellsByLevel, spellsAll };
+  }, [allSpells, savedLevel]);
+
+  // per-level caps derived from progression (if available)
+  const perLevelCaps = useMemo(() => {
+    const caps: Record<number, number> = {};
+    if (!progression) return caps;
+
+    if (progression.spell_slots && typeof progression.spell_slots === 'object') {
+      Object.entries(progression.spell_slots).forEach(([levelStr, count]) => {
+        let lvl = parseInt(String(levelStr), 10);
+        if (isNaN(lvl)) {
+          const match = String(levelStr).match(/\d+/);
+          if (match) lvl = parseInt(match[0], 10);
+        }
+        if (!isNaN(lvl)) caps[lvl] = Number(count);
+      });
+    }
+
+    if (progression.pact_slots && typeof progression.pact_slots === 'object') {
+      Object.entries(progression.pact_slots).forEach(([levelStr, count]) => {
+        let lvl = parseInt(String(levelStr), 10);
+        if (isNaN(lvl)) {
+          const match = String(levelStr).match(/\d+/);
+          if (match) lvl = parseInt(match[0], 10);
+        }
+        if (!isNaN(lvl)) caps[lvl] = Math.max(caps[lvl] ?? 0, Number(count));
+      });
+    }
+
+    return caps;
+  }, [progression]);
+
+  const highestSpellLevel = useMemo(() => {
+    let highest = 0;
     if (progression) {
-      if (progression.cantrips_known && progression.cantrips_known > 0) {
-        availableLevelsSet.add(0);
-      }
-
-      // spell_slots is an object like { '1': 2, '2': 0, ... }
+      if (progression.pact_slot_level && Number(progression.pact_slot_level) > 0) highest = Math.max(highest, Number(progression.pact_slot_level));
       if (progression.spell_slots && typeof progression.spell_slots === 'object') {
         Object.entries(progression.spell_slots).forEach(([levelStr, count]) => {
-          // levelStr can be like "1st", "2nd", "3rd" — try parseInt first,
-          // then fallback to extracting the first number with a regex.
           let lvl = parseInt(String(levelStr), 10);
           if (isNaN(lvl)) {
             const match = String(levelStr).match(/\d+/);
             if (match) lvl = parseInt(match[0], 10);
           }
-          if (!isNaN(lvl) && Number(count) > 0) availableLevelsSet.add(lvl);
+          if (!isNaN(lvl) && Number(count) > 0) highest = Math.max(highest, lvl);
         });
       }
-
-      // Warlock / pact magic: pact_slot_level indicates the highest level they can cast
-      if (progression.pact_slot_level && Number(progression.pact_slot_level) > 0) {
-        const max = Number(progression.pact_slot_level);
-        for (let i = 1; i <= max; i++) availableLevelsSet.add(i);
-      }
     }
-
-    // Fallback: if nothing was deduced, allow cantrips (0) and level 1 as safe default
-    if (availableLevelsSet.size === 0) {
-      availableLevelsSet.add(0);
-      availableLevelsSet.add(1);
+    if (highest === 0) {
+      highest = Math.min(5, Math.max(1, Math.floor(savedLevel / 2) + 1));
     }
-
-    const availableLevels = Array.from(availableLevelsSet.values());
-
-    return {
-      cantrips: allSpells.filter((s: Spell) => s.level === 0),
-      spells: allSpells.filter((s: Spell) => s.level > 0 && availableLevels.includes(s.level)),
-    };
-  }, [allSpells, progression]);
+    return Math.min(5, highest);
+  }, [progression, savedLevel]);
 
   const selectedCantrips = selected.filter((id) => cantrips.some((c: Spell) => String(c.id) === id));
-  const selectedSpells   = selected.filter((id) => spells.some((s: Spell) => String(s.id) === id));
+  const selectedSpells   = selected.filter((id) => spellsAll.some((s: Spell) => String(s.id) === id));
 
   const filteredCantrips = cantrips.filter((s: Spell) =>
     s.name.toLowerCase().includes(searchCantrips.toLowerCase()),
   );
-  const filteredSpells = spells.filter((s: Spell) =>
+  // We'll filter per-level when rendering; keep a convenience filteredAll for searches across levels
+  const filteredAllSpells = spellsAll.filter((s: Spell) =>
     s.name.toLowerCase().includes(searchSpells.toLowerCase()),
   );
 
@@ -161,7 +185,21 @@ export function SpellsStep({
     }
 
     if (type === 'cantrip' && selectedCantrips.length >= cantripsAllowed) return;
-    if (type === 'spell'   && selectedSpells.length   >= (isWizard ? Math.max(6, 6 + intModifier) : spellsAllowed)) return;
+
+    if (type === 'spell') {
+      // global cap
+      if (selectedSpells.length >= (isWizard ? Math.max(6, 6 + intModifier) : spellsAllowed)) return;
+
+      // per-level cap (if available)
+      const lvl = spell.level ?? 1;
+      const cap = perLevelCaps[lvl];
+      if (cap !== undefined) {
+        const selectedForLevel = selected.filter((id) =>
+          (spellsByLevel[lvl] ?? []).some((s) => String(s.id) === id),
+        ).length;
+        if (selectedForLevel >= cap) return;
+      }
+    }
     console.log('Toggling spell', spell.name, 'type', type);
     const next = [...selected, idStr];
     setSelected(next);
@@ -339,19 +377,29 @@ export function SpellsStep({
         )}
 
         {(spellsAllowed > 0 || isWizard) && (
-          <SpellSection
-            title={
-              isWizard
-                ? `Grimorio — scegli ${wizardSpellbookSize} incantesimi`
-                : `Incantesimi — scegli ${spellsAllowed}`
-            }
-            icon={<BookOpen className="w-4 h-4" />}
-            selected={selectedSpells}
-            max={isWizard ? wizardSpellbookSize : spellsAllowed}
-            spells={filteredSpells}
-            onToggle={(s) => toggle(s, 'spell')}
-            onDetail={setDetailSpell}
-          />
+          <div className="space-y-4">
+            {Array.from({ length: highestSpellLevel }, (_, i) => i + 1).map((lvl) => {
+              const spellsForLevel = (spellsByLevel[lvl] ?? []).filter((s) =>
+                s.name.toLowerCase().includes(searchSpells.toLowerCase()),
+              );
+
+              if (spellsForLevel.length === 0) return null;
+
+              return (
+                <SpellSection
+                  key={`lvl-${lvl}`}
+                  title={isWizard ? `Grimorio — livello ${lvl}` : `Incantesimi livello ${lvl}`}
+                  icon={<BookOpen className="w-4 h-4" />}
+                  selected={selectedSpells}
+                  max={isWizard ? wizardSpellbookSize : spellsAllowed}
+                  perLevelMax={perLevelCaps[lvl]}
+                  spells={spellsForLevel}
+                  onToggle={(s) => toggle(s, 'spell')}
+                  onDetail={setDetailSpell}
+                />
+              );
+            })}
+          </div>
         )}
 
         {!hasSpellSlots && progression && !isWizard && (
@@ -382,11 +430,12 @@ interface SpellSectionProps {
   spells: Spell[];
   selected: string[];
   max: number;
+  perLevelMax?: number;
   onToggle: (spell: Spell) => void;
   onDetail: (spell: Spell) => void;
 }
 
-function SpellSection({ title, icon, spells, selected, max, onToggle, onDetail }: SpellSectionProps) {
+function SpellSection({ title, icon, spells, selected, max, perLevelMax, onToggle, onDetail }: SpellSectionProps) {
   return (
     <div>
       <h3 className="flex items-center gap-2 font-serif text-amber-800 font-medium mb-2">
@@ -400,7 +449,8 @@ function SpellSection({ title, icon, spells, selected, max, onToggle, onDetail }
           {spells.map((spell) => {
             const idStr      = String(spell.id);
             const isSelected = selected.includes(idStr);
-            const isDisabled = !isSelected && selected.length >= max;
+            const selectedInThisSection = selected.filter((id) => spells.some((s) => String(s.id) === id)).length;
+            const isDisabled = !isSelected && (perLevelMax !== undefined ? selectedInThisSection >= perLevelMax : selected.length >= max);
 
             return (
               <button
