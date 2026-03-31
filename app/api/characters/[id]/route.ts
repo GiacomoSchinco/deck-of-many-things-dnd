@@ -109,10 +109,8 @@ export async function PUT(
     if (body.combatStats) {
       const { error: combatError } = await supabase
         .from('combat_stats')
-        .upsert({
-          character_id: id,
-          ...body.combatStats
-        })
+        .update(body.combatStats)
+        .eq('character_id', id)
 
       if (combatError) throw combatError
     }

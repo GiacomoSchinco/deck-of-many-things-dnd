@@ -75,6 +75,33 @@ export function useInitSpellSlots() {
   })
 }
 
+type UpdateSpellSlotsPayload = {
+  characterId: string
+  slots: { spell_level: number; total_slots: number; used_slots?: number }[]
+}
+
+export function useUpdateSpellSlots() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ characterId, slots }: UpdateSpellSlotsPayload) => {
+      const res = await fetch(`/api/characters/${characterId}/spell-slots`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slots }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || 'Errore aggiornamento spell slots')
+      }
+      return res.json()
+    },
+    onSuccess: (_data, { characterId }) => {
+      queryClient.invalidateQueries({ queryKey: ['character', characterId, 'spell-slots'] })
+      queryClient.invalidateQueries({ queryKey: ['character', characterId] })
+    },
+  })
+}
+
 export function useCharacterSpellMutations() {
   return {
     add: useAddCharacterSpells(),

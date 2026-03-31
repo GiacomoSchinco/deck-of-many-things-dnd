@@ -63,8 +63,52 @@ export async function POST(
   return NextResponse.json({ inserted: data?.length ?? 0 })
 }
 
+// PUT /api/characters/[id]/spell-slots
+// Body: { slots: [{ spell_level, total_slots, used_slots }] }
+// Usato dal level-up: fa un upsert basato su (character_id, spell_level)
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const cookieStore = await cookies()
+  const { id } = await params
+  const supabase = createServerSupabase(cookieStore)
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
+  }
+
+  const body = await request.json()
+  const { slots } = body as {
+    slots: { spell_level: number; total_slots: number; used_slots?: number }[]
+  }
+
+  if (!Array.isArray(slots) || slots.length === 0) {
+    return NextResponse.json({ error: 'slots richiesto' }, { status: 400 })
+  }
+
+  const rows = slots.map((s) => ({
+    character_id: id,
+    spell_level: s.spell_level,
+    total_slots: s.total_slots,
+    used_slots: s.used_slots ?? 0,
+  }))
+
+  const { data, error } = await supabase
+    .from('spell_slots')
+    .upsert(rows, { onConflict: 'character_id,spell_level' })
+    .select()
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  return NextResponse.json({ updated: data?.length ?? 0 })
+}
+
 // PATCH /api/characters/[id]/spell-slots
-// Body: { spell_level: number, used: number }  — aggiorna gli slot usati
+// Body: { spell_level: number, used_slots: number }  — aggiorna gli slot usati
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }

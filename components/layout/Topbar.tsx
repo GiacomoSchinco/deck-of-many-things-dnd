@@ -6,6 +6,7 @@ import { appMetadata } from "@/lib/metadata";
 import AuthButton from "../custom/AuthButton";
 import { supabase } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
+import { useIsAdmin } from "@/hooks/useAuth";
 import { 
   LayoutDashboard, 
   Users, 
@@ -36,6 +37,7 @@ export default function Topbar() {
     const [user, setUser] = useState<User | null>(null);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
     const userMenuRef = useRef<HTMLDivElement>(null);
+    const { data: isAdmin} = useIsAdmin();
 
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
@@ -121,7 +123,7 @@ export default function Topbar() {
                     {/* Right Section - Admin + User Menu (desktop) / User Menu + Hamburger (mobile) */}
                     <div className="flex items-center gap-2 md:gap-3">
                         {/* Admin Link - solo desktop */}
-                        {isLoggedIn && adminLinks.length > 0 && (
+                        {isLoggedIn && isAdmin && adminLinks.length > 0 && (
                             <div className="hidden lg:block">
                                 {adminLinks.map((link) => {
                                     const Icon = link.icon;
@@ -194,7 +196,7 @@ export default function Topbar() {
                                         <div className="mx-3 border-t border-amber-700/30 my-1" />
 
                                         {/* Admin Link mobile (mostrato solo nel menu utente) */}
-                                        {adminLinks.map((link) => {
+                                        {isAdmin && adminLinks.map((link) => {
                                             const Icon = link.icon;
                                             return (
                                                 <Link
@@ -269,7 +271,7 @@ export default function Topbar() {
                                 );
                             })}
                             
-                            {isLoggedIn && adminLinks.length > 0 && (
+                            {isAdmin &&isLoggedIn && adminLinks.length > 0 && (
                                 <>
                                     <div className="mx-4 border-b border-amber-700/20" />
                                     {adminLinks.map((link) => {

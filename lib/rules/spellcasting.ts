@@ -1,4 +1,4 @@
-// lib/dnd/spellcasting.ts
+// lib/rules/spellcasting.ts
 
 export type SpellCastingClass =
   | 'wizard'
@@ -16,12 +16,14 @@ export interface SpellProgression {
   /**
    * Numero di incantesimi conosciuti (spells known).
    * - null significa che la classe prepara gli incantesimi (non li conosce fissi).
-   * - Per il mago, null indica che prepara, ma il grimorio ha una dimensione iniziale (vedi wizardSpellbookSize).
+   * - Per il mago, null indica che prepara, ma il grimorio ha una dimensione iniziale
    */
   spellsKnown: number | null;
+  /** Numero di incantesimi preparabili (solo per classi che preparano) */
+  spellsPreparable?: number;
   /** Solo per il mago: numero di incantesimi nel grimorio al momento della creazione (sempre 6 a livello 1) */
   wizardSpellbookSize?: number;
-  /** Per classi che preparano: caratteristica usata per calcolare quanti preparare (es. 'int' per mago) */
+  /** Per classi che preparano: caratteristica usata per calcolare quanti preparare */
   preparedModifier?: 'int' | 'wis' | 'cha';
   /** Slot incantesimi normali (per tutte le classi tranne warlock). La chiave è il livello dell'incantesimo (1-9). */
   spellSlots: Record<number, number>;
@@ -34,7 +36,7 @@ export interface SpellProgression {
 }
 
 // --------------------------------------------------------------
-// 1. PROGRESSIONE TRUCCHETTI (cantrips) – valori corretti PHB
+// 1. PROGRESSIONE TRUCCHETTI (cantrips)
 // --------------------------------------------------------------
 const cantripsProgression: Record<SpellCastingClass, Record<number, number>> = {
   wizard:   {1:3,2:3,3:3,4:4,5:4,6:4,7:4,8:4,9:4,10:5,11:5,12:5,13:5,14:5,15:5,16:5,17:5,18:5,19:5,20:5},
@@ -49,9 +51,15 @@ const cantripsProgression: Record<SpellCastingClass, Record<number, number>> = {
 
 // --------------------------------------------------------------
 // 2. PROGRESSIONE INCANTESIMI CONOSCIUTI (spells known)
-//    Solo per classi che conoscono (non preparano)
+//    Le classi che preparano (wizard, cleric, druid, paladin) hanno oggetti vuoti
 // --------------------------------------------------------------
-const spellsKnownProgression: Partial<Record<SpellCastingClass, Record<number, number>>> = {
+const spellsKnownProgression: Record<SpellCastingClass, Record<number, number>> = {
+  // Classi che preparano (non hanno spells known fissi)
+  wizard: {},
+  cleric: {},
+  druid: {},
+  paladin: {},
+  // Classi che conoscono
   bard: {
     1:2,2:3,3:4,4:5,5:6,6:7,7:8,8:9,9:10,10:11,
     11:12,12:12,13:13,14:13,15:14,16:14,17:15,18:15,19:15,20:15,
@@ -68,11 +76,10 @@ const spellsKnownProgression: Partial<Record<SpellCastingClass, Record<number, n
     1:2,2:3,3:4,4:5,5:6,6:7,7:8,8:9,9:10,10:10,
     11:11,12:11,13:12,14:12,15:13,16:13,17:14,18:14,19:15,20:15,
   },
-  // wizard, cleric, druid, paladin non sono qui (preparano)
 };
 
 // --------------------------------------------------------------
-// 3. SLOT INCANTESIMI (per full caster, half caster)
+// 3. SLOT INCANTESIMI
 // --------------------------------------------------------------
 const fullCasterSlots: Record<number, Record<number, number>> = {
   1: {1:2},
@@ -140,23 +147,26 @@ export function getSpellProgression(
   // 2. Spells known / preparazione
   if (className === 'wizard') {
     progression.spellsKnown = null;
-    progression.wizardSpellbookSize = 6;   // a livello 1 il grimorio ha 6 incantesimi
+    progression.wizardSpellbookSize = 6;
     progression.preparedModifier = 'int';
+    progression.spellsPreparable = Math.max(1, level + abilityModifier);
+    
   } else if (className === 'cleric' || className === 'druid') {
     progression.spellsKnown = null;
-    progression.preparedModifier = className === 'cleric' ? 'wis' : 'wis'; // entrambi saggezza
+    progression.preparedModifier = 'wis';
+    progression.spellsPreparable = Math.max(1, level + abilityModifier);
+    
   } else if (className === 'paladin') {
     progression.spellsKnown = null;
     progression.preparedModifier = 'cha';
+    progression.spellsPreparable = Math.max(1, Math.floor(level / 2) + abilityModifier);
+    
   } else if (spellsKnownProgression[className]) {
     progression.spellsKnown = spellsKnownProgression[className][level] ?? 0;
-  } else {
-    progression.spellsKnown = 0;
   }
 
-  // 3. Slot incantesimi (normali o pact magic)
+  // 3. Slot incantesimi
   if (className === 'warlock') {
-    // Pact Magic
     let pactSlots = 1;
     let pactLevel = 1;
     if (level >= 1 && level <= 2) { pactSlots = 1; pactLevel = 1; }
@@ -179,4 +189,31 @@ export function getSpellProgression(
   }
 
   return progression;
+}
+
+// --------------------------------------------------------------
+// 5. FUNZIONE PER IL LEVEL UP
+// --------------------------------------------------------------
+export function getLevelUpSpellChanges(
+  className: SpellCastingClass,
+  oldLevel: number,
+  newLevel: number,
+  abilityModifier: number = 0
+): {
+  newCantrips: number;
+  newSpellsKnown: number;
+  newSpellsPreparable: number;
+  newSpellSlots: Record<number, number>;
+  newPactMagic?: SpellProgression['pactMagic'];
+} {
+  const oldProg = getSpellProgression(className, oldLevel, abilityModifier);
+  const newProg = getSpellProgression(className, newLevel, abilityModifier);
+
+  return {
+    newCantrips: newProg.cantrips - oldProg.cantrips,
+    newSpellsKnown: (newProg.spellsKnown ?? 0) - (oldProg.spellsKnown ?? 0),
+    newSpellsPreparable: (newProg.spellsPreparable ?? 0) - (oldProg.spellsPreparable ?? 0),
+    newSpellSlots: newProg.spellSlots,
+    newPactMagic: newProg.pactMagic,
+  };
 }

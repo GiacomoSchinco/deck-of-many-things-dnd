@@ -1,7 +1,7 @@
 // app/characters/page.tsx
 'use client'
 
-import { useMyCharacters } from '@/hooks/queries/useCharacter';
+import { useCharacters } from '@/hooks/queries/useCharacter';
 import Loading from '@/components/custom/Loading';
 import DataTable from '@/components/custom/DataTable';
 import { Button } from '@/components/ui/button';
@@ -29,7 +29,7 @@ function extractNames(value: unknown): string[] {
 
 export default function CharactersPage() {
   const router = useRouter();
-  const { data: characters, isLoading, error } = useMyCharacters();
+  const { data: characters, isLoading, error } = useCharacters();
 
   if (isLoading) return <Loading />;
 

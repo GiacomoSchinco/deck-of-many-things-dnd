@@ -15,7 +15,7 @@ export function useCharacters() {
 }
 
 // GET /api/characters/me — personaggio corrente dell'utente
-export function useMyCharacter() {
+export function useMyCharacters() {
   return useQuery({
     queryKey: ['characters', 'me'],
     queryFn: async () => {

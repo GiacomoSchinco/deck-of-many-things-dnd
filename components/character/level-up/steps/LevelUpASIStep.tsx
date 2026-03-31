@@ -1,0 +1,221 @@
+// components/character/level-up/LevelUpASIStep.tsx
+'use client';
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { TrendingUp, Sparkles } from 'lucide-react';
+
+interface LevelUpASIStepProps {
+  character: { ability_scores?: Record<string, number> };
+  currentLevel: number;
+  newLevel: number;
+  changes: unknown;
+  data: Record<string, unknown>;
+  onNext: (data: Record<string, unknown>) => void;
+  onBack: () => void;
+  isLast: boolean;
+}
+
+const abilityScores = [
+  { id: 'strength', label: 'Forza', icon: '💪' },
+  { id: 'dexterity', label: 'Destrezza', icon: '🏃' },
+  { id: 'constitution', label: 'Costituzione', icon: '❤️' },
+  { id: 'intelligence', label: 'Intelligenza', icon: '🧠' },
+  { id: 'wisdom', label: 'Saggezza', icon: '🕯️' },
+  { id: 'charisma', label: 'Carisma', icon: '👑' },
+];
+
+export default function LevelUpASIStep({
+  character,
+  // currentLevel, newLevel, changes are part of the standard step interface
+  data,
+  onNext,
+  onBack,
+  isLast,
+}: LevelUpASIStepProps) {
+  const [asiType, setAsiType] = useState<'increase' | 'feat'>((data.asiType as 'increase' | 'feat') || 'increase');
+  const [selectedStat, setSelectedStat] = useState<string>((data.selectedStat as string) || 'strength');
+  const [increaseType, setIncreaseType] = useState<'single' | 'double'>((data.increaseType as 'single' | 'double') || 'single');
+  const [secondStat, setSecondStat] = useState<string>((data.secondStat as string) || 'dexterity');
+
+  const currentStats = character.ability_scores || {};
+
+  const getNewValue = (stat: string) => {
+    const current = currentStats[stat] || 10;
+    if (increaseType === 'single') {
+      return current + 2;
+    }
+    return current + 1;
+  };
+
+  const handleNext = () => {
+    if (asiType === 'increase') {
+      if (increaseType === 'single') {
+        onNext({
+          asiType: 'increase',
+          increaseType: 'single',
+          selectedStat,
+          changes: {
+            [selectedStat]: getNewValue(selectedStat),
+          },
+        });
+      } else {
+        onNext({
+          asiType: 'increase',
+          increaseType: 'double',
+          selectedStat,
+          secondStat,
+          changes: {
+            [selectedStat]: getNewValue(selectedStat),
+            [secondStat]: getNewValue(secondStat),
+          },
+        });
+      }
+    } else {
+      onNext({
+        asiType: 'feat',
+        featId: null, // da implementare con selezione talenti
+      });
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="text-center">
+        <div className="inline-flex items-center justify-center p-3 bg-amber-100 rounded-full mb-4">
+          <TrendingUp className="w-8 h-8 text-amber-700" />
+        </div>
+        <h2 className="text-xl font-serif font-bold text-amber-900">
+          Aumento delle Caratteristiche
+        </h2>
+        <p className="text-amber-600 text-sm mt-1">
+          Aumenta le tue statistiche o scegli un talento
+        </p>
+      </div>
+
+      <RadioGroup
+        value={asiType}
+        onValueChange={(v) => setAsiType(v as 'increase' | 'feat')}
+        className="space-y-3"
+      >
+        <div className="flex items-start gap-3 p-3 rounded-lg border border-amber-200">
+          <RadioGroupItem value="increase" id="increase" className="mt-1" />
+          <Label htmlFor="increase" className="flex-1 cursor-pointer">
+            <div className="font-medium text-amber-900">Aumenta caratteristiche</div>
+            <div className="text-sm text-amber-600">
+              Aumenta una caratteristica di 2 o due caratteristiche di 1
+            </div>
+          </Label>
+        </div>
+
+        <div className="flex items-start gap-3 p-3 rounded-lg border border-amber-200">
+          <RadioGroupItem value="feat" id="feat" className="mt-1" />
+          <Label htmlFor="feat" className="flex-1 cursor-pointer">
+            <div className="font-medium text-amber-900 flex items-center gap-1">
+              <Sparkles className="w-4 h-4" />
+              Scegli un talento
+            </div>
+            <div className="text-sm text-amber-600">
+              Sostituisci l&apos;ASI con un talento speciale
+            </div>
+          </Label>
+        </div>
+      </RadioGroup>
+
+      {asiType === 'increase' && (
+        <div className="mt-4 space-y-4">
+          <RadioGroup
+            value={increaseType}
+            onValueChange={(v) => setIncreaseType(v as 'single' | 'double')}
+            className="flex gap-4"
+          >
+            <div className="flex items-center gap-2">
+              <RadioGroupItem value="single" id="single" />
+              <Label htmlFor="single">Una caratteristica +2</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <RadioGroupItem value="double" id="double" />
+              <Label htmlFor="double">Due caratteristiche +1</Label>
+            </div>
+          </RadioGroup>
+
+          <div className="grid gap-4">
+            <div>
+              <Label>Caratteristica principale</Label>
+              <Select value={selectedStat} onValueChange={(v) => v && setSelectedStat(v)}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {abilityScores.map(stat => (
+                    <SelectItem key={stat.id} value={stat.id}>
+                      <span className="flex items-center gap-2">
+                        <span>{stat.icon}</span>
+                        {stat.label} ({currentStats[stat.id] || 10} → {getNewValue(stat.id)})
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {increaseType === 'double' && (
+              <div>
+                <Label>Seconda caratteristica</Label>
+                <Select value={secondStat} onValueChange={(v) => v && setSecondStat(v)}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {abilityScores
+                      .filter(s => s.id !== selectedStat)
+                      .map(stat => (
+                        <SelectItem key={stat.id} value={stat.id}>
+                          <span className="flex items-center gap-2">
+                            <span>{stat.icon}</span>
+                            {stat.label} ({currentStats[stat.id] || 10} → {getNewValue(stat.id)})
+                          </span>
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {asiType === 'feat' && (
+        <div className="mt-4 p-4 bg-amber-50/50 rounded-lg border border-amber-200 text-center">
+          <p className="text-amber-700 text-sm">
+            ⚠️ Selezione talenti in arrivo
+          </p>
+          <p className="text-xs text-amber-500 mt-1">
+            Per ora puoi procedere senza talento
+          </p>
+        </div>
+      )}
+
+      <div className="flex justify-between pt-4 border-t border-amber-200">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onBack}
+          className="border-amber-600 text-amber-700"
+        >
+          Indietro
+        </Button>
+        <Button
+          type="button"
+          onClick={handleNext}
+          className="bg-amber-700 hover:bg-amber-800 text-white"
+        >
+          {isLast ? 'Conferma' : 'Avanti'}
+        </Button>
+      </div>
+    </div>
+  );
+}
