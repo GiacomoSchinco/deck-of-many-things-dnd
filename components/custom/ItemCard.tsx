@@ -29,7 +29,15 @@ interface ItemCardProps {
   onDelete?: () => void;
   size?: 'sm' | 'md' | 'lg';
 }
-
+const TYPE_COLORS: Record<string, string> = {
+  weapon:     'text-red-800',
+  armor:      'text-blue-800',
+  gear:       'text-amber-800',
+  consumable: 'text-green-800',
+  ammunition: 'text-yellow-800',
+  tool:       'text-purple-800',
+  currency:   'text-amber-600',
+};
 const rarityColors: Record<string, string> = {
   common: 'text-gray-500',
   uncommon: 'text-green-600',
@@ -187,7 +195,7 @@ export default function ItemCard({ item, showActions = false, onEdit, onDelete, 
 
         {/* Icona tipo centrata */}
         <div className="flex flex-col items-center justify-center mt-3 gap-1">
-          <DndIcon size={40} name={item.type} className="text-amber-700" />
+          <DndIcon size={40} name={item.type} className={TYPE_COLORS[item.type]} />
           <span className="text-xs text-amber-600 font-medium">{getItalianItemType(item.type)}</span>
           {item.category && (
             <span className="text-xs text-amber-400 italic">{item.category}</span>

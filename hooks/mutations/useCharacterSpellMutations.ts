@@ -49,9 +49,36 @@ export function useRemoveCharacterSpells() {
   })
 }
 
+type InitSpellSlotsPayload = {
+  characterId: string
+  slots: { spell_level: number; total_slots: number; used_slots: number }[]
+}
+
+export function useInitSpellSlots() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ characterId, slots }: InitSpellSlotsPayload) => {
+      const res = await fetch(`/api/characters/${characterId}/spell-slots`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slots }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || 'Errore inizializzazione spell slots')
+      }
+      return res.json()
+    },
+    onSuccess: (_data, { characterId }) => {
+      queryClient.invalidateQueries({ queryKey: ['character', characterId, 'spell-slots'] })
+    },
+  })
+}
+
 export function useCharacterSpellMutations() {
   return {
     add: useAddCharacterSpells(),
     remove: useRemoveCharacterSpells(),
+    initSlots: useInitSpellSlots(),
   }
 }

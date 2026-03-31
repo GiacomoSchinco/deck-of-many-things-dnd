@@ -70,7 +70,8 @@ export interface Spell {
   // Lancio
   casting_time: string | null;            // Tempo di lancio
   range: string | null;                   // Gittata
-  components: SpellComponents | null;      // Componenti
+  components: SpellComponents | string[] | null; // Componenti (oggetto o array di lettere ['V','S','M'])
+  material?: string | null;               // Materiale (alcune API lo pongono a livello top-level)
   duration: string | null;                 // Durata
   
   // Descrizione

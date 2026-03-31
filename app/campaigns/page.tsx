@@ -42,7 +42,7 @@ export default function CampaignsPage() {
           </p>
         </div>
 
-        <Link href="/create-campaign">
+        <Link href="/campaigns/create">
           <Button className="bg-amber-700 hover:bg-amber-800">
             <PlusCircle className="w-4 h-4 mr-2" />
             Nuova Campagna

@@ -10,22 +10,12 @@ import {
   Target,
   Hourglass,
   ScrollText,
-  BookOpen,
-  Eye,
-  Shield,
-  Wand2,
-  Heart,
-  Zap,
-  Moon,
-  Skull,
-  Brain,
   Crown,
   Star,
   Info,
-  SignalZero
 } from 'lucide-react';
 import { DndIcon } from '../icons/DndIcon';
-import { getItalianSchool, getItalianClass } from '@/lib/utils/nameMappers';
+import { getItalianSchool } from '@/lib/utils/nameMappers';
 import type { Spell } from '@/types/spell';
 
 interface SpellCardProps {
@@ -37,7 +27,7 @@ interface SpellCardProps {
 }
 
 // Mappa delle icone per scuola (usate anche per il badge colorato)
-const schoolConfig: Record<string, { icon: React.ElementType; color: string; bgLight: string }> = {
+const schoolConfig: Record<string, { color: string; bgLight: string }> = {
   abjuration:    {   color: 'text-blue-600', bgLight: 'bg-blue-50' },
   conjuration:   {     color: 'text-purple-600', bgLight: 'bg-purple-50' },
   divination:    {      color: 'text-indigo-600', bgLight: 'bg-indigo-50' },
@@ -65,8 +55,7 @@ const levelConfig: Record<number, { icon: React.ElementType; label: string }> = 
 export default function SpellCard({ spell, showActions = false, onEdit, onDelete, size = 'md' }: SpellCardProps) {
   const [showDesc, setShowDesc] = React.useState(false);
 
-  const schoolInfo = schoolConfig[spell.school] || { icon: BookOpen, color: 'text-amber-600', bgLight: 'bg-amber-50' };
-  const SchoolIcon = <DndIcon name={spell.school} className={schoolInfo.color} size={64} />;
+  const schoolInfo = schoolConfig[spell.school] || { color: 'text-amber-600', bgLight: 'bg-amber-50' };
   const LevelIcon = levelConfig[spell.level]?.icon || Star;
   const levelLabel = levelConfig[spell.level]?.label || `${spell.level}° Livello`;
 

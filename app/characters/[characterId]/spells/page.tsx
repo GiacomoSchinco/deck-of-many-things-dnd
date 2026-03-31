@@ -1,10 +1,10 @@
 "use client";
 import { useParams } from 'next/navigation';
-import { useSpells } from "@/hooks/queries/useSpells";
 import Spellbook from '@/components/character/sheet/Spellbook';
 import { useCharacterSpells } from '@/hooks/queries/useSpells';
 import Loading from '@/components/custom/Loading';
 import SpellCard from '@/components/custom/SpellCard';
+import { Spell, SpellKnown } from '@/types/spell';
 
 export default function SpellPage() {
   const params = useParams();
@@ -27,7 +27,7 @@ export default function SpellPage() {
       {spellsKnown.length === 0 && (
         <p className="text-amber-700 text-center py-4">Nessun incantesimo presente</p>
       )}
-      {spellsKnown.map((sk) => {
+      {spellsKnown.map((sk: SpellKnown & { spell: Spell }) => {
         if (!sk.spell) return null;
         return (
           <SpellCard key={sk.id} spell={sk.spell}/>
