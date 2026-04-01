@@ -10,18 +10,7 @@ import type { CreationData } from '@/types/creation';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import { Plus, Minus } from 'lucide-react';
 import { WizardStep } from '../WizardStep';
-
-const ALIGNMENTS = [
-  'Legale Buono',
-  'Neutrale Buono',
-  'Caotico Buono',
-  'Legale Neutrale',
-  'Neutrale',
-  'Caotico Neutrale',
-  'Legale Malvagio',
-  'Neutrale Malvagio',
-  'Caotico Malvagio',
-];
+import { ALIGNMENTS } from '@/lib/utils/nameMappers';
 
 interface BasicInfoStepProps {
   initialData?: Partial<CreationData>;

@@ -13,32 +13,17 @@ import { WizardStep } from '../WizardStep';
 import { cn } from '@/lib/utils';
 import type { Skill } from '@/types/skill';
 import Loading from '@/components/custom/Loading';
+import { getAbilityShort } from '@/lib/utils/nameMappers';
+import type { AbilityScores } from '@/types/character';
 
 interface SkillsStepProps {
   classId: number;
-  abilityScores: {
-    strength: number;
-    dexterity: number;
-    constitution: number;
-    intelligence: number;
-    wisdom: number;
-    charisma: number;
-  };
+  abilityScores: AbilityScores;
   onConfirm: (selectedSkills: string[]) => void;
   onChange?: (selectedSkills: string[]) => void;
   initialSelectedSkills?: string[];
   onBack: () => void;
 }
-
-// Mappa per convertire ability in nome breve
-const abilityShortNames: Record<string, string> = {
-  strength: 'FOR',
-  dexterity: 'DES',
-  constitution: 'COS',
-  intelligence: 'INT',
-  wisdom: 'SAG',
-  charisma: 'CAR',
-};
 
 export function SkillsStep({ classId, abilityScores, onConfirm, onChange, initialSelectedSkills, onBack }: SkillsStepProps) {
   const { data: classData, isLoading: classLoading } = useClass(classId);
@@ -134,7 +119,7 @@ export function SkillsStep({ classId, abilityScores, onConfirm, onChange, initia
           {availableSkills.map((skill) => {
             const isSelected = selectedSkills.includes(String(skill.id));
             const modifier = getModifier(skill.ability);
-            const abilityShort = abilityShortNames[skill.ability] || skill.ability.slice(0,3).toUpperCase();
+            const abilityShort = getAbilityShort(skill.ability);
             
             return (
               <div

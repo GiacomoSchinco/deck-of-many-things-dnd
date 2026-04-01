@@ -5,12 +5,15 @@ import { useState } from 'react';
 import { useClasses } from '@/hooks/queries/useClasses';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Search, X } from 'lucide-react';
 import { RaceClassCard } from '../../../custom/RaceClassCard';
+import { getItalianClass } from '@/lib/utils/nameMappers';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import Loading from '@/components/custom/Loading';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { WizardStep } from '../WizardStep';
+import CardSwiper, { type CardSwiperEntry } from '@/components/custom/CardSwiper';
 import type { ClassFeature } from '@/types/class';
+
 
 interface ClassStepProps {
   initialClassId?: number | null;
@@ -21,28 +24,32 @@ interface ClassStepProps {
 export function ClassStep({ initialClassId, onBack, onSelect }: ClassStepProps) {
   const { data: classes, isLoading, error } = useClasses();
   const [selectedClassId, setSelectedClassId] = useState<number | null>(initialClassId ?? null);
-  const [currentIndex, setCurrentIndex] = useState(() => {
-    if (!initialClassId || !classes) return 0;
-    const idx = classes.findIndex(c => c.id === initialClassId);
-    return idx >= 0 ? idx : 0;
-  });
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [search, setSearch] = useState('');
+  const [gotoIndex, setGotoIndex] = useState<number | undefined>(undefined);
 
   const selectedClass = classes?.[currentIndex];
-  const totalClasses = classes?.length || 0;
+  const searchResults = search.trim()
+    ? (classes ?? []).filter(c => {
+        const q = search.toLowerCase();
+        return c.name.toLowerCase().includes(q) || getItalianClass(c.name).toLowerCase().includes(q);
+      })
+    : [];
 
-  const handlePrevious = () => {
-    setCurrentIndex(prev => (prev > 0 ? prev - 1 : totalClasses - 1));
-  };
-
-  const handleNext = () => {
-    setCurrentIndex(prev => (prev < totalClasses - 1 ? prev + 1 : 0));
-  };
-
-  const handleSelectCurrent = () => {
-    if (selectedClass) {
-      setSelectedClassId(selectedClass.id);
-    }
-  };
+  const items: CardSwiperEntry[] = (classes ?? []).map(cls => ({
+    id: cls.id,
+    node: (
+      <RaceClassCard
+        id={cls.id}
+        name={cls.name}
+        type="class"
+        isSelected={selectedClassId === cls.id}
+        onSelect={() => setSelectedClassId(cls.id)}
+        size="md"
+      />
+    ),
+    label: cls.name,
+  }));
 
   const handleConfirm = () => {
     if (selectedClassId) {
@@ -71,8 +78,6 @@ export function ClassStep({ initialClassId, onBack, onSelect }: ClassStepProps) 
     );
   }
 
-  const isSelected = selectedClassId === selectedClass.id;
-
   return (
     <WizardStep
       title="⚔️ Scegli la tua Classe"
@@ -82,51 +87,66 @@ export function ClassStep({ initialClassId, onBack, onSelect }: ClassStepProps) 
       nextDisabled={!selectedClassId}
       nextLabel="Avanti: Punteggi →"
     >
-      {/* Carosello principale */}
-      <div className="relative flex items-center justify-center gap-4">
-        {/* Freccia sinistra */}
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={handlePrevious}
-          className="rounded-full border-2 border-amber-700 text-amber-700 hover:bg-amber-100 w-12 h-12"
-        >
-          <ChevronLeft className="w-6 h-6" />
-        </Button>
-
-        {/* Carta centrale */}
-        <div className="relative">
-          <RaceClassCard
-            id={selectedClass.id}
-            name={selectedClass.name}
-            type="class"
-            isSelected={isSelected}
-            onSelect={handleSelectCurrent}
-            size="md"
+      {/* Ricerca per nome */}
+      <div className="relative w-full max-w-sm mx-auto">
+        <div className="relative flex items-center">
+          <Search className="absolute left-3 w-4 h-4 text-amber-700 pointer-events-none" />
+          <input
+            type="text"
+            placeholder="Cerca classe..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="w-full pl-9 pr-9 py-2 rounded-md border-2 border-amber-700/50 bg-amber-50/80 text-amber-900 placeholder-amber-500 text-sm focus:outline-none focus:border-amber-700"
           />
-          
-          {/* Indicatore di selezione */}
-          {isSelected && (
-            <div className="absolute -top-4 -right-4 bg-green-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
-              Selezionata!
-            </div>
+          {search && (
+            <button onClick={() => setSearch('')} className="absolute right-3 text-amber-600 hover:text-amber-900">
+              <X className="w-4 h-4" />
+            </button>
           )}
         </div>
 
-        {/* Freccia destra */}
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={handleNext}
-          className="rounded-full border-2 border-amber-700 text-amber-700 hover:bg-amber-100 w-12 h-12"
-        >
-          <ChevronRight className="w-6 h-6" />
-        </Button>
+        {searchResults.length > 0 && (
+          <div className="absolute z-10 mt-1 w-full bg-amber-50 border-2 border-amber-700/40 rounded-md shadow-lg overflow-hidden">
+            {searchResults.map(cls => {
+              const idx = (classes ?? []).findIndex(c => c.id === cls.id);
+              return (
+                <button
+                  key={cls.id}
+                  onClick={() => {
+                    setSelectedClassId(cls.id);
+                    setCurrentIndex(idx);
+                    setGotoIndex(idx);
+                    setSearch('');
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-amber-900 hover:bg-amber-200 border-b border-amber-200 last:border-0 flex items-center gap-2"
+                >
+                  <span className="text-amber-600">⚔️</span>
+                  {getItalianClass(cls.name)}
+                  {selectedClassId === cls.id && <span className="ml-auto text-emerald-700 text-xs font-bold">✓</span>}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {search.trim() && searchResults.length === 0 && (
+          <p className="absolute mt-1 w-full text-center text-sm text-amber-600 bg-amber-50 border border-amber-300 rounded-md py-2">Nessuna classe trovata</p>
+        )}
       </div>
 
-      {/* Indicatore di posizione */}
-      <div className="text-center text-amber-600">
-        {currentIndex + 1} di {totalClasses}
+      {/* Carosello CardSwiper */}
+      <div className="flex justify-center">
+        <CardSwiper
+          items={items}
+          initialIndex={Math.max(0, (classes ?? []).findIndex(c => c.id === initialClassId))}
+          activeIndex={gotoIndex}
+          size="md"
+          showLabel={false}
+          onSelect={(entry) => {
+            const idx = (classes ?? []).findIndex(c => c.id === entry.id);
+            if (idx >= 0) setCurrentIndex(idx);
+          }}
+        />
       </div>
 
       {/* Dettagli della classe corrente */}
@@ -134,7 +154,7 @@ export function ClassStep({ initialClassId, onBack, onSelect }: ClassStepProps) 
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="text-2xl font-serif font-bold text-amber-900">
-              {selectedClass.name}
+              {getItalianClass(selectedClass.name)}
             </h3>
             <Badge variant="outline" className="bg-amber-100">
               Dado Vita: {selectedClass.hit_die}

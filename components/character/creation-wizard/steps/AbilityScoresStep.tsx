@@ -8,6 +8,7 @@ import { WizardStep } from '../WizardStep';
 import { DndIcon } from '@/components/icons/DndIcon';
 import type { DndIconName } from '@/components/icons/DndIcon';
 import type { AbilityScores } from '@/types/character';
+import { ABILITY_LIST, getAbilityShort } from '@/lib/utils/nameMappers';
 
 interface AbilityScoresStepProps {
   initialScores?: AbilityScores | null;
@@ -17,14 +18,7 @@ interface AbilityScoresStepProps {
   onConfirm: (scores: AbilityScores) => void;
 }
 
-const ABILITIES = [
-  { key: 'strength', label: 'FOR', name: 'Forza', icon: 'strength' },
-  { key: 'dexterity', label: 'DES', name: 'Destrezza', icon: 'dexterity' },
-  { key: 'constitution', label: 'COS', name: 'Costituzione', icon: 'constitution' },
-  { key: 'intelligence', label: 'INT', name: 'Intelligenza', icon: 'intelligence' },
-  { key: 'wisdom', label: 'SAG', name: 'Saggezza', icon: 'wisdom' },
-  { key: 'charisma', label: 'CAR', name: 'Carisma', icon: 'charisma' },
-];
+const ABILITIES = ABILITY_LIST.map(a => ({ ...a, icon: a.key as DndIconName }));
 
 export function AbilityScoresStep({
   initialScores,
@@ -91,17 +85,11 @@ export function AbilityScoresStep({
             <span className="font-semibold">{raceName}:</span> bonus razziali applicati
           </p>
           <div className="flex flex-wrap justify-center gap-2 mt-1">
-            {Object.entries(raceBonuses).map(([stat, bonus]) => {
-              const statMap: Record<string, string> = {
-                strength: 'FOR', dexterity: 'DES', constitution: 'COS',
-                intelligence: 'INT', wisdom: 'SAG', charisma: 'CAR'
-              };
-              return (
+            {Object.entries(raceBonuses).map(([stat, bonus]) => (
                 <span key={stat} className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
-                  {statMap[stat]}+{bonus}
+                  {getAbilityShort(stat)}+{bonus}
                 </span>
-              );
-            })}
+              ))}
           </div>
         </div>
       )}

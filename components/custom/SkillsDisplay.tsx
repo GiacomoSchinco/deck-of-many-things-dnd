@@ -13,44 +13,27 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import type { Skill } from '@/types/skill';
+import type { AbilityScores, ProficiencyType } from '@/types/character';
+import { getAbilityShort, getItalianAbilityFull } from '@/lib/utils/nameMappers';
 
 interface SkillsDisplayProps {
+  information?: boolean;
+  /** Numero di colonne della griglia (default: 3) */
+  gridCols?: 1 | 2 | 3 | 4;
   skills: Skill[];
-  characterSkills: Map<number, string>; // skill_id -> proficiency_type
-  abilityScores: {
-    strength: number;
-    dexterity: number;
-    constitution: number;
-    intelligence: number;
-    wisdom: number;
-    charisma: number;
-  };
+  characterSkills: Map<number, ProficiencyType>;
+  abilityScores: AbilityScores;
   proficiencyBonus: number;
+  className?: string;
 }
-
-const ABILITY_SHORT: Record<string, string> = {
-  strength: 'FOR',
-  dexterity: 'DES',
-  constitution: 'COS',
-  intelligence: 'INT',
-  wisdom: 'SAG',
-  charisma: 'CAR',
-};
-
-const ABILITY_FULL: Record<string, string> = {
-  strength: 'Forza',
-  dexterity: 'Destrezza',
-  constitution: 'Costituzione',
-  intelligence: 'Intelligenza',
-  wisdom: 'Saggezza',
-  charisma: 'Carisma',
-};
 
 export function SkillsDisplay({
   skills,
+  gridCols = 3,
   characterSkills,
   abilityScores,
   proficiencyBonus,
+  information = true
 }: SkillsDisplayProps) {
 
   const getSkillBonus = (skill: Skill) => {
@@ -110,13 +93,16 @@ export function SkillsDisplay({
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-2">
         <h3 className="text-xl font-serif font-bold text-amber-900 flex items-center gap-2">
-          <span>🎯</span> Tutte le Abilità
-          {selectedCount > 0 && (
-            <Badge className="bg-amber-100 text-amber-800 border-amber-300 text-sm">
-              {selectedCount} selezionate
-            </Badge>
+          <span>🎯</span>Abilità
+          {information && (
+            selectedCount > 0 && (
+              <Badge className="bg-amber-100 text-amber-800 border-amber-300 text-sm">
+                {selectedCount} selezionate
+              </Badge>
+            )
           )}
         </h3>
+
         <div className="text-xs text-amber-600 flex items-center gap-2 bg-amber-100/50 p-2 rounded-lg border border-amber-200">
           <div className="flex items-center gap-1">
             <Circle className="w-3 h-3 fill-green-500 text-green-500" />
@@ -134,7 +120,13 @@ export function SkillsDisplay({
       </div>
 
       {/* Griglia abilità */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className={cn(
+        'gap-3',
+        gridCols === 1 ? 'grid grid-cols-1' :
+        gridCols === 2 ? 'grid grid-cols-1 md:grid-cols-2' :
+        gridCols === 4 ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4' :
+        'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+      )}>
         {skills.map((skill) => {
           const proficiency = characterSkills.get(skill.id);
           const isSelected = proficiency && proficiency !== 'none';
@@ -168,7 +160,7 @@ export function SkillsDisplay({
                   <span className={cn(
                     "font-serif font-semibold text-base",
                     isExpertise ? "text-blue-800" :
-                    isSelected ? "text-amber-800" : "text-amber-700"
+                      isSelected ? "text-amber-800" : "text-amber-700"
                   )}>
                     {skill.name_it}
                   </span>
@@ -188,14 +180,20 @@ export function SkillsDisplay({
                 <p className={cn(
                   'text-xs mt-0.5 font-mono',
                   isExpertise ? 'text-blue-600' :
-                  isSelected ? 'text-amber-600' : 'text-amber-500'
+                    isSelected ? 'text-amber-600' : 'text-amber-500'
                 )}>
-                  {ABILITY_SHORT[skill.ability]} ({abilityMod >= 0 ? `+${abilityMod}` : abilityMod})
-                  {isSelected && (
-                    <span className="ml-1 text-amber-500 text-[10px]">
-                      • competenza attiva
+
+                  {getAbilityShort(skill.ability)} ({abilityMod >= 0 ? `+${abilityMod}` : abilityMod})
+                  {information && (
+                    <span>
+                      {isSelected && (
+                        <span className="ml-1 text-amber-500 text-[10px]">
+                          • competenza attiva
+                        </span>
+                      )}
                     </span>
                   )}
+
                 </p>
               </div>
 
@@ -206,7 +204,7 @@ export function SkillsDisplay({
                     className={cn(
                       'text-2xl font-bold font-mono tracking-tight',
                       isExpertise ? 'text-blue-700' :
-                      isSelected ? 'text-amber-800' : 'text-amber-500'
+                        isSelected ? 'text-amber-800' : 'text-amber-500'
                     )}
                     title={`Calcolo: ${getBonusBreakdown(skill)} = ${bonus >= 0 ? `+${bonus}` : bonus}`}
                   >
@@ -232,7 +230,7 @@ export function SkillsDisplay({
                       <div className="space-y-4 mt-2">
                         <div className="flex items-center gap-2 text-sm text-amber-700">
                           <Badge variant="outline" className="border-amber-600">
-                            {ABILITY_FULL[skill.ability]}
+                            {getItalianAbilityFull(skill.ability)}
                           </Badge>
                           {isExpertise && (
                             <Badge className="bg-blue-100 text-blue-700 border-blue-300">
@@ -274,7 +272,7 @@ export function SkillsDisplay({
       </div>
 
       {/* Legenda */}
-{/*      <div className="mt-4 pt-3 border-t border-amber-200 text-xs text-amber-500 text-center">
+      {/*      <div className="mt-4 pt-3 border-t border-amber-200 text-xs text-amber-500 text-center">
         <div className="flex items-center justify-center gap-4 flex-wrap">
           <span className="flex items-center gap-1">
             <span className="inline-block w-3 h-3 bg-amber-600 rounded-full" />

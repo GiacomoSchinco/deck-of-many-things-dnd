@@ -1,12 +1,4 @@
-export interface CreationAbilityScores {
-  strength: number;
-  dexterity: number;
-  constitution: number;
-  intelligence: number;
-  wisdom: number;
-  charisma: number;
-}
-
+import type { AbilityScores } from './character'
 import type { EquipmentItem } from './equipment'
 
 export interface CreationData {
@@ -19,7 +11,7 @@ export interface CreationData {
   classId: number | null;
   campaignId: string | null;
 
-  abilityScores: CreationAbilityScores | null;
+  abilityScores: AbilityScores | null;
   skills?: string[];
   spells?: string[];        // spell IDs scelti (cantrip + incantesimi)
   equipment?: EquipmentItem[];

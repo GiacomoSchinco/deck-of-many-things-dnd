@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TrendingUp, Sparkles } from 'lucide-react';
+import { ABILITY_LIST_ICONS } from '@/lib/utils/nameMappers';
 
 interface LevelUpASIStepProps {
   character: { ability_scores?: Record<string, number> };
@@ -18,15 +19,6 @@ interface LevelUpASIStepProps {
   onBack: () => void;
   isLast: boolean;
 }
-
-const abilityScores = [
-  { id: 'strength', label: 'Forza', icon: '💪' },
-  { id: 'dexterity', label: 'Destrezza', icon: '🏃' },
-  { id: 'constitution', label: 'Costituzione', icon: '❤️' },
-  { id: 'intelligence', label: 'Intelligenza', icon: '🧠' },
-  { id: 'wisdom', label: 'Saggezza', icon: '🕯️' },
-  { id: 'charisma', label: 'Carisma', icon: '👑' },
-];
 
 export default function LevelUpASIStep({
   character,
@@ -150,7 +142,7 @@ export default function LevelUpASIStep({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {abilityScores.map(stat => (
+                  {ABILITY_LIST_ICONS.map(stat => (
                     <SelectItem key={stat.id} value={stat.id}>
                       <span className="flex items-center gap-2">
                         <span>{stat.icon}</span>
@@ -170,7 +162,7 @@ export default function LevelUpASIStep({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {abilityScores
+                    {ABILITY_LIST_ICONS
                       .filter(s => s.id !== selectedStat)
                       .map(stat => (
                         <SelectItem key={stat.id} value={stat.id}>

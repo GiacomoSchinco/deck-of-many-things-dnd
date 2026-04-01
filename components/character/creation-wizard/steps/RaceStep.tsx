@@ -5,11 +5,13 @@ import { useRaces } from '@/hooks/queries/useRaces';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Search, X } from 'lucide-react';
 import { RaceClassCard } from '../../../custom/RaceClassCard';
+import { getItalianRace, getAbilityShort } from '@/lib/utils/nameMappers';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import Loading from '@/components/custom/Loading';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { WizardStep } from '../WizardStep';
+import CardSwiper, { type CardSwiperEntry } from '@/components/custom/CardSwiper';
 
 interface RaceStepProps {
   initialRaceId?: number | null;
@@ -20,28 +22,32 @@ interface RaceStepProps {
 export function RaceStep({ initialRaceId, onBack, onSelect }: RaceStepProps) {
   const { data: races, isLoading, error } = useRaces();
   const [selectedRaceId, setSelectedRaceId] = useState<number | null>(initialRaceId ?? null);
-  const [currentIndex, setCurrentIndex] = useState(() => {
-    if (!initialRaceId || !races) return 0;
-    const idx = races.findIndex(r => r.id === initialRaceId);
-    return idx >= 0 ? idx : 0;
-  });
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [search, setSearch] = useState('');
+  const [gotoIndex, setGotoIndex] = useState<number | undefined>(undefined);
 
   const selectedRace = races?.[currentIndex];
-  const totalRaces = races?.length || 0;
+  const searchResults = search.trim()
+    ? (races ?? []).filter(r => {
+        const q = search.toLowerCase();
+        return r.name.toLowerCase().includes(q) || getItalianRace(r.name).toLowerCase().includes(q);
+      })
+    : [];
 
-  const handlePrevious = () => {
-    setCurrentIndex(prev => (prev > 0 ? prev - 1 : totalRaces - 1));
-  };
-
-  const handleNext = () => {
-    setCurrentIndex(prev => (prev < totalRaces - 1 ? prev + 1 : 0));
-  };
-
-  const handleSelectCurrent = () => {
-    if (selectedRace) {
-      setSelectedRaceId(selectedRace.id);
-    }
-  };
+  const items: CardSwiperEntry[] = (races ?? []).map(race => ({
+    id: race.id,
+    node: (
+      <RaceClassCard
+        id={race.id}
+        name={race.name}
+        type="race"
+        isSelected={selectedRaceId === race.id}
+        onSelect={() => setSelectedRaceId(race.id)}
+        size="md"
+      />
+    ),
+    label: race.name,
+  }));
 
   const handleConfirm = () => {
     if (selectedRaceId) {
@@ -51,17 +57,7 @@ export function RaceStep({ initialRaceId, onBack, onSelect }: RaceStepProps) {
 
   const formatBonus = (bonuses: Record<string, number>) => {
     return Object.entries(bonuses)
-      .map(([stat, bonus]) => {
-        const statMap: Record<string, string> = {
-          strength: 'FOR',
-          dexterity: 'DES',
-          constitution: 'COS',
-          intelligence: 'INT',
-          wisdom: 'SAG',
-          charisma: 'CAR',
-        };
-        return `${statMap[stat] || stat}+${bonus}`;
-      })
+      .map(([stat, bonus]) => `${getAbilityShort(stat)}+${bonus}`)
       .join(' · ');
   };
 
@@ -80,8 +76,6 @@ export function RaceStep({ initialRaceId, onBack, onSelect }: RaceStepProps) {
     );
   }
 
-  const isSelected = selectedRaceId === selectedRace.id;
-
   return (
     <WizardStep
       title="🧝 Scegli la tua Razza"
@@ -91,51 +85,66 @@ export function RaceStep({ initialRaceId, onBack, onSelect }: RaceStepProps) {
       nextDisabled={!selectedRaceId}
       nextLabel="Avanti: Scegli Classe →"
     >
-      {/* Carosello principale */}
-      <div className="relative flex items-center justify-center gap-4">
-        {/* Freccia sinistra */}
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={handlePrevious}
-          className="rounded-full border-2 border-amber-700 text-amber-700 hover:bg-amber-100 w-12 h-12"
-        >
-          <ChevronLeft className="w-6 h-6" />
-        </Button>
-
-        {/* Carta centrale */}
-        <div className="relative">
-          <RaceClassCard
-            id={selectedRace.id}
-            name={selectedRace.name}
-            type="race"
-            isSelected={isSelected}
-            onSelect={handleSelectCurrent}
-            size="md"
+      {/* Ricerca per nome */}
+      <div className="relative w-full max-w-sm mx-auto">
+        <div className="relative flex items-center">
+          <Search className="absolute left-3 w-4 h-4 text-amber-700 pointer-events-none" />
+          <input
+            type="text"
+            placeholder="Cerca razza..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="w-full pl-9 pr-9 py-2 rounded-md border-2 border-amber-700/50 bg-amber-50/80 text-amber-900 placeholder-amber-500 text-sm focus:outline-none focus:border-amber-700"
           />
-          
-          {/* Indicatore di selezione */}
-          {isSelected && (
-            <div className="absolute -top-4 -right-4 bg-green-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
-              Selezionata!
-            </div>
+          {search && (
+            <button onClick={() => setSearch('')} className="absolute right-3 text-amber-600 hover:text-amber-900">
+              <X className="w-4 h-4" />
+            </button>
           )}
         </div>
 
-        {/* Freccia destra */}
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={handleNext}
-          className="rounded-full border-2 border-amber-700 text-amber-700 hover:bg-amber-100 w-12 h-12"
-        >
-          <ChevronRight className="w-6 h-6" />
-        </Button>
+        {searchResults.length > 0 && (
+          <div className="absolute z-10 mt-1 w-full bg-amber-50 border-2 border-amber-700/40 rounded-md shadow-lg overflow-hidden">
+            {searchResults.map(race => {
+              const idx = (races ?? []).findIndex(r => r.id === race.id);
+              return (
+                <button
+                  key={race.id}
+                  onClick={() => {
+                    setSelectedRaceId(race.id);
+                    setCurrentIndex(idx);
+                    setGotoIndex(idx);
+                    setSearch('');
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-amber-900 hover:bg-amber-200 border-b border-amber-200 last:border-0 flex items-center gap-2"
+                >
+                  <span className="text-amber-600">🧝</span>
+                  {getItalianRace(race.name)}
+                  {selectedRaceId === race.id && <span className="ml-auto text-emerald-700 text-xs font-bold">✓</span>}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {search.trim() && searchResults.length === 0 && (
+          <p className="absolute mt-1 w-full text-center text-sm text-amber-600 bg-amber-50 border border-amber-300 rounded-md py-2">Nessuna razza trovata</p>
+        )}
       </div>
 
-      {/* Indicatore di posizione */}
-      <div className="text-center text-amber-600">
-        {currentIndex + 1} di {totalRaces}
+      {/* Carosello CardSwiper */}
+      <div className="flex justify-center">
+        <CardSwiper
+          items={items}
+          initialIndex={Math.max(0, (races ?? []).findIndex(r => r.id === initialRaceId))}
+          activeIndex={gotoIndex}
+          size="md"
+          showLabel={false}
+          onSelect={(entry) => {
+            const idx = (races ?? []).findIndex(r => r.id === entry.id);
+            if (idx >= 0) setCurrentIndex(idx);
+          }}
+        />
       </div>
 
       {/* Dettagli della razza corrente */}
@@ -143,7 +152,7 @@ export function RaceStep({ initialRaceId, onBack, onSelect }: RaceStepProps) {
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="text-2xl font-serif font-bold text-amber-900">
-              {selectedRace.name}
+              {getItalianRace(selectedRace.name)}
             </h3>
             <Badge variant="outline" className="bg-amber-100">
               {selectedRace.size} · Vel. {selectedRace.speed}

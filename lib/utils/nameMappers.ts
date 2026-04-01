@@ -160,3 +160,72 @@ export function getItalianAbility(abbr?: string): string {
   if (!abbr) return ''
   return abilityItalianNames[abbr.toLowerCase()] ?? abbr
 }
+
+/** Chiavi full English → nome italiano */
+export const abilityFullItalianNames: Record<string, string> = {
+  strength:     'Forza',
+  dexterity:    'Destrezza',
+  constitution: 'Costituzione',
+  intelligence: 'Intelligenza',
+  wisdom:       'Saggezza',
+  charisma:     'Carisma',
+}
+
+/** Chiavi full English → abbreviazione italiana (3 lettere maiuscole) */
+export const abilityShortNames: Record<string, string> = {
+  strength:     'FOR',
+  dexterity:    'DES',
+  constitution: 'COS',
+  intelligence: 'INT',
+  wisdom:       'SAG',
+  charisma:     'CAR',
+}
+
+export function getItalianAbilityFull(name?: string): string {
+  if (!name) return ''
+  return abilityFullItalianNames[name.toLowerCase()] ?? name
+}
+
+export function getAbilityShort(name?: string): string {
+  if (!name) return ''
+  return abilityShortNames[name.toLowerCase()] ?? name.slice(0, 3).toUpperCase()
+}
+
+/**
+ * Array ordinato delle 6 caratteristiche con id, nome italiano e abbreviazione.
+ * Usato da AbilityScoresStep, StatDiamond, ecc.
+ */
+export const ABILITY_LIST: { key: string; label: string; name: string }[] = [
+  { key: 'strength',     label: 'FOR', name: 'Forza' },
+  { key: 'dexterity',    label: 'DES', name: 'Destrezza' },
+  { key: 'constitution', label: 'COS', name: 'Costituzione' },
+  { key: 'intelligence', label: 'INT', name: 'Intelligenza' },
+  { key: 'wisdom',       label: 'SAG', name: 'Saggezza' },
+  { key: 'charisma',     label: 'CAR', name: 'Carisma' },
+]
+
+/**
+ * Array ordinato delle 6 caratteristiche con id, nome italiano e icona emoji.
+ * Usato da LevelUpASIStep, ecc.
+ */
+export const ABILITY_LIST_ICONS: { id: string; label: string; icon: string }[] = [
+  { id: 'strength',     label: 'Forza',        icon: '💪' },
+  { id: 'dexterity',    label: 'Destrezza',    icon: '🏃' },
+  { id: 'constitution', label: 'Costituzione', icon: '❤️' },
+  { id: 'intelligence', label: 'Intelligenza', icon: '🧠' },
+  { id: 'wisdom',       label: 'Saggezza',     icon: '🕯️' },
+  { id: 'charisma',     label: 'Carisma',      icon: '👑' },
+]
+
+/** I 9 allineamenti D&D in italiano. */
+export const ALIGNMENTS: string[] = [
+  'Legale Buono',
+  'Neutrale Buono',
+  'Caotico Buono',
+  'Legale Neutrale',
+  'Neutrale',
+  'Caotico Neutrale',
+  'Legale Malvagio',
+  'Neutrale Malvagio',
+  'Caotico Malvagio',
+]
