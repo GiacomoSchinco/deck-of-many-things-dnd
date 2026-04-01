@@ -10,6 +10,11 @@ export async function GET(request: Request) {
 
   const supabase = createServerSupabase(cookieStore)
 
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
+  }
+
   let query = supabase.from('items').select('*').order('name')
 
   if (type && type !== 'all') {

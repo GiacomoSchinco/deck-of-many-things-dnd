@@ -164,7 +164,6 @@ export function SpellsStep({
         if (selectedForLevel >= cap) return;
       }
     }
-    console.log('Toggling spell', spell.name, 'type', type);
     const next = [...selected, idStr];
     setSelected(next);
     onChange?.(next);

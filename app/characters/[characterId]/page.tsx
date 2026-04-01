@@ -28,7 +28,7 @@ export default function CharacterPage() {
 
   const { data: character, isLoading, error } = useCharacter(characterId)
   const { data: characterSkills } = useSkills(characterId)
-  const { data: allSkills, isLoading: skillsLoading } = useSkillList() 
+  const { data: allSkills, isLoading: skillsLoading } = useSkillList()
   const { data: inventory, isLoading: inventoryLoading } = useInventory(characterId) // ← NUOVO
 
   if (isLoading || skillsLoading || inventoryLoading) {
@@ -53,10 +53,10 @@ export default function CharacterPage() {
 
   // Crea una mappa delle skill possedute dal personaggio
   const skillsMap = new Map<number, string>()
-  ;(characterSkills as unknown as { skill_id: number; proficiency_type: string }[] | undefined)
-    ?.forEach((skill) => {
-      skillsMap.set(Number(skill.skill_id), skill.proficiency_type)
-    })
+    ; (characterSkills as unknown as { skill_id: number; proficiency_type: string }[] | undefined)
+      ?.forEach((skill) => {
+        skillsMap.set(Number(skill.skill_id), skill.proficiency_type)
+      })
   return (
     <div className="container mx-auto p-4 md:p-6 space-y-6">
       {/* Header */}
@@ -65,9 +65,7 @@ export default function CharacterPage() {
           <h1 className="text-4xl font-serif font-bold text-amber-900">
             {character.name}
           </h1>
-          <p className="text-amber-700">
-            Livello {character.level}
-          </p>
+
         </div>
 
         <div className="flex gap-2">
@@ -98,39 +96,37 @@ export default function CharacterPage() {
       </div>
 
       {/* Razza e Classe */}
-      <FanCardGroup size="md" spread="normal" noWrapper>
-        <RaceClassCard type='race' name={character?.races?.name ?? '...'} size='md' isSelected={false} />
-        <RaceClassCard type='class' name={character?.classes?.name ?? '...'} size='md' isSelected={false} />
-      </FanCardGroup>
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <FanCardGroup size="md" spread="normal" noWrapper>
+          <RaceClassCard type='class' name={character?.classes?.name ?? '...'} size='md' isSelected={false} />
+          <RaceClassCard type='race' name={character?.races?.name ?? '...'} size='md' isSelected={false} />
+        </FanCardGroup>
+        <AncientScroll variant='rolled'>
+          <div >
+            <h2 className="text-2xl font-serif font-bold text-amber-900 mb-4 text-center border-b border-amber-200 pb-2">
+              Caratteristiche
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {STATS.map(({ label, key }) => (
+                <StatDiamond
+                  key={key}
+                  label={label}
+                  statKey={key}
+                  value={character.ability_scores?.[key as keyof typeof character.ability_scores] || 10}
+                  modifier={0}
+                />
+              ))}
+            </div>
 
-      {/* Competenze principali (riepilogo) */}
-      <AncientScroll variant='rolled'>
-        <div className="p-4">
-          <p className="text-xs text-amber-600 mb-2 text-center">Competenze di Classe</p>
-          <div className="flex flex-wrap justify-center gap-2">
-            {Array.from(skillsMap.keys()).map(skillId => {
-              const skill = allSkills?.find((s: Skill) => s.id === skillId)
-              if (!skill) return null
-              // Calcola bonus per il badge
-              const abilityScore = character.ability_scores?.[skill.ability as keyof typeof character.ability_scores] || 10
-              const abilityMod = Math.floor((abilityScore - 10) / 2)
-              const profType = skillsMap.get(skillId)
-              let bonus = abilityMod
-              if (profType === 'proficient') bonus += proficiencyBonus
-              if (profType === 'expertise') bonus += proficiencyBonus * 2
-              if (profType === 'half') bonus += Math.floor(proficiencyBonus / 2)
-              return (
-                <Badge key={skillId} className="bg-amber-200 text-amber-900">
-                  {skill.name_it} (+{bonus})
-                </Badge>
-              )
-            })}
-            {skillsMap.size === 0 && (
-              <p className="text-amber-600 text-sm">Nessuna competenza selezionata</p>
-            )}
           </div>
-        </div>
-      </AncientScroll>
+        </AncientScroll>
+      </div>
+
+      <p className="text-amber-700">
+        Livello {character.level}
+      </p>
+      {/* Competenze principali (riepilogo) */}
+
 
       {/* Combat Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -167,25 +163,7 @@ export default function CharacterPage() {
       {/* Griglia a 2 colonne */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Caratteristiche */}
-        <AncientCardContainer className="p-6">
-          <h2 className="text-2xl font-serif font-bold text-amber-900 mb-4 text-center border-b border-amber-200 pb-2">
-            Caratteristiche
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {STATS.map(({ label, key }) => (
-              <StatDiamond
-                key={key}
-                label={label}
-                statKey={key}
-                value={character.ability_scores?.[key as keyof typeof character.ability_scores] || 10}
-                modifier={0}
-              />
-            ))}
-          </div>
-        </AncientCardContainer>
-
-        {/* Info Personaggio */}
-        <AncientCardContainer className="p-6">
+                <AncientScroll className="p-6">
           <h2 className="text-2xl font-serif font-bold text-amber-900 mb-4 text-center border-b border-amber-200 pb-2">
             Info Personaggio
           </h2>
@@ -209,7 +187,33 @@ export default function CharacterPage() {
               </span>
             </div>
           </div>
-        </AncientCardContainer>
+        </AncientScroll>
+        {/* Info Personaggio */}
+        <AncientScroll className="p-6">
+          <h2 className="text-2xl font-serif font-bold text-amber-900 mb-4 text-center border-b border-amber-200 pb-2">
+            Info Personaggio
+          </h2>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center p-2 bg-amber-50 rounded">
+              <span className="text-amber-800">Background</span>
+              <span className="font-bold text-amber-900">{character.background || 'Nessuno'}</span>
+            </div>
+            <div className="flex justify-between items-center p-2 bg-amber-50 rounded">
+              <span className="text-amber-800">Allineamento</span>
+              <span className="font-bold text-amber-900">{character.alignment || 'Neutrale'}</span>
+            </div>
+            <div className="flex justify-between items-center p-2 bg-amber-50 rounded">
+              <span className="text-amber-800">Bonus Competenza</span>
+              <span className="font-bold text-amber-900 text-xl">+{proficiencyBonus}</span>
+            </div>
+            <div className="flex justify-between items-center p-2 bg-amber-50 rounded">
+              <span className="text-amber-800">Tiri Salvezza</span>
+              <span className="font-bold text-amber-900">
+                {character.classes?.saving_throws?.map((s: string) => s.slice(0, 3).toUpperCase()).join(' · ')}
+              </span>
+            </div>
+          </div>
+        </AncientScroll>
       </div>
 
       {/* Tabs */}
@@ -242,11 +246,11 @@ export default function CharacterPage() {
         <TabsContent value="inventory">
           <AncientCardContainer className="p-6">
             <h3 className="text-xl font-serif font-bold text-amber-900 mb-4">
-              Inventario  
+              Inventario
             </h3>
             <InventoryGrouped items={inventory?.items} />
-            </AncientCardContainer>
-        
+          </AncientCardContainer>
+
         </TabsContent>
       </Tabs>
     </div>

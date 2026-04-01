@@ -17,9 +17,6 @@ export default function InventoryPage() {
 
   if (isLoading) return <Loading />
   if (error) return <div className="container mx-auto p-4">Errore caricamento inventario</div>
-  const test =(argument: string)=> {
-    console.log(argument)
-  }
   const items = data?.items ?? []
 
   return (

@@ -148,3 +148,15 @@ export function getItalianRarity(rarity?: string): string {
   if (!rarity) return ''
   return rarityItalianNames[rarity.toLowerCase()] ?? rarity
 }
+export const abilityItalianNames: Record<string, string> = {
+  'str': 'Forza',
+  'dex': 'Destrezza',
+  'con': 'Costituzione',
+  'int': 'Intelligenza',
+  'wis': 'Saggezza',
+  'cha': 'Carisma',
+}
+export function getItalianAbility(abbr?: string): string {
+  if (!abbr) return ''
+  return abilityItalianNames[abbr.toLowerCase()] ?? abbr
+}
