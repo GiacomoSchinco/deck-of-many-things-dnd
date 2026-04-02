@@ -12,20 +12,22 @@ import Loading from '@/components/custom/Loading';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { Sparkles, BookOpen, Search, CheckCircle2, Info } from 'lucide-react';
+import { Sparkles, BookOpen, Search, CheckCircle2, Info, Lock } from 'lucide-react';
 import type { Spell } from '@/types/spell';
 import SpellDetailDialog from '@/components/custom/SpellDetailDialog';
 
 interface SpellsStepProps {
   classId: number;
-  intelligenceScore?: number; // per wizard (dimensione grimorio)
+  intelligenceScore?: number;
+  mode?: 'create' | 'edit';
+  existingSpellIds?: string[];
+  characterLevel?: number;
   onConfirm: (selectedSpellIds: string[]) => void;
   onChange?: (selectedSpellIds: string[]) => void;
   initialSelectedSpells?: string[];
   onBack: () => void;
 }
 
-// Classi che preparano: nessuna selezione di spells_known
 const PREPARER_CLASSES = ['cleric', 'druid', 'paladin'];
 
 const schoolColors: Record<string, string> = {
@@ -41,7 +43,10 @@ const schoolColors: Record<string, string> = {
 
 export function SpellsStep({
   classId,
-  intelligenceScore = 10,
+  // intelligenceScore: accettato per compatibilità ma non usato internamente
+  mode = 'create',
+  existingSpellIds = [],
+  characterLevel,
   onConfirm,
   onChange,
   initialSelectedSpells = [],
@@ -53,93 +58,76 @@ export function SpellsStep({
   const [selected, setSelected] = useState<string[]>(initialSelectedSpells);
   const [detailSpell, setDetailSpell] = useState<Spell | null>(null);
 
-  const englishClassName  = classData ? getEnglishClass(classData.name) : null;
+  const englishClassName = classData ? getEnglishClass(classData.name) : null;
   const savedLevel = useCreationStore((s) => s.data?.level ?? 1);
+  const effectiveLevel = characterLevel ?? savedLevel;
 
-  const isPreparerClass   = englishClassName ? PREPARER_CLASSES.includes(englishClassName) : false;
-  const isWizard          = englishClassName === 'wizard';
-  const hasSpellcasting   = !!classData?.spellcasting;
+  const isPreparerClass = englishClassName ? PREPARER_CLASSES.includes(englishClassName) : false;
+  const isWizard = englishClassName === 'wizard';
+  const hasSpellcasting = !!classData?.spellcasting;
 
-  const SPELLCASTING_CLASSES: SpellCastingClass[] = ['wizard','sorcerer','bard','cleric','druid','paladin','ranger','warlock'];
+  const SPELLCASTING_CLASSES: SpellCastingClass[] = [
+    'wizard', 'sorcerer', 'bard', 'cleric', 'druid', 'paladin', 'ranger', 'warlock'
+  ];
   const spellcastingClass = (englishClassName && SPELLCASTING_CLASSES.includes(englishClassName as SpellCastingClass))
     ? (englishClassName as SpellCastingClass)
     : null;
 
   const prog = spellcastingClass
-    ? getSpellProgression(spellcastingClass, savedLevel, 0)
+    ? getSpellProgression(spellcastingClass, effectiveLevel, 0)
     : null;
 
   const { data: allSpells, isLoading: spellsLoading } = useSpells(
     hasSpellcasting && englishClassName ? { class: englishClassName } : undefined,
   );
 
-  const intModifier      = Math.floor((intelligenceScore - 10) / 2);
-  const cantripsAllowed  = prog?.cantrips ?? 0;
-  const spellsAllowed    = useMemo(() => {
+  const cantripsAllowed = prog?.cantrips ?? 0;
+  const spellsAllowed = useMemo(() => {
     if (!prog) return 0;
     if (isWizard) return 0;
     return prog.spellsKnown ?? 0;
   }, [prog, isWizard]);
 
-  const hasSpellSlots = useMemo(() => {
-    if (!prog) return false;
-    if (Object.values(prog.spellSlots).some((v) => v > 0)) return true;
-    if (prog.pactMagic && prog.pactMagic.slots > 0) return true;
-    return false;
+  const wizardSpellbookSize = isWizard ? 6 : 0;
+
+  // Massimo livello di incantesimo che può essere lanciato (basato sugli slot)
+  const maxSpellLevel = useMemo(() => {
+    if (!prog) return 1;
+    let max = 0;
+    Object.keys(prog.spellSlots).forEach((lvlStr) => {
+      const lvl = Number(lvlStr);
+      if (prog.spellSlots[lvl] > 0 && lvl > max) max = lvl;
+    });
+    if (prog.pactMagic && prog.pactMagic.slots > 0) {
+      max = Math.max(max, prog.pactMagic.level);
+    }
+    return max > 0 ? max : 1;
   }, [prog]);
 
-  const { cantrips, spellsByLevel, spellsAll } = useMemo(() => {
-    if (!allSpells) return { cantrips: [] as Spell[], spellsByLevel: {} as Record<number, Spell[]>, spellsAll: [] as Spell[] };
-
-    // cantrips as before
+  const { cantrips, spellsByLevel } = useMemo(() => {
+    if (!allSpells) return { cantrips: [] as Spell[], spellsByLevel: {} as Record<number, Spell[]> };
     const cantrips = allSpells.filter((s: Spell) => s.level === 0);
-
-    // Build spells grouped by level 1..5 (we fetch/consider levels 1 to 5)
-    const spellsByLevel: Record<number, Spell[]> = {} as Record<number, Spell[]>;
-    for (let lvl = 1; lvl <= 5; lvl++) {
+    const spellsByLevel: Record<number, Spell[]> = {};
+    for (let lvl = 1; lvl <= maxSpellLevel; lvl++) {
       spellsByLevel[lvl] = allSpells.filter((s: Spell) => s.level === lvl);
     }
-
-    const spellsAll = Object.values(spellsByLevel).flat();
-
-    return { cantrips, spellsByLevel, spellsAll };
-  }, [allSpells]);
-
-  // per-level caps derived from progression (if available)
-  const perLevelCaps = useMemo(() => {
-    const caps: Record<number, number> = {};
-    if (!prog) return caps;
-    Object.entries(prog.spellSlots).forEach(([lvlStr, count]) => {
-      if (count > 0) caps[Number(lvlStr)] = count;
-    });
-    if (prog.pactMagic) {
-      const lvl = prog.pactMagic.level;
-      caps[lvl] = Math.max(caps[lvl] ?? 0, prog.pactMagic.slots);
-    }
-    return caps;
-  }, [prog]);
-
-  const highestSpellLevel = useMemo(() => {
-    if (!prog) return 1;
-    let highest = 0;
-    if (prog.pactMagic?.level) highest = Math.max(highest, prog.pactMagic.level);
-    Object.entries(prog.spellSlots).forEach(([lvlStr, count]) => {
-      if (count > 0) highest = Math.max(highest, Number(lvlStr));
-    });
-    if (highest === 0) highest = Math.min(5, Math.max(1, Math.floor(savedLevel / 2) + 1));
-    return Math.min(5, highest);
-  }, [prog, savedLevel]);
+    return { cantrips, spellsByLevel };
+  }, [allSpells, maxSpellLevel]);
 
   const selectedCantrips = selected.filter((id) => cantrips.some((c: Spell) => String(c.id) === id));
-  const selectedSpells   = selected.filter((id) => spellsAll.some((s: Spell) => String(s.id) === id));
+  const selectedSpells = selected.filter((id) =>
+    Object.values(spellsByLevel).flat().some((s: Spell) => String(s.id) === id)
+  );
 
   const filteredCantrips = cantrips.filter((s: Spell) =>
     s.name.toLowerCase().includes(searchCantrips.toLowerCase()),
   );
 
   const toggle = (spell: Spell, type: 'cantrip' | 'spell') => {
-    const idStr     = String(spell.id);
+    const idStr = String(spell.id);
     const isSelected = selected.includes(idStr);
+
+    if (mode === 'edit' && existingSpellIds.includes(idStr)) return;
 
     if (isSelected) {
       const next = selected.filter((id) => id !== idStr);
@@ -148,42 +136,35 @@ export function SpellsStep({
       return;
     }
 
-    if (type === 'cantrip' && selectedCantrips.length >= cantripsAllowed) return;
-
-    if (type === 'spell') {
-      // global cap
-      if (selectedSpells.length >= (isWizard ? Math.max(6, 6 + intModifier) : spellsAllowed)) return;
-
-      // per-level cap (if available)
-      const lvl = spell.level ?? 1;
-      const cap = perLevelCaps[lvl];
-      if (cap !== undefined) {
-        const selectedForLevel = selected.filter((id) =>
-          (spellsByLevel[lvl] ?? []).some((s) => String(s.id) === id),
-        ).length;
-        if (selectedForLevel >= cap) return;
+    if (type === 'cantrip') {
+      if (selectedCantrips.length >= cantripsAllowed) return;
+    } else {
+      if (spell.level > maxSpellLevel) return;
+      if (isWizard) {
+        if (selectedSpells.length >= wizardSpellbookSize) return;
+      } else {
+        if (selectedSpells.length >= spellsAllowed) return;
       }
     }
+
     const next = [...selected, idStr];
     setSelected(next);
     onChange?.(next);
   };
 
-  const wizardSpellbookSize = isWizard ? 6 : 0;
-
   const canProceed = useMemo(() => {
+    if (mode === 'edit') return true;
     if (!hasSpellcasting) return true;
     if (isPreparerClass) return true;
     if (cantripsAllowed > 0 && selectedCantrips.length < cantripsAllowed) return false;
-    if (spellsAllowed > 0 && selectedSpells.length < spellsAllowed) return false;
     if (isWizard && selectedSpells.length < wizardSpellbookSize) return false;
+    if (!isWizard && spellsAllowed > 0 && selectedSpells.length < spellsAllowed) return false;
     return true;
-  }, [hasSpellcasting, isPreparerClass, cantripsAllowed, spellsAllowed, isWizard, wizardSpellbookSize, selectedCantrips, selectedSpells]);
+  }, [mode, hasSpellcasting, isPreparerClass, cantripsAllowed, isWizard, wizardSpellbookSize, spellsAllowed, selectedCantrips, selectedSpells]);
 
   const isLoading = classLoading || spellsLoading;
   if (isLoading) return <Loading />;
 
-  // ── Classe senza magie ───────────────────────────────────────────────────────
   if (!hasSpellcasting) {
     return (
       <WizardStep
@@ -203,7 +184,6 @@ export function SpellsStep({
     );
   }
 
-  // ── Classi che preparano (Chierico, Druido, Paladino) ────────────────────────
   if (isPreparerClass) {
     const slotsText = prog
       ? (Object.entries(prog.spellSlots)
@@ -217,13 +197,104 @@ export function SpellsStep({
 
     return (
       <>
+        <WizardStep
+          title="Incantesimi"
+          subtitle={`${classData?.name} — Preparazione incantesimi`}
+          onBack={onBack}
+          onNext={() => onConfirm(selected)}
+          nextLabel={mode === 'edit' ? 'Salva modifiche' : undefined}
+          backLabel={mode === 'edit' ? 'Annulla' : undefined}
+        >
+          <div className="space-y-4">
+            {cantripsAllowed > 0 && (
+              <>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-500" />
+                  <Input
+                    value={searchCantrips}
+                    onChange={(e) => setSearchCantrips(e.target.value)}
+                    placeholder="Cerca trucchetti..."
+                    className="pl-9 bg-amber-50 border-amber-300"
+                  />
+                </div>
+                <SpellSection
+                  title={`Cantip — scegli ${cantripsAllowed}`}
+                  icon={<Sparkles className="w-4 h-4" />}
+                  selected={selectedCantrips}
+                  max={cantripsAllowed}
+                  spells={filteredCantrips}
+                  onToggle={(s) => toggle(s, 'cantrip')}
+                  onDetail={setDetailSpell}
+                  lockedIds={mode === 'edit' ? existingSpellIds : []}
+                />
+              </>
+            )}
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 flex gap-3">
+              <Info className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" />
+              <div className="text-sm text-blue-800">
+                <p className="font-medium mb-1">Preparazione degli incantesimi</p>
+                <p>
+                  I {classData?.name} preparano gli incantesimi dopo ogni riposo lungo,
+                  scegliendo dalla lista completa della classe. Non è necessario sceglierli ora.
+                </p>
+                {slotsText && (
+                  <p className="mt-2 font-medium">Slot al livello {effectiveLevel}: {slotsText}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </WizardStep>
+        <SpellDetailDialog spell={detailSpell} open={detailSpell !== null} onClose={() => setDetailSpell(null)} />
+      </>
+    );
+  }
+
+  return (
+    <>
       <WizardStep
         title="Incantesimi"
-        subtitle={`${classData?.name} — Preparazione incantesimi`}
+        subtitle={`${classData?.name} — Scegli i tuoi incantesimi`}
         onBack={onBack}
         onNext={() => onConfirm(selected)}
+        nextDisabled={!canProceed}
+        nextLabel={mode === 'edit' ? 'Salva modifiche' : undefined}
+        backLabel={mode === 'edit' ? 'Annulla' : undefined}
       >
-        <div className="space-y-4">
+        <div className="space-y-2 mb-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-500" />
+            <Input
+              value={searchSpells}
+              onChange={(e) => setSearchSpells(e.target.value)}
+              placeholder="Cerca incantesimo..."
+              className="pl-9 bg-amber-50 border-amber-300"
+            />
+          </div>
+          <div className="flex gap-3 text-sm flex-wrap">
+            {cantripsAllowed > 0 && (
+              <span className={cn(
+                'px-2 py-0.5 rounded-full font-medium',
+                selectedCantrips.length === cantripsAllowed
+                  ? 'bg-green-100 text-green-700'
+                  : 'bg-amber-100 text-amber-700',
+              )}>
+                Cantip: {selectedCantrips.length}/{cantripsAllowed}
+              </span>
+            )}
+            {(spellsAllowed > 0 || isWizard) && (
+              <span className={cn(
+                'px-2 py-0.5 rounded-full font-medium',
+                selectedSpells.length === (isWizard ? wizardSpellbookSize : spellsAllowed)
+                  ? 'bg-green-100 text-green-700'
+                  : 'bg-amber-100 text-amber-700',
+              )}>
+                {isWizard ? 'Grimorio' : 'Incantesimi'}: {selectedSpells.length}/{isWizard ? wizardSpellbookSize : spellsAllowed}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-6">
           {cantripsAllowed > 0 && (
             <>
               <div className="relative">
@@ -232,7 +303,7 @@ export function SpellsStep({
                   value={searchCantrips}
                   onChange={(e) => setSearchCantrips(e.target.value)}
                   placeholder="Cerca trucchetti..."
-                  className="pl-9 bg-amber-50 border-amber-300"
+                  className="pl-9 bg-amber-50 border-amber-300 mb-2"
                 />
               </div>
               <SpellSection
@@ -243,152 +314,41 @@ export function SpellsStep({
                 spells={filteredCantrips}
                 onToggle={(s) => toggle(s, 'cantrip')}
                 onDetail={setDetailSpell}
+                lockedIds={mode === 'edit' ? existingSpellIds : []}
               />
             </>
           )}
 
-          <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 flex gap-3">
-            <Info className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" />
-            <div className="text-sm text-blue-800">
-              <p className="font-medium mb-1">Preparazione degli incantesimi</p>
-              <p>
-                I {classData?.name} preparano gli incantesimi dopo ogni riposo lungo,
-                scegliendo dalla lista completa della classe. Non è necessario sceglierli ora.
-              </p>
-              {slotsText && (
-                <p className="mt-2 font-medium">Slot al livello 1: {slotsText}</p>
-              )}
+          {(spellsAllowed > 0 || isWizard) && (
+            <div className="space-y-4">
+              {Array.from({ length: maxSpellLevel }, (_, i) => i + 1).map((lvl) => {
+                const spellsForLevel = spellsByLevel[lvl]?.filter((s) =>
+                  s.name.toLowerCase().includes(searchSpells.toLowerCase()),
+                ) ?? [];
+                if (spellsForLevel.length === 0) return null;
+
+                return (
+                  <SpellSection
+                    key={`lvl-${lvl}`}
+                    title={isWizard ? `Grimorio — livello ${lvl}` : `Incantesimi livello ${lvl}`}
+                    icon={<BookOpen className="w-4 h-4" />}
+                    selected={selectedSpells}
+                    max={isWizard ? wizardSpellbookSize : spellsAllowed}
+                    spells={spellsForLevel}
+                    onToggle={(s) => toggle(s, 'spell')}
+                    onDetail={setDetailSpell}
+                    lockedIds={mode === 'edit' ? existingSpellIds : []}
+                  />
+                );
+              })}
             </div>
-          </div>
+          )}
         </div>
       </WizardStep>
-
-      <SpellDetailDialog
-        spell={detailSpell}
-        open={detailSpell !== null}
-        onClose={() => setDetailSpell(null)}
-      />
-    </>
-    );
-  }
-
-  // ── Classi con spells known (Bardo, Ranger, Stregone, Warlock, Mago) ─────────
-  return (
-    <>
-    <WizardStep
-      title="Incantesimi"
-      subtitle={`${classData?.name} — Scegli i tuoi incantesimi`}
-      onBack={onBack}
-      onNext={() => onConfirm(selected)}
-      nextDisabled={!canProceed}
-    >
-      <div className="space-y-2 mb-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-500" />
-          <Input
-            value={searchSpells}
-            onChange={(e) => setSearchSpells(e.target.value)}
-            placeholder="Cerca incantesimo..."
-            className="pl-9 bg-amber-50 border-amber-300"
-          />
-        </div>
-
-        <div className="flex gap-3 text-sm flex-wrap">
-          {cantripsAllowed > 0 && (
-            <span className={cn(
-              'px-2 py-0.5 rounded-full font-medium',
-              selectedCantrips.length === cantripsAllowed
-                ? 'bg-green-100 text-green-700'
-                : 'bg-amber-100 text-amber-700',
-            )}>
-              Cantip: {selectedCantrips.length}/{cantripsAllowed}
-            </span>
-          )}
-          {(spellsAllowed > 0 || isWizard) && (
-            <span className={cn(
-              'px-2 py-0.5 rounded-full font-medium',
-              selectedSpells.length === (isWizard ? wizardSpellbookSize : spellsAllowed)
-                ? 'bg-green-100 text-green-700'
-                : 'bg-amber-100 text-amber-700',
-            )}>
-              {isWizard ? 'Grimorio' : 'Incantesimi'}:{' '}
-              {selectedSpells.length}/{isWizard ? wizardSpellbookSize : spellsAllowed}
-            </span>
-          )}
-        </div>
-      </div>
-
-      <div className="space-y-6">
-        {cantripsAllowed > 0 && (
-          <>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-500" />
-              <Input
-                value={searchCantrips}
-                onChange={(e) => setSearchCantrips(e.target.value)}
-                placeholder="Cerca trucchetti..."
-                className="pl-9 bg-amber-50 border-amber-300 mb-2"
-              />
-            </div>
-            <SpellSection
-              title={`Cantip — scegli ${cantripsAllowed}`}
-              icon={<Sparkles className="w-4 h-4" />}
-              selected={selectedCantrips}
-              max={cantripsAllowed}
-              spells={filteredCantrips}
-              onToggle={(s) => toggle(s, 'cantrip')}
-              onDetail={setDetailSpell}
-            />
-          </>
-        )}
-
-        {(spellsAllowed > 0 || isWizard) && (
-          <div className="space-y-4">
-            {Array.from({ length: highestSpellLevel }, (_, i) => i + 1).map((lvl) => {
-              const spellsForLevel = (spellsByLevel[lvl] ?? []).filter((s) =>
-                s.name.toLowerCase().includes(searchSpells.toLowerCase()),
-              );
-
-              if (spellsForLevel.length === 0) return null;
-
-              return (
-                <SpellSection
-                  key={`lvl-${lvl}`}
-                  title={isWizard ? `Grimorio — livello ${lvl}` : `Incantesimi livello ${lvl}`}
-                  icon={<BookOpen className="w-4 h-4" />}
-                  selected={selectedSpells}
-                  max={isWizard ? wizardSpellbookSize : spellsAllowed}
-                  perLevelMax={perLevelCaps[lvl]}
-                  spells={spellsForLevel}
-                  onToggle={(s) => toggle(s, 'spell')}
-                  onDetail={setDetailSpell}
-                />
-              );
-            })}
-          </div>
-        )}
-
-        {!hasSpellSlots && prog && !isWizard && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 flex gap-2 text-sm text-amber-700">
-            <Info className="w-4 h-4 shrink-0 mt-0.5" />
-            <span>
-              I {classData?.name} ottengono gli slot incantesimo a partire dal livello 2.
-            </span>
-          </div>
-        )}
-      </div>
-    </WizardStep>
-
-      <SpellDetailDialog
-        spell={detailSpell}
-        open={detailSpell !== null}
-        onClose={() => setDetailSpell(null)}
-      />
+      <SpellDetailDialog spell={detailSpell} open={detailSpell !== null} onClose={() => setDetailSpell(null)} />
     </>
   );
 }
-
-// ─── Sub-component: griglia spell selezionabile ───────────────────────────────
 
 interface SpellSectionProps {
   title: string;
@@ -396,12 +356,21 @@ interface SpellSectionProps {
   spells: Spell[];
   selected: string[];
   max: number;
-  perLevelMax?: number;
+  lockedIds?: string[];
   onToggle: (spell: Spell) => void;
   onDetail: (spell: Spell) => void;
 }
 
-function SpellSection({ title, icon, spells, selected, max, perLevelMax, onToggle, onDetail }: SpellSectionProps) {
+function SpellSection({
+  title,
+  icon,
+  spells,
+  selected,
+  max,
+  lockedIds = [],
+  onToggle,
+  onDetail,
+}: SpellSectionProps) {
   return (
     <div>
       <h3 className="flex items-center gap-2 font-serif text-amber-800 font-medium mb-2">
@@ -413,32 +382,41 @@ function SpellSection({ title, icon, spells, selected, max, perLevelMax, onToggl
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-72 overflow-y-auto pr-1">
           {spells.map((spell) => {
-            const idStr      = String(spell.id);
+            const idStr = String(spell.id);
             const isSelected = selected.includes(idStr);
-            const selectedInThisSection = selected.filter((id) => spells.some((s) => String(s.id) === id)).length;
-            const isDisabled = !isSelected && (perLevelMax !== undefined ? selectedInThisSection >= perLevelMax : selected.length >= max);
+            const isLocked = lockedIds.includes(idStr);
+            const selectedInSection = selected.filter((id) =>
+              spells.some((s) => String(s.id) === id)
+            ).length;
+            const isDisabled = isLocked || (!isSelected && selectedInSection >= max);
 
             return (
               <button
                 key={spell.id}
                 type="button"
-                onClick={() => onToggle(spell)}
-                disabled={isDisabled}
+                onClick={() => !isLocked && onToggle(spell)}
+                disabled={isDisabled && !isLocked}
+                title={isLocked ? 'Incantesimo già conosciuto — rimuovilo dalla scheda del personaggio' : undefined}
                 className={cn(
                   'flex items-start gap-2 p-2 rounded-lg border text-left transition-all',
-                  isSelected
+                  isSelected && isLocked
+                    ? 'border-amber-300 bg-amber-50/50 text-amber-700 cursor-default'
+                    : isSelected
                     ? 'border-amber-500 bg-amber-50 text-amber-900'
                     : isDisabled
                     ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
                     : 'border-amber-200 hover:border-amber-400 hover:bg-amber-50/50 text-amber-800',
                 )}
               >
-                <CheckCircle2
-                  className={cn(
-                    'w-4 h-4 mt-0.5 shrink-0',
-                    isSelected ? 'text-amber-600' : 'text-gray-300',
-                  )}
-                />
+                {isLocked
+                  ? <Lock className="w-4 h-4 mt-0.5 shrink-0 text-amber-400" />
+                  : <CheckCircle2
+                      className={cn(
+                        'w-4 h-4 mt-0.5 shrink-0',
+                        isSelected ? 'text-amber-600' : 'text-gray-300',
+                      )}
+                    />
+                }
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium truncate">{spell.name}</p>
                   <div className="flex items-center gap-1 mt-0.5 flex-wrap">

@@ -3,6 +3,7 @@
 
 import { useState, useMemo } from 'react';
 import { useSpells } from '@/hooks/queries/useSpells';
+import { useCharacterSpells } from '@/hooks/queries/useSpells';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -14,7 +15,11 @@ import type { Spell } from '@/types/spell';
 import SpellDetailDialog from '@/components/custom/SpellDetailDialog';
 
 interface LevelUpSpellsStepProps {
-  character: Record<string, unknown>;
+  character: {
+    id?: string;
+    classes?: { name: string };
+    spells_known?: Array<{ spell_id: number }>;
+  };
   currentLevel: number;
   newLevel: number;
   changes: {
@@ -24,9 +29,12 @@ interface LevelUpSpellsStepProps {
       newSpellsPreparable: number;
       newSpellSlots: Record<number, number>;
     };
-    newSpellProgression: unknown;
+    newSpellProgression: {
+      spellSlots?: Record<number, number>;
+      pactMagic?: { slots: number; level: number };
+    };
   };
-  data: Record<string, unknown>;
+  data: { newSpells?: string[] };
   onNext: (data: { newSpells: string[] }) => void;
   onBack: () => void;
   isLast: boolean;
@@ -43,9 +51,12 @@ const schoolColors: Record<string, string> = {
   transmutation: 'bg-green-100 text-green-700',
 };
 
+// Classi che preparano (non selezionano incantesimi al level up)
+const PREPARER_CLASSES = ['cleric', 'druid', 'paladin', 'wizard'];
+
 export default function LevelUpSpellsStep({
   character,
-  // currentLevel is part of the standard step interface but not needed here
+  // currentLevel unused — kept in props interface for callers
   newLevel,
   changes,
   data,
@@ -54,26 +65,40 @@ export default function LevelUpSpellsStep({
   isLast,
 }: LevelUpSpellsStepProps) {
   const [search, setSearch] = useState('');
-  const [selectedSpells, setSelectedSpells] = useState<string[]>((data.newSpells as string[] | undefined) || []);
+  const [selectedSpells, setSelectedSpells] = useState<string[]>(data.newSpells || []);
   const [detailSpell, setDetailSpell] = useState<Spell | null>(null);
 
-  const className = (character.classes as Record<string, unknown> | undefined)?.name as string | undefined;
-  const isPreparer = ['cleric', 'druid', 'paladin'].includes(className ?? '');
+  const className = character.classes?.name?.toLowerCase();
+  const isPreparer = className ? PREPARER_CLASSES.includes(className) : false;
+  const isWizard = className === 'wizard';
 
-  // Ottieni gli incantesimi disponibili per la classe
-  const { data: allSpells } = useSpells({ class: className });
+  // Per il mago, recupera gli incantesimi già nel grimorio
+  const { data: existingSpells } = useCharacterSpells(isWizard ? character.id ?? null : null);
+  const existingSpellIds = (existingSpells ?? []).map((sk: { spell_id: number }) => String(sk.spell_id));
+
+  // Ottieni gli incantesimi disponibili per la classe (solo per classi che conoscono)
+  const { data: allSpells } = useSpells(
+    !isPreparer && className ? { class: className } : undefined
+  );
 
   // Determina quali livelli di incantesimi sono disponibili al nuovo livello
   const availableLevels = useMemo(() => {
     const levels = new Set<number>();
-    const slots = changes.spellChanges.newSpellSlots;
     
+    // Slot normali
+    const slots = changes.spellChanges.newSpellSlots;
     Object.entries(slots).forEach(([level, count]) => {
       if (count > 0) levels.add(parseInt(level));
     });
     
+    // Pact magic (Warlock)
+    const pactMagic = changes.newSpellProgression?.pactMagic;
+    if (pactMagic && pactMagic.slots > 0) {
+      levels.add(pactMagic.level);
+    }
+    
     return Array.from(levels).sort((a, b) => a - b);
-  }, [changes.spellChanges.newSpellSlots]);
+  }, [changes.spellChanges.newSpellSlots, changes.newSpellProgression]);
 
   // Filtra gli incantesimi per livello e ricerca
   const spellsByLevel = useMemo(() => {
@@ -84,7 +109,6 @@ export default function LevelUpSpellsStep({
       s.name.toLowerCase().includes(search.toLowerCase())
     );
 
-    // Raggruppa per livello
     const grouped: Record<number, Spell[]> = {};
     spells.forEach((spell: Spell) => {
       if (!grouped[spell.level]) grouped[spell.level] = [];
@@ -93,9 +117,6 @@ export default function LevelUpSpellsStep({
 
     return grouped;
   }, [allSpells, availableLevels, search]);
-
-  // Incantesimi già conosciuti (per evitare di selezionarli di nuovo)
-  const existingSpellIds = (character.spells_known as Array<{ spell_id: number }> | undefined)?.map(s => String(s.spell_id)) || [];
 
   const toggleSpell = (spell: Spell) => {
     const id = String(spell.id);
@@ -113,14 +134,53 @@ export default function LevelUpSpellsStep({
 
   const canProceed = () => {
     if (isPreparer) return true;
-    if (changes.spellChanges.newCantrips > 0) return true; // TODO: gestire selezione cantrip
+    if (changes.spellChanges.newCantrips > 0) return true;
     return selectedSpells.length === changes.spellChanges.newSpellsKnown;
   };
 
-  // Nuovi slot sbloccati
+  // Nuovi slot sbloccati (formattazione migliorata)
   const newSlots = Object.entries(changes.spellChanges.newSpellSlots)
     .filter(([, count]) => count > 0)
-    .map(([level, count]) => `${count} slot di ${level}° livello`);
+    .map(([level, count]) => {
+      const levelNum = parseInt(level);
+      return `${count} slot di ${levelNum}° livello`;
+    });
+
+  // Aggiungi slot patto per Warlock
+  const pactMagic = changes.newSpellProgression?.pactMagic;
+  if (pactMagic && pactMagic.slots > 0) {
+    newSlots.push(`${pactMagic.slots} slot di ${pactMagic.level}° livello (Pact Magic)`);
+  }
+
+  // Se non ci sono cambiamenti, mostra solo messaggio
+  if (changes.spellChanges.newCantrips === 0 && 
+      changes.spellChanges.newSpellsKnown === 0 && 
+      changes.spellChanges.newSpellsPreparable === 0 &&
+      newSlots.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center p-3 bg-amber-100 rounded-full mb-4">
+            <BookOpen className="w-8 h-8 text-amber-700" />
+          </div>
+          <h2 className="text-xl font-serif font-bold text-amber-900">
+            Incantesimi
+          </h2>
+          <p className="text-amber-600 text-sm mt-1">
+            Al livello {newLevel} non ottieni nuovi incantesimi o slot.
+          </p>
+        </div>
+        <div className="flex justify-between pt-4 border-t border-amber-200">
+          <Button variant="outline" onClick={onBack} className="border-amber-600 text-amber-700">
+            Indietro
+          </Button>
+          <Button onClick={() => onNext({ newSpells: selectedSpells })} className="bg-amber-700 hover:bg-amber-800 text-white">
+            {isLast ? 'Conferma' : 'Avanti'}
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -134,7 +194,7 @@ export default function LevelUpSpellsStep({
           </h2>
           <p className="text-amber-600 text-sm mt-1">
             {isPreparer 
-              ? 'Puoi preparare nuovi incantesimi dalla lista della tua classe'
+              ? `Al livello ${newLevel} puoi preparare più incantesimi`
               : `Scegli ${changes.spellChanges.newSpellsKnown} nuovi incantesimi da imparare`
             }
           </p>
@@ -166,7 +226,6 @@ export default function LevelUpSpellsStep({
             </h3>
             <p className="text-sm text-amber-600">
               Al livello {newLevel} impari {changes.spellChanges.newCantrips} nuovo trucchetto.
-              (Selezione in sviluppo)
             </p>
           </div>
         )}
@@ -276,7 +335,20 @@ export default function LevelUpSpellsStep({
           <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
             <p className="text-sm text-blue-800">
               🔮 Al livello {newLevel} puoi preparare {changes.spellChanges.newSpellsPreparable} incantesimi in più.
-              Puoi modificare la tua lista di incantesimi preparati nella scheda del personaggio.
+              {isWizard && (
+                <span className="block mt-1 text-xs text-blue-600">
+                  Puoi anche aggiungere nuovi incantesimi al tuo grimorio dalla sezione &quot;Gestisci Incantesimi&quot;.
+                </span>
+              )}
+            </p>
+          </div>
+        )}
+
+        {/* Messaggio per classi che non hanno cambiamenti significativi */}
+        {!isPreparer && changes.spellChanges.newSpellsKnown === 0 && changes.spellChanges.newCantrips === 0 && (
+          <div className="bg-amber-50/50 rounded-lg p-4 border border-amber-200 text-center">
+            <p className="text-sm text-amber-700">
+              Al livello {newLevel} non impari nuovi incantesimi.
             </p>
           </div>
         )}

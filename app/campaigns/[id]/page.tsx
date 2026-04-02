@@ -23,6 +23,7 @@ type CampaignCharacter = {
     combat_stats?: {
         current_hp: number;
         max_hp: number;
+        temp_hp: number;
     };
 };
 
@@ -120,6 +121,9 @@ export default function CampaignPage() {
                                     name={character.name}
                                     race={raceName}
                                     characterClass={className}
+                                    currentHp={character.combat_stats?.current_hp}
+                                    maxHp={character.combat_stats?.max_hp}
+                                    tempHp={character.combat_stats?.temp_hp}
                                     level={character.level || 1}
                                     background={character.background || '-'}
                                     alignment={character.alignment || 'Neutrale'}

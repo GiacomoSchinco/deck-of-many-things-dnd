@@ -78,10 +78,10 @@ export async function POST(request: Request) {
       name: body.name,
       class_id: body.class_id,
       description: body.description || null,
-      items: body.items,
-      choices: body.choices || [],
+      items: body.items as unknown as import('@/lib/supabase/types').Json,
+      choices: (body.choices || []) as unknown as import('@/lib/supabase/types').Json,
       is_default: body.is_default || false
-    })
+    } as any)
     .select()
     .single()
 

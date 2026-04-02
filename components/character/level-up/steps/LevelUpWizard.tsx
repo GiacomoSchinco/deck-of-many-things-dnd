@@ -107,7 +107,8 @@ export default function LevelUpWizard({ characterId, currentLevel, onComplete }:
     { id: 'summary', label: 'Riepilogo', component: LevelUpSummaryStep, condition: true },
   ].filter(step => step.condition);
 
-  const currentStep = steps[step];
+  const currentStep = steps[step] ?? steps[steps.length - 1];
+  if (!currentStep) return <Loading />;
   const CurrentComponent = currentStep.component;
   const progress = ((step + 1) / steps.length) * 100;
 

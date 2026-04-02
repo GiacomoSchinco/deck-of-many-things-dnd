@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TrendingUp, Sparkles } from 'lucide-react';
-import { ABILITY_LIST_ICONS } from '@/lib/utils/nameMappers';
+import { ABILITY_LIST_ICONS, getItalianAbilityFull } from '@/lib/utils/nameMappers';
 
 interface LevelUpASIStepProps {
   character: { ability_scores?: Record<string, number> };
@@ -22,7 +22,6 @@ interface LevelUpASIStepProps {
 
 export default function LevelUpASIStep({
   character,
-  // currentLevel, newLevel, changes are part of the standard step interface
   data,
   onNext,
   onBack,
@@ -69,9 +68,17 @@ export default function LevelUpASIStep({
     } else {
       onNext({
         asiType: 'feat',
-        featId: null, // da implementare con selezione talenti
+        featId: null,
       });
     }
+  };
+
+  // Formatta il testo per il valore selezionato nel SelectTrigger
+  const formatSelectValue = (statId: string) => {
+    const current = currentStats[statId] || 10;
+    const newValue = getNewValue(statId);
+    const stat = ABILITY_LIST_ICONS.find(s => s.id === statId);
+    return `${stat?.icon || '📊'} ${getItalianAbilityFull(statId)} (${current} → ${newValue})`;
   };
 
   return (
@@ -139,14 +146,17 @@ export default function LevelUpASIStep({
               <Label>Caratteristica principale</Label>
               <Select value={selectedStat} onValueChange={(v) => v && setSelectedStat(v)}>
                 <SelectTrigger className="mt-1">
-                  <SelectValue />
+                  <SelectValue>{formatSelectValue(selectedStat)}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {ABILITY_LIST_ICONS.map(stat => (
                     <SelectItem key={stat.id} value={stat.id}>
                       <span className="flex items-center gap-2">
                         <span>{stat.icon}</span>
-                        {stat.label} ({currentStats[stat.id] || 10} → {getNewValue(stat.id)})
+                        <span>{getItalianAbilityFull(stat.id)}</span>
+                        <span className="text-amber-600 text-xs ml-2">
+                          ({currentStats[stat.id] || 10} → {getNewValue(stat.id)})
+                        </span>
                       </span>
                     </SelectItem>
                   ))}
@@ -159,7 +169,7 @@ export default function LevelUpASIStep({
                 <Label>Seconda caratteristica</Label>
                 <Select value={secondStat} onValueChange={(v) => v && setSecondStat(v)}>
                   <SelectTrigger className="mt-1">
-                    <SelectValue />
+                    <SelectValue>{formatSelectValue(secondStat)}</SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {ABILITY_LIST_ICONS
@@ -168,7 +178,10 @@ export default function LevelUpASIStep({
                         <SelectItem key={stat.id} value={stat.id}>
                           <span className="flex items-center gap-2">
                             <span>{stat.icon}</span>
-                            {stat.label} ({currentStats[stat.id] || 10} → {getNewValue(stat.id)})
+                            <span>{getItalianAbilityFull(stat.id)}</span>
+                            <span className="text-amber-600 text-xs ml-2">
+                              ({currentStats[stat.id] || 10} → {getNewValue(stat.id)})
+                            </span>
                           </span>
                         </SelectItem>
                       ))}

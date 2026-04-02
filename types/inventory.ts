@@ -11,7 +11,7 @@ export interface InventoryItem {
   notes?: string | null
   value: number
   currency?: string | null
-  properties: Record<string, unknown>
+  properties: Record<string, unknown> | null
   created_at: string
 }
 

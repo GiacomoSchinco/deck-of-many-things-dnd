@@ -685,6 +685,42 @@ export type Database = {
           },
         ]
       }
+      prepared_spells: {
+        Row: {
+          character_id: string | null
+          created_at: string | null
+          id: string
+          spell_id: number | null
+        }
+        Insert: {
+          character_id?: string | null
+          created_at?: string | null
+          id?: string
+          spell_id?: number | null
+        }
+        Update: {
+          character_id?: string | null
+          created_at?: string | null
+          id?: string
+          spell_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prepared_spells_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "characters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prepared_spells_spell_id_fkey"
+            columns: ["spell_id"]
+            isOneToOne: false
+            referencedRelation: "spells"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string | null

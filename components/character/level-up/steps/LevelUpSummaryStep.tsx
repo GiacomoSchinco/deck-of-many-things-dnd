@@ -103,10 +103,10 @@ export default function LevelUpSummaryStep({
             </div>
             <div className="text-sm">
               {Object.entries(changes.spellChanges.newSpellSlots)
-                .filter(([_, count]) => count > 0)
+                .filter(([_, count]) => (count as number) > 0)
                 .map(([level, count]) => (
                   <span key={level} className="inline-block mr-2">
-                    {count} slot di {level}° livello
+                    {count as number} slot di {level}° livello
                   </span>
                 ))}
             </div>

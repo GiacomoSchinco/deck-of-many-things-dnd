@@ -74,8 +74,8 @@ export async function POST(request: Request) {
 
     // 5. Verifica che raceId e classId esistano
     const [{ error: raceErr }, { error: classErr }] = await Promise.all([
-      supabase.from('races').select('id').eq('id', body.raceId).single(),
-      supabase.from('classes').select('id').eq('id', body.classId).single(),
+      supabase.from('races').select('id').eq('id', body.raceId as number).single(),
+      supabase.from('classes').select('id').eq('id', body.classId as number).single(),
     ])
     if (raceErr) {
       return NextResponse.json({ error: 'Razza non valida' }, { status: 400 })
@@ -98,7 +98,7 @@ export async function POST(request: Request) {
         experience: body.experience || 0,
         background: body.background || null,
         alignment: body.alignment || null,
-      })
+      } as any)
       .select()
       .single()
 
@@ -139,7 +139,7 @@ export async function POST(request: Request) {
           initiative_bonus: cs.initiative_bonus ?? 0,
           speed:            cs.speed            ?? 30,
           inspiration:      cs.inspiration      ?? false,
-        })
+        } as any)
 
       if (combatError) throw combatError
     }

@@ -1,5 +1,6 @@
 // hooks/queries/useSpells.ts
 import { useQuery } from '@tanstack/react-query';
+import type { PreparedSpell } from '@/types/spell';
 
 export function useSpells(filters?: { class?: string; level?: string | number; school?: string; search?: string }) {
   const params = new URLSearchParams()
@@ -50,6 +51,18 @@ export function useCharacterSpellSlots(characterId: string | null) {
       const res = await fetch(`/api/characters/${characterId}/spell-slots`)
       if (!res.ok) throw new Error('Errore caricamento slot incantesimi')
       return res.json()
+    },
+    enabled: !!characterId,
+  })
+}
+
+export function useCharacterPreparedSpells(characterId: string | null) {
+  return useQuery({
+    queryKey: ['character', characterId, 'prepared-spells'],
+    queryFn: async () => {
+      const res = await fetch(`/api/characters/${characterId}/prepared-spells`)
+      if (!res.ok) throw new Error('Errore caricamento incantesimi preparati')
+      return res.json() as Promise<PreparedSpell[]>
     },
     enabled: !!characterId,
   })

@@ -16,7 +16,12 @@ export async function GET(
     .select(`
       *,
       races:race_id (name),
-      classes:class_id (name)
+      classes:class_id (name),
+      combat_stats!inner (
+        current_hp,
+        max_hp,
+        temp_hp
+      )
     `)
     .eq('campaign_id', id)
     .order('name')

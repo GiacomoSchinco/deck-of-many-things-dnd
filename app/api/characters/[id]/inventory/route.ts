@@ -225,7 +225,7 @@ export async function POST(
       if (validRows.length > 0) {
         const { data, error } = await supabase
           .from('inventory')
-          .insert(validRows)
+          .insert(validRows as any)
           .select()
 
         if (error) {

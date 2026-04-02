@@ -111,6 +111,14 @@ export interface SpellKnown {
 // SLOT INCANTESIMI
 // ===========================================
 
+export interface PreparedSpell {
+  id: string;
+  character_id: string;
+  spell_id: number;
+  created_at?: string;
+  spell?: Spell;
+}
+
 export interface SpellSlot {
   character_id: string;                     // UUID del personaggio
   spell_level: number;                       // Livello slot (1-9)

@@ -53,7 +53,7 @@ export async function PUT(
       .eq('id', parseInt(id))
       .single()
 
-    if (current) {
+  if (current && current.class_id != null) {
       await supabase
         .from('equipment_presets')
         .update({ is_default: false })
@@ -68,8 +68,8 @@ export async function PUT(
       name: body.name,
       class_id: body.class_id,
       description: body.description,
-      items: body.items,
-      choices: body.choices,
+      items: body.items as unknown as import('@/lib/supabase/types').Json,
+      choices: body.choices as unknown as import('@/lib/supabase/types').Json,
       is_default: body.is_default
     })
     .eq('id', parseInt(id))

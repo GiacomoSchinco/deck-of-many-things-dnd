@@ -2,6 +2,9 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { createServerSupabase } from '@/lib/supabase/server'
 import type { UpdateInventoryItemDTO } from '@/types/inventory'
+import type { Database } from '@/lib/supabase/types'
+
+type InventoryUpdate = Database['public']['Tables']['inventory']['Update']
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string; invId: string }> }) {
   const cookieStore = await cookies()
@@ -44,7 +47,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
   const { data, error } = await supabase
     .from('inventory')
-    .update(payload)
+    .update(payload as unknown as InventoryUpdate)
     .eq('character_id', id)
     .eq('id', invId)
     .select()

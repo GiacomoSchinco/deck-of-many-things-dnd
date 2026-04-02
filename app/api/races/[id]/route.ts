@@ -14,7 +14,7 @@ export async function GET(
   const { data: race, error } = await supabase
     .from('races')
     .select('*')
-    .eq('id', id)
+    .eq('id', parseInt(id))
     .single()
 
   if (error) {

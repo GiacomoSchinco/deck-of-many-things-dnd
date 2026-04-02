@@ -109,3 +109,49 @@ export function useCharacterSpellMutations() {
     initSlots: useInitSpellSlots(),
   }
 }
+
+// ── Incantesimi preparati ────────────────────────────────────────────────────
+
+type PreparedSpellsPayload = { characterId: string; spellIds: number[] }
+
+export function useAddPreparedSpells() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ characterId, spellIds }: PreparedSpellsPayload) => {
+      const res = await fetch(`/api/characters/${characterId}/prepared-spells`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ spell_ids: spellIds }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || 'Errore salvataggio incantesimi preparati')
+      }
+      return res.json()
+    },
+    onSuccess: (_data, { characterId }) => {
+      queryClient.invalidateQueries({ queryKey: ['character', characterId, 'prepared-spells'] })
+    },
+  })
+}
+
+export function useRemovePreparedSpells() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ characterId, spellIds }: PreparedSpellsPayload) => {
+      const res = await fetch(`/api/characters/${characterId}/prepared-spells`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ spell_ids: spellIds }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || 'Errore rimozione incantesimi preparati')
+      }
+      return res.json()
+    },
+    onSuccess: (_data, { characterId }) => {
+      queryClient.invalidateQueries({ queryKey: ['character', characterId, 'prepared-spells'] })
+    },
+  })
+}

@@ -34,7 +34,7 @@ export default function InventoryPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {items.map((it) => (
-            <ItemCard key={it.id} item={it as unknown as Item} showActions onEdit={() => test(it.id)}/>
+            <ItemCard key={it.id} item={it as unknown as Item} showActions />
           ))}
         </div>
       )}
