@@ -23,6 +23,7 @@ import type { ProficiencyType } from '@/types/character'
 import { getItalianAbilityFull, getEnglishClass } from '@/lib/utils/nameMappers'
 import { CharacterLevelBadge } from '@/components/custom/CharacterLevelBadge'
 import  HpBar from '@/components/custom/HpBar'
+import { PageWrapper } from '@/components/layout/PageWrapper'
 
 export default function CharacterPage() {
   const params = useParams()
@@ -62,43 +63,34 @@ export default function CharacterPage() {
         skillsMap.set(Number(skill.skill_id), skill.proficiency_type)
       })
   return (
-    <div className="container mx-auto p-4 md:p-6 space-y-6">
-{/* Header */}
-<div className="flex flex-col md:flex-row justify-between items-center gap-4">
-  <div className="flex flex-wrap items-baseline gap-2">
-    <h1 className="text-4xl font-serif font-bold text-amber-900">
-      {character.name}
-    </h1>
-    <CharacterLevelBadge level={character.level} size="sm" showLabel={false}   className="inline-flex align-middle"/>
-  </div>
-
-  <div className="flex flex-wrap justify-center gap-2">
-    <Link href={`/characters/${characterId}/edit`}>
-      <Button variant="outline" size="sm">
-        Modifica
-      </Button>
-    </Link>
-    <Link href={`/characters/${characterId}/spells`}>
-      <Button variant="outline" size="sm">
-        <Scroll className="w-4 h-4 mr-2" />
-        Incantesimi
-      </Button>
-    </Link>
-    <Link href={`/characters/${characterId}/inventory`}>
-      <Button variant="outline" size="sm">
-        <Package className="w-4 h-4 mr-2" />
-        Inventario
-      </Button>
-    </Link>
-    <Link href={`/characters/${characterId}/level-up`}>
-      <Button variant="outline" size="sm">
-        <Zap className="w-4 h-4 mr-2" />
-        Level Up
-      </Button>
-    </Link>
-  </div>
-</div>
-
+    <PageWrapper
+      withContainer={false}
+      title={character.name}
+      subtitle={`${character.races?.name ?? ''} · ${character.classes?.name ?? ''} · Livello ${character.level}`}
+      action={
+        <div className="flex flex-wrap justify-center gap-2">
+          <Link href={`/characters/${characterId}/edit`}>
+            <Button variant="outline" size="sm">Modifica</Button>
+          </Link>
+          <Link href={`/characters/${characterId}/spells`}>
+            <Button variant="outline" size="sm">
+              <Scroll className="w-4 h-4 mr-2" />Incantesimi
+            </Button>
+          </Link>
+          <Link href={`/characters/${characterId}/inventory`}>
+            <Button variant="outline" size="sm">
+              <Package className="w-4 h-4 mr-2" />Inventario
+            </Button>
+          </Link>
+          <Link href={`/characters/${characterId}/level-up`}>
+            <Button variant="outline" size="sm">
+              <Zap className="w-4 h-4 mr-2" />Level Up
+            </Button>
+          </Link>
+        </div>
+      }
+    >
+    <div className="not-prose space-y-6">
       {/* Razza e Classe */}
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <FanCardGroup size="md" spread="normal" noWrapper>
@@ -228,5 +220,6 @@ export default function CharacterPage() {
         </TabsContent>
       </Tabs>
     </div>
+    </PageWrapper>
   )
 }

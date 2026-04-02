@@ -17,6 +17,7 @@ import type { User } from '@supabase/supabase-js';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import Loading from '@/components/custom/Loading';
 import { useMyRecentCharacters } from '@/hooks/queries/useCharacter';
+import { PageWrapper } from '@/components/layout/PageWrapper';
 
 type DashboardCharacter = {
   id: string;
@@ -74,34 +75,22 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        {/* Header con benvenuto */}
-        <div className="flex justify-between items-center mb-8">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-amber-200 rounded-full border-2 border-amber-700 flex items-center justify-center">
-              <UserIcon className="w-6 h-6 text-amber-700" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-serif font-bold text-amber-900">
-                Bentornato, {user.email?.split('@')[0] || 'Avventuriero'}
-              </h1>
-              <p className="text-amber-600 text-sm">
-                Il tuo grimorio personale ti aspetta
-              </p>
-            </div>
-          </div>
-
-          <Button
-            onClick={handleLogout}
-            variant="outline"
-            className="border-amber-700 text-amber-700 hover:bg-amber-100"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Esci
-          </Button>
-        </div>
-
+    <PageWrapper
+      withContainer={false}
+      title={`Bentornato, ${user.email?.split('@')[0] || 'Avventuriero'}`}
+      subtitle="Il tuo grimorio personale ti aspetta"
+      action={
+        <Button
+          onClick={handleLogout}
+          variant="outline"
+          className="border-amber-700 text-amber-700 hover:bg-amber-100"
+        >
+          <LogOut className="w-4 h-4 mr-2" />
+          Esci
+        </Button>
+      }
+    >
+      <div className="not-prose space-y-6">
         {/* Statistiche rapide e azioni */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Area account */}
@@ -221,6 +210,6 @@ export default function DashboardPage() {
           </p>
         </div>
       </div>
-    </div>
+    </PageWrapper>
   );
 }

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Sparkles } from 'lucide-react';
 import AncientContainer from '@/components/custom/AncientContainer';
 import LevelUpWizard from '@/components/character/level-up/steps/LevelUpWizard';
+import { PageWrapper } from '@/components/layout/PageWrapper';
 
 export default function LevelUpPage() {
   const params = useParams();
@@ -20,8 +21,12 @@ export default function LevelUpPage() {
   if (!character) return <div>Personaggio non trovato</div>;
 
   return (
-    <div className="container mx-auto p-4 md:p-6 max-w-4xl">
-      <div className="mb-4">
+    <PageWrapper
+      withContainer={false}
+      title={`Level Up: ${character.name}`}
+      subtitle={`Da livello ${character.level} a livello ${character.level + 1}`}
+      centerHeader
+      action={
         <Button
           variant="ghost"
           onClick={() => router.back()}
@@ -30,19 +35,15 @@ export default function LevelUpPage() {
           <ArrowLeft className="w-4 h-4 mr-2" />
           Torna al personaggio
         </Button>
-      </div>
-
-      <AncientContainer
-        title={`Level Up: ${character.name}`}
-        subtitle={`Da livello ${character.level} a livello ${character.level + 1}`}
-        icon={Sparkles}
-      >
+      }
+    >
+      <div className="not-prose max-w-2xl mx-auto space-y-6">
         <LevelUpWizard
           characterId={characterId}
           currentLevel={character.level}
           onComplete={() => router.push(`/characters/${characterId}`)}
         />
-      </AncientContainer>
-    </div>
+      </div>
+    </PageWrapper>
   );
 }

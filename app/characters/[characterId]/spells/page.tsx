@@ -11,6 +11,7 @@ import Loading from '@/components/custom/Loading';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AncientScroll } from '@/components/custom/AncientScroll';
+import { PageWrapper } from '@/components/layout/PageWrapper';
 
 export default function SpellPage() {
   const params = useParams();
@@ -38,14 +39,12 @@ export default function SpellPage() {
   if (isLoading) return <Loading />;
 
   return (
-    <div className="container mx-auto p-4 md:p-6 space-y-6">
-      <div>
-        <h1 className="text-4xl font-serif font-bold text-amber-900">Magie</h1>
-        <p className="text-amber-700 mt-1">
-          Gestisci le magie conosciute e preparate del tuo personaggio.
-        </p>
-      </div>
-
+    <PageWrapper
+      withContainer={false}
+      title="Magie"
+      subtitle="Gestisci le magie conosciute e preparate del tuo personaggio."
+    >
+      <div className="not-prose">
       <Tabs defaultValue="known" className="space-y-4">
         <TabsList className="bg-amber-100/50 border border-amber-200">
           <TabsTrigger value="known">📖 Incantesimi Conosciuti</TabsTrigger>
@@ -83,6 +82,7 @@ export default function SpellPage() {
           </TabsContent>
         )}
       </Tabs>
-    </div>
+      </div>
+    </PageWrapper>
   );
 }

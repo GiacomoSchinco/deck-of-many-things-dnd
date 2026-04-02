@@ -14,6 +14,7 @@ import { SkillsStep } from './steps/SkillsStep';
 import { SpellsStep } from './steps/SpellsStep';
 import Loading from '@/components/custom/Loading';
 import type { Race } from '@/types/race';
+import { PageWrapper } from '@/components/layout/PageWrapper';
 
 export function CreationWizard() {
   const {
@@ -167,16 +168,17 @@ export function CreationWizard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-parchment-100 to-parchment-200 p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-serif text-amber-900 mb-6 text-center">
-          Creazione Personaggio
-        </h1>
-
+    <PageWrapper
+      withContainer={false}
+      title="Creazione Personaggio"
+      subtitle="Segui i passi per dare vita al tuo eroe"
+      centerHeader
+    >
+      <div className="not-prose max-w-2xl mx-auto space-y-6">
         {!isHydrated ? (
           <Loading />
         ) : (
-          <div className="max-w-2xl mx-auto space-y-6">
+          <>
             {/* Progress bar */}
             <div className="h-2 bg-amber-200 rounded-full">
               <div
@@ -195,12 +197,12 @@ export function CreationWizard() {
             </div>
 
             {/* Step content */}
-            <div className="bg-parchment-100 rounded-lg p-6 shadow-xl border-2 border-amber-900/30">
+            <div>
               {renderStep()}
             </div>
-          </div>
+          </>
         )}
       </div>
-    </div>
+    </PageWrapper>
   );
 }

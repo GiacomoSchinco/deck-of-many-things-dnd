@@ -11,6 +11,7 @@ import { Scroll, Package, Zap, Heart, Shield, Footprints, Zap as InitiativeIcon 
 import Link from 'next/link'
 import { useCharacter } from '@/hooks/queries/useCharacter'
 import Loading from '@/components/custom/Loading'
+import { PageWrapper } from '@/components/layout/PageWrapper'
 
 export default function CharacterPage() {
   const params = useParams()
@@ -39,40 +40,31 @@ export default function CharacterPage() {
   const initiative = character.combat_stats?.initiative_bonus ?? 0
 
   return (
-    <div className="container mx-auto p-4 md:p-6 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-4xl font-serif font-bold text-amber-900">
-            {character.name}
-          </h1>
-          <p className="text-amber-700">
-            {character.races?.name} · {character.classes?.name} · Livello {character.level}
-          </p>
-        </div>
-        
+    <PageWrapper
+      withContainer={false}
+      title={character.name}
+      subtitle={`${character.races?.name ?? ''} · ${character.classes?.name ?? ''} · Livello ${character.level}`}
+      action={
         <div className="flex gap-2">
           <Link href={`/characters/${characterId}/spells`}>
             <Button variant="outline" size="sm">
-              <Scroll className="w-4 h-4 mr-2" />
-              Incantesimi
+              <Scroll className="w-4 h-4 mr-2" />Incantesimi
             </Button>
           </Link>
           <Link href={`/characters/${characterId}/inventory`}>
             <Button variant="outline" size="sm">
-              <Package className="w-4 h-4 mr-2" />
-              Inventario
+              <Package className="w-4 h-4 mr-2" />Inventario
             </Button>
           </Link>
           <Link href={`/characters/${characterId}/level-up`}>
             <Button variant="outline" size="sm">
-              <Zap className="w-4 h-4 mr-2" />
-              Level Up
+              <Zap className="w-4 h-4 mr-2" />Level Up
             </Button>
           </Link>
         </div>
-      </div>
-
+      }
+    >
+    <div className="not-prose space-y-6">
       {/* Combat Stats in alto */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <AncientCardContainer className="p-4 text-center" size='sm'>
@@ -202,5 +194,6 @@ export default function CharacterPage() {
         </TabsContent>
       </Tabs>
     </div>
+    </PageWrapper>
   )
 }

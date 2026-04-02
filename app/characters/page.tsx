@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { getItalianClass, getItalianRace } from '@/lib/utils/nameMappers';
+import { PageWrapper } from '@/components/layout/PageWrapper';
 
 // Utility per estrarre il nome da strutture nested
 function extractName(value: unknown): string {
@@ -54,25 +55,20 @@ export default function CharactersPage() {
   }));
 
   return (
-    <div className="container mx-auto p-4 md:p-6 space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-4xl font-serif font-bold text-amber-900">
-            I Miei Personaggi
-          </h1>
-          <p className="text-amber-700 mt-1">
-            Gestisci tutti i tuoi eroi e compagni
-          </p>
-        </div>
-
+    <PageWrapper
+      withContainer={false}
+      title="I Miei Personaggi"
+      subtitle="Gestisci tutti i tuoi eroi e compagni"
+      action={
         <Link href="/create-character">
           <Button className="bg-amber-700 hover:bg-amber-800">
             <PlusCircle className="w-4 h-4 mr-2" />
             Nuovo Personaggio
           </Button>
         </Link>
-      </div>
-
+      }
+    >
+      <div className="not-prose">
       <DataTable
         initialData={tableData}
         visibleColumns={['name', 'classes.name', 'races.name', 'level', 'alignment', 'created_at_formatted']}
@@ -91,6 +87,7 @@ export default function CharactersPage() {
         onRowClick={(id) => router.push(`/characters/${id}`)}
         pagination
       />
-    </div>
+      </div>
+    </PageWrapper>
   );
 }

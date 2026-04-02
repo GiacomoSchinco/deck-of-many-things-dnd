@@ -3,6 +3,7 @@ import Link from 'next/link';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import { Button } from '@/components/ui/button';
 import { Heart, ExternalLink, ArrowLeft } from 'lucide-react';
+import { PageWrapper } from '@/components/layout/PageWrapper';
 
 export default function CreditsPage() {
   const authors = [
@@ -33,27 +34,20 @@ export default function CreditsPage() {
   ];
 
   return (
-    <div className="parchment-bg py-12">
-      <div className="container mx-auto px-4 max-w-4xl">
-        
-        {/* Torna indietro */}
-        <Link href="/" className="inline-block mb-6">
+    <PageWrapper
+      withContainer={false}
+      title="Crediti"
+      subtitle="Fatto con ❤️ e tanti dadi 🎲"
+      action={
+        <Link href="/">
           <Button variant="ghost" className="text-amber-700 hover:text-amber-900">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Torna alla Home
           </Button>
         </Link>
-
-        {/* Header */}
-        <AncientCardContainer className="p-8 mb-8 text-center">
-          <h1 className="text-4xl font-serif font-bold text-amber-900 mb-4">
-            📜 Crediti
-          </h1>
-          <p className="text-lg text-amber-700 italic flex items-center justify-center gap-2">
-            Fatto con <Heart className="h-5 w-5 text-red-500 fill-red-500" /> e tanti dadi 🎲
-          </p>
-        </AncientCardContainer>
-
+      }
+    >
+      <div className="not-prose space-y-6">
         {/* Icone principali */}
         <AncientCardContainer className="p-8 mb-8">
           <h2 className="text-2xl font-serif font-bold text-amber-900 mb-4 flex items-center gap-2">
@@ -183,6 +177,6 @@ export default function CreditsPage() {
           </p>
         </div>
       </div>
-    </div>
+    </PageWrapper>
   );
 }

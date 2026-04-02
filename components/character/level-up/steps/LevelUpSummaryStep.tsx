@@ -4,13 +4,38 @@
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, Heart, TrendingUp, BookOpen, Zap } from 'lucide-react';
 
+interface SummaryCharacter {
+  name: string;
+  classes?: { name?: string } | null;
+  combat_stats?: { max_hp?: number } | null;
+}
+
+interface SpellChanges {
+  newSpellSlots?: Record<string, number>;
+}
+
+interface SummaryChanges {
+  spellChanges?: SpellChanges;
+  newFeatures?: { name: string; description: string; level: number; icon?: string }[];
+}
+
+interface SummaryData {
+  hpGain?: number;
+  asiType?: 'increase' | 'feat';
+  increaseType?: 'single' | 'double';
+  selectedStat?: string;
+  secondStat?: string;
+  featId?: string;
+  newSpells?: string[];
+}
+
 interface LevelUpSummaryStepProps {
-  character: any;
+  character: SummaryCharacter;
   currentLevel: number;
   newLevel: number;
-  changes: any;
-  data: any;
-  onNext: (data: any) => void;
+  changes: SummaryChanges;
+  data: SummaryData;
+  onNext: (data: Record<string, unknown>) => void;
   onBack: () => void;
   isLast: boolean;
   isSaving?: boolean;
@@ -18,16 +43,13 @@ interface LevelUpSummaryStepProps {
 
 export default function LevelUpSummaryStep({
   character,
-  currentLevel,
   newLevel,
   changes,
   data,
   onNext,
   onBack,
-  isLast,
   isSaving = false,
 }: LevelUpSummaryStepProps) {
-  const className = character.classes?.name;
   const newTotalHp = (character.combat_stats?.max_hp || 0) + (data.hpGain || 0);
 
   return (
@@ -66,13 +88,9 @@ export default function LevelUpSummaryStep({
             <p className="text-sm">
               {data.asiType === 'increase' ? (
                 data.increaseType === 'single' ? (
-                  <span>
-                    {data.selectedStat} +2
-                  </span>
+                  <span>{data.selectedStat} +2</span>
                 ) : (
-                  <span>
-                    {data.selectedStat} +1, {data.secondStat} +1
-                  </span>
+                  <span>{data.selectedStat} +1, {data.secondStat} +1</span>
                 )
               ) : (
                 <span>Talento: {data.featId || 'Da selezionare'}</span>
@@ -103,10 +121,10 @@ export default function LevelUpSummaryStep({
             </div>
             <div className="text-sm">
               {Object.entries(changes.spellChanges.newSpellSlots)
-                .filter(([_, count]) => (count as number) > 0)
+                .filter(([, count]) => count > 0)
                 .map(([level, count]) => (
                   <span key={level} className="inline-block mr-2">
-                    {count as number} slot di {level}° livello
+                    {count} slot di {level}° livello
                   </span>
                 ))}
             </div>
@@ -114,14 +132,14 @@ export default function LevelUpSummaryStep({
         )}
 
         {/* Nuove feature */}
-        {changes.newFeatures?.length > 0 && (
+        {changes.newFeatures && changes.newFeatures.length > 0 && (
           <div className="bg-amber-50/50 rounded-lg p-3 border border-amber-200">
             <div className="flex items-center gap-2 text-amber-700 mb-1">
               <Zap className="w-4 h-4" />
               <span className="font-medium">Nuove Abilità</span>
             </div>
             <div className="text-sm">
-              {changes.newFeatures.map((f: any, i: number) => (
+              {changes.newFeatures.map((f, i) => (
                 <div key={i}>• {f.name}</div>
               ))}
             </div>

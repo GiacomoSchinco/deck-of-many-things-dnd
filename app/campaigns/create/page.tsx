@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { useCreateCampaign } from '@/hooks/mutations/useCampaignMutations'
 import { PlusCircle, Loader2 } from 'lucide-react'
 import { AncientScroll } from '@/components/custom/AncientScroll'
+import { PageWrapper } from '@/components/layout/PageWrapper'
 
 export default function CreateCampaignPage() {
   const router = useRouter()
@@ -33,10 +34,10 @@ export default function CreateCampaignPage() {
   }
 
   return (
-    <div className="container mx-auto p-4 md:p-6">
-      <AncientScroll variant="rolled">
-        <h1 className="text-2xl font-serif font-bold text-amber-900 mb-4">Crea Nuova Campagna</h1>
-        
+    <PageWrapper
+      withContainer={false}
+      title="Crea Nuova Campagna"
+    >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1">
             <label className="text-sm font-medium text-amber-700">Nome</label>
@@ -72,7 +73,6 @@ export default function CreateCampaignPage() {
             </Button>
           </div>
         </form>
-      </AncientScroll>
-    </div>
+    </PageWrapper>
   )
 }

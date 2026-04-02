@@ -7,6 +7,7 @@ import DataTable from '@/components/custom/DataTable';
 import Link from 'next/link';
 import { PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { PageWrapper } from '@/components/layout/PageWrapper';
 export default function CampaignsPage() {
     const { data: campaigns, isLoading } = useCampaigns();
     const router = useRouter();
@@ -30,26 +31,21 @@ export default function CampaignsPage() {
     }
 
     return (
-           <div className="container mx-auto p-4 md:p-6 space-y-6">
-      {/* Header con titolo e pulsante nuovo personaggio */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-4xl font-serif font-bold text-amber-900">
-            Le Mie Campagne
-          </h1>
-          <p className="text-amber-700 mt-1">
-            Gestisci tutte le tue campagne e avventure
-          </p>
-        </div>
-
-        <Link href="/campaigns/create">
-          <Button className="bg-amber-700 hover:bg-amber-800">
-            <PlusCircle className="w-4 h-4 mr-2" />
-            Nuova Campagna
-          </Button>
-        </Link>
-      </div>
-            <DataTable<Campaign>
+      <PageWrapper
+        withContainer={false}
+        title="Le Mie Campagne"
+        subtitle="Gestisci tutte le tue campagne e avventure"
+        action={
+          <Link href="/campaigns/create">
+            <Button className="bg-amber-700 hover:bg-amber-800">
+              <PlusCircle className="w-4 h-4 mr-2" />
+              Nuova Campagna
+            </Button>
+          </Link>
+        }
+      >
+        <div className="not-prose">
+        <DataTable<Campaign>
                 initialData={tableData as Campaign[]}
                 visibleColumns={["name", "charactersCount"]}
                 labels={{
@@ -59,5 +55,6 @@ export default function CampaignsPage() {
                 onRowClick={handleRowClick}
             />
         </div>
+      </PageWrapper>
     );
 }

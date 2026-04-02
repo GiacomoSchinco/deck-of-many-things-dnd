@@ -139,8 +139,8 @@ export default function LevelUpWizard({ characterId, currentLevel, onComplete }:
         level: newLevel,
         combatStats: {
           max_hp: newMaxHp,
-          // Preserva current_hp; default a newMaxHp solo se non esiste ancora
-          current_hp: character.combat_stats?.current_hp ?? newMaxHp,
+          // Aumenta current_hp della stessa quantità guadagnata (come in D&D)
+          current_hp: (character.combat_stats?.current_hp ?? 0) + levelUpData.hpGain,
         },
       };
 
