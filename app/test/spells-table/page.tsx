@@ -5,6 +5,8 @@ import { useSpells } from '@/hooks/queries/useSpells';
 import DataTable from '@/components/custom/DataTable';
 import Loading from '@/components/custom/Loading';
 import { getItalianClasses, getItalianSchool } from '@/lib/utils/nameMappers';
+import { AncientPageWrapper, ScrollPageWrapper } from '@/components/layout/AncientPageWrapper';
+import { PageWrapper } from '@/components/layout/PageWrapper';
 
 type SpellRow = {
   id: number;
@@ -55,7 +57,8 @@ export default function SpellsTablePage() {
   })) || [];
 
   return (
-    <div className="container mx-auto p-6">
+
+    <PageWrapper title="Tabella Incantesimi" variant="default">
       <DataTable
         initialData={tableData}
         visibleColumns={[
@@ -87,6 +90,6 @@ export default function SpellsTablePage() {
         }}
         pagination={true}
       />
-    </div>
+    </PageWrapper>
   );
 }

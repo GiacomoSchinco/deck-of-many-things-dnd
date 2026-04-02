@@ -33,7 +33,7 @@ export default function CreditsPage() {
   ];
 
   return (
-    <main className="min-h-screen parchment-bg py-12">
+    <div className="parchment-bg py-12">
       <div className="container mx-auto px-4 max-w-4xl">
         
         {/* Torna indietro */}
@@ -183,6 +183,6 @@ export default function CreditsPage() {
           </p>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

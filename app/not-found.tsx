@@ -4,7 +4,7 @@ import { AntiqueButton } from "@/components/custom/AntiqueButton";
 
 export default function NotFound() {
     return (
-        <main className="min-h-screen p-4 mt-10">
+        <div className="p-4 mt-10">
             <div className="container mx-auto flex flex-col items-center mt-10"> {/* Aggiungi flex e items-center qui */}
                 <div className="max-w-3xl mx-auto text-center">
                     {/* 404 grande in stile antico */}
@@ -87,6 +87,6 @@ export default function NotFound() {
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
     );
 }

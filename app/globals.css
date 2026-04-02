@@ -53,10 +53,10 @@
   --color-popover-foreground: hsl(30 40% 20%);
 
   /* 📝 Font */
-  --font-serif: 'Cinzel', Georgia, serif;
-  --font-sans: 'Cinzel', sans-serif;
+  --font-serif: var(--font-cinzel, 'Cinzel', Georgia, serif);
+  --font-sans: var(--font-cinzel, 'Cinzel', sans-serif);
   --font-fantasy: 'MedievalSharp', cursive;
-  --font-antique: 'IM Fell English', serif;
+  --font-antique: var(--font-im-fell, 'IM Fell English', Georgia, serif);
 
   /* ✨ Animazioni */
   --animate-float: float 3s ease-in-out infinite;

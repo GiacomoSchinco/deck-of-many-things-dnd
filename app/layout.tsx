@@ -1,19 +1,24 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Cinzel, IM_Fell_English } from "next/font/google";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 import Topbar from "@/components/layout/Topbar";
 import { Toaster } from "@/components/ui/sonner";
 import Footer from "@/components/layout/Footer";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const cinzel = Cinzel({
+  variable: "--font-cinzel",
   subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "600", "700", "900"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const imFellEnglish = IM_Fell_English({
+  variable: "--font-im-fell",
   subsets: ["latin"],
+  display: "swap",
+  weight: "400",
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -29,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${cinzel.variable} ${imFellEnglish.variable} antialiased`}
       >
         <Providers>
           <Toaster richColors position="top-right" />

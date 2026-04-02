@@ -1,14 +1,16 @@
-// app/characters/page.tsx
+// app/admin/characters/page.tsx
 'use client'
 
 import { useCharacters } from '@/hooks/queries/useCharacter';
 import Loading from '@/components/custom/Loading';
 import DataTable from '@/components/custom/DataTable';
+import AncientContainer from '@/components/custom/AncientContainer';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { Input } from '@/components/ui/input';
 import { PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { getItalianClass, getItalianRace } from '@/lib/utils/nameMappers';
+import { useState, useEffect } from 'react';
 
 // Utility per estrarre il nome da strutture nested
 function extractName(value: unknown): string {
@@ -29,16 +31,22 @@ function extractNames(value: unknown): string[] {
 
 export default function CharactersPage() {
   const router = useRouter();
+  const [query, setQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQuery(query.trim()), 300);
+    return () => clearTimeout(t);
+  }, [query]);
+
   const { data: characters, isLoading, error } = useCharacters();
 
   if (isLoading) return <Loading />;
 
   if (error) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          Errore: {error.message}
-        </div>
+      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        Errore: {error.message}
       </div>
     );
   }
@@ -48,29 +56,38 @@ export default function CharactersPage() {
     return new Intl.DateTimeFormat('it-IT', { dateStyle: 'medium' }).format(new Date(iso));
   };
 
-  const tableData = (characters ?? []).map((c: Record<string, unknown>) => ({
-    ...c,
-    created_at_formatted: formatDate(c.created_at as string | undefined),
-  }));
+  const tableData = (characters ?? [])
+    .map((c: Record<string, unknown>) => ({
+      ...c,
+      created_at_formatted: formatDate(c.created_at as string | undefined),
+    }))
+    .filter((c: Record<string, unknown>) => {
+      if (!debouncedQuery) return true;
+      const q = debouncedQuery.toLowerCase();
+      return String(c.name ?? '').toLowerCase().includes(q);
+    });
 
   return (
-    <div className="container mx-auto p-4 md:p-6 space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-4xl font-serif font-bold text-amber-900">
-            I Miei Personaggi
-          </h1>
-          <p className="text-amber-700 mt-1">
-            Gestisci tutti i tuoi eroi e compagni
-          </p>
-        </div>
-
-        <Link href="/create-character">
-          <Button className="bg-amber-700 hover:bg-amber-800">
-            <PlusCircle className="w-4 h-4 mr-2" />
-            Nuovo Personaggio
-          </Button>
-        </Link>
+    <AncientContainer
+      title="Gestione Personaggi"
+      subtitle="Visualizza e gestisci tutti i personaggi creati dagli utenti."
+      action={
+        <Button
+          onClick={() => router.push('/create-character')}
+          className="bg-amber-700 hover:bg-amber-800 text-white shadow-md hover:shadow-lg transition-all"
+        >
+          <PlusCircle className="w-4 h-4 mr-2" />
+          Nuovo Personaggio
+        </Button>
+      }
+      showDecorations={false}
+    >
+      <div className="mb-4">
+        <Input
+          placeholder="Cerca per nome..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
       </div>
 
       <DataTable
@@ -82,15 +99,17 @@ export default function CharactersPage() {
           'races.name': 'Razza',
           level: 'Livello',
           alignment: 'Allineamento',
-          created_at_formatted: 'Creazione'
+          created_at_formatted: 'Creazione',
         }}
         customRenderers={{
-          'classes.name': (_v, row?: Record<string, unknown>) => extractNames(row?.classes).map(getItalianClass).join(', '),
-          'races.name': (_v, row?: Record<string, unknown>) => extractNames(row?.races).map(getItalianRace).join(', '),
+          'classes.name': (_v, row?: Record<string, unknown>) =>
+            extractNames(row?.classes).map(getItalianClass).join(', '),
+          'races.name': (_v, row?: Record<string, unknown>) =>
+            extractNames(row?.races).map(getItalianRace).join(', '),
         }}
         onRowClick={(id) => router.push(`/characters/${id}`)}
         pagination
       />
-    </div>
+    </AncientContainer>
   );
 }

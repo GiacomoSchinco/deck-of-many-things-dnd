@@ -24,7 +24,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <main className="min-h-screen parchment-bg relative overflow-hidden">
+    <div className="min-h-screen parchment-bg relative overflow-hidden">
       {/* Sfondo animato con gradienti mobili */}
       <div
         className="absolute inset-0 opacity-30 pointer-events-none"
@@ -101,6 +101,6 @@ export default function HomePage() {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

@@ -74,8 +74,8 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-parchment-100 to-parchment-200 p-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="space-y-6">
+      <div>
         {/* Header con benvenuto */}
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-3">
