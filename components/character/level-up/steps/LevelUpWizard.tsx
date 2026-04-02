@@ -5,7 +5,7 @@ import { useState, useMemo } from 'react';
 import { useCharacter } from '@/hooks/queries/useCharacter';
 import { getLevelUpSpellChanges, getSpellProgression } from '@/lib/rules/spellcasting';
 import { useUpdateCharacter } from '@/hooks/mutations/useCharacterMutations';
-import { useAddCharacterSpells, useUpdateSpellSlots } from '@/hooks/mutations/useCharacterSpellMutations';
+import { useAddCharacterSpells, useRemoveCharacterSpells, useUpdateSpellSlots } from '@/hooks/mutations/useCharacterSpellMutations';
 import LevelUpHPStep from './LevelUpHPStep';
 import LevelUpASIStep from './LevelUpASIStep';
 import LevelUpSpellsStep from './LevelUpSpellsStep';
@@ -33,6 +33,8 @@ type LevelUpData = {
   secondStat?: string;
   changes?: Record<string, number>;
   newSpells: string[];
+  swapFrom?: string;  // known_id dell'incantesimo da rimuovere
+  swapTo?: string;    // spell_id del sostituto
 };
 
 export default function LevelUpWizard({ characterId, currentLevel, onComplete }: LevelUpWizardProps) {
@@ -49,6 +51,7 @@ export default function LevelUpWizard({ characterId, currentLevel, onComplete }:
   const { data: character, isLoading } = useCharacter(characterId);
   const updateCharacter = useUpdateCharacter(characterId);
   const addSpells = useAddCharacterSpells();
+  const removeSpells = useRemoveCharacterSpells();
   const updateSpellSlots = useUpdateSpellSlots();
 
   // Calcola cosa cambia al nuovo livello
@@ -149,11 +152,21 @@ export default function LevelUpWizard({ characterId, currentLevel, onComplete }:
       }
       await updateCharacter.mutateAsync(updateBody);
 
-      // 2. Nuovi incantesimi
-      if (levelUpData.newSpells.length > 0) {
+      // 2. Nuovi incantesimi (+ sostituto se swap)
+      const spellsToAdd = [...levelUpData.newSpells];
+      if (levelUpData.swapTo) spellsToAdd.push(levelUpData.swapTo);
+      if (spellsToAdd.length > 0) {
         await addSpells.mutateAsync({
           characterId,
-          spellIds: levelUpData.newSpells.map(Number),
+          spellIds: spellsToAdd.map(Number),
+        });
+      }
+
+      // 2b. Rimozione incantesimo sostituito
+      if (levelUpData.swapFrom) {
+        await removeSpells.mutateAsync({
+          characterId,
+          knownIds: [levelUpData.swapFrom],
         });
       }
 

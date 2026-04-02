@@ -217,7 +217,7 @@ export default function Spellbook({
 
       {/* Dialog gestione incantesimi */}
       <Dialog open={managing} onOpenChange={setManaging}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-4">
           <DialogHeader className="p-6 pb-0">
             <DialogTitle className="font-serif text-amber-900">Gestisci Incantesimi</DialogTitle>
           </DialogHeader>

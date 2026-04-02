@@ -8,7 +8,7 @@ import { useAddPreparedSpells, useRemovePreparedSpells } from '@/hooks/mutations
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Search, Check, X, RefreshCw } from 'lucide-react';
+import { Search, Check, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Spell } from '@/types/spell';
 
@@ -52,7 +52,7 @@ export default function PreparedSpellsManager({
   const addPrepared = useAddPreparedSpells();
   const removePrepared = useRemovePreparedSpells();
 
-  const preparedSpellIds = new Set((preparedSpells ?? []).map((p: any) => p.spell_id));
+  const preparedSpellIds = new Set((preparedSpells ?? []).map((p: { spell_id: number }) => p.spell_id));
 
   // Calcola il numero massimo di incantesimi preparabili
   const maxPreparable = useMemo(() => {
@@ -73,7 +73,7 @@ export default function PreparedSpellsManager({
     if (isWizard) {
       // Mago: solo quelli nel grimorio (spells_known)
       return (spellsKnown ?? [])
-        .map((sk: any) => sk.spell)
+        .map((sk: { spell: Spell }) => sk.spell)
         .filter((s: Spell) => s && s.level > 0);
     } else {
       // Altre classi: tutti gli incantesimi della classe
@@ -113,7 +113,7 @@ export default function PreparedSpellsManager({
       refetchPrepared();
       if (onRefresh) onRefresh();
     } catch (error) {
-      toast.error('Errore durante la preparazione');
+      toast.error('Errore durante la preparazione' + (error instanceof Error ? `: ${error.message}` : ''));
     }
   };
 

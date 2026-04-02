@@ -10,6 +10,7 @@ import { getEnglishClass } from '@/lib/utils/nameMappers';
 import Loading from '@/components/custom/Loading';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AncientScroll } from '@/components/custom/AncientScroll';
 
 export default function SpellPage() {
   const params = useParams();
@@ -54,7 +55,7 @@ export default function SpellPage() {
         </TabsList>
 
         <TabsContent value="known">
-          <AncientCardContainer className="p-6">
+          <AncientScroll className="p-6">
             <Spellbook
               key={refreshKey}
               characterId={characterId}
@@ -64,12 +65,12 @@ export default function SpellPage() {
               isPreparer={isPreparerClass}
               onSpellsChange={() => setRefreshKey(prev => prev + 1)}
             />
-          </AncientCardContainer>
+          </AncientScroll>
         </TabsContent>
 
         {isPreparerClass && (
           <TabsContent value="prepared">
-            <AncientCardContainer className="p-6">
+            <AncientScroll className="p-6">
               <PreparedSpellsManager
                 characterId={characterId}
                 className={englishClass}
@@ -78,7 +79,7 @@ export default function SpellPage() {
                 isWizard={isWizard}
                 onRefresh={() => refetch()}
               />
-            </AncientCardContainer>
+            </AncientScroll>
           </TabsContent>
         )}
       </Tabs>
