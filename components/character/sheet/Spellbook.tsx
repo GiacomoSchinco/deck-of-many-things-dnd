@@ -159,7 +159,7 @@ export default function Spellbook({
           {/* Cantrips */}
           {cantrips.length > 0 && (
             <section>
-              <h4 className="text-md font-serif font-bold text-amber-900 mb-2 pb-1 border-b border-amber-200 flex items-center gap-1">
+              <h4 className="text-md fantasy-title mb-2 pb-1 border-b border-amber-200 flex items-center gap-1">
                 <Sparkles className="w-4 h-4" />
                 Trucchetti
               </h4>
@@ -186,7 +186,7 @@ export default function Spellbook({
             .map((lvl) => (
               <section key={lvl}>
                 <div className="flex justify-between items-baseline mb-2 pb-1 border-b border-amber-200">
-                  <h4 className="text-md font-serif font-bold text-amber-900">
+                  <h4 className="text-md fantasy-title">
                     Livello {lvl}
                   </h4>
                   {/* Mostra slot disponibili per questo livello */}

@@ -79,7 +79,7 @@ export default function InventoryGrouped({ items = [], onRowClick, onEdit, onDel
                     <div className="p-2 rounded-lg bg-amber-900/10 border border-amber-700/20 group-hover:scale-110 transition-transform duration-200">
                       <Icon className="w-5 h-5 text-amber-600" />
                     </div>
-                    <span className="font-serif font-bold text-amber-900 text-lg">
+                    <span className="fantasy-title text-lg">
                       {getItalianItemType(t)}
                       <span className="ml-2 text-xs text-amber-600/70 font-normal">({groups[t].length})</span>
                     </span>

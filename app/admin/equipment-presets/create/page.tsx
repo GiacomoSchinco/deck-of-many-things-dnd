@@ -98,7 +98,7 @@ export default function CreateEquipmentPresetPage({ initialData }: Props) {
       <div className="bg-gradient-to-br from-parchment-100 to-parchment-200 rounded-xl border-2 border-amber-900/30 shadow-xl overflow-hidden">
         {/* Header decorativo */}
         <div className="bg-amber-900/10 border-b border-amber-900/20 px-6 py-4">
-          <h1 className="text-2xl font-serif font-bold text-amber-900 flex items-center gap-2">
+          <h1 className="text-2xl fantasy-title flex items-center gap-2">
             {preset.id ? '✏️ Modifica Preset' : '✨ Nuovo Preset'}
             {preset.id && (
               <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">
@@ -113,8 +113,8 @@ export default function CreateEquipmentPresetPage({ initialData }: Props) {
 
         <form onSubmit={onSubmit} className="p-6 space-y-8">
           {/* === SEZIONE INFO BASE === */}
-          <div className="bg-amber-50/50 rounded-lg p-5 border border-amber-200">
-            <h2 className="text-lg font-serif font-bold text-amber-900 mb-4 flex items-center gap-2">
+          <div className="fantasy-section p-5">
+            <h2 className="text-lg fantasy-title mb-4 flex items-center gap-2">
               <span className="w-1 h-6 bg-amber-600 rounded-full" />
               Informazioni Base
             </h2>
@@ -177,9 +177,9 @@ export default function CreateEquipmentPresetPage({ initialData }: Props) {
           </div>
 
           {/* === SEZIONE OGGETTI FISSI === */}
-          <div className="bg-amber-50/50 rounded-lg p-5 border border-amber-200">
+          <div className="fantasy-section p-5">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-serif font-bold text-amber-900 flex items-center gap-2">
+              <h2 className="text-lg fantasy-title flex items-center gap-2">
                 <span className="w-1 h-6 bg-amber-600 rounded-full" />
                 📦 Oggetti Fissi
               </h2>
@@ -223,9 +223,9 @@ export default function CreateEquipmentPresetPage({ initialData }: Props) {
           </div>
 
           {/* === SEZIONE SCELTE (ACCORDION) === */}
-          <div className="bg-amber-50/50 rounded-lg p-5 border border-amber-200">
+          <div className="fantasy-section p-5">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-serif font-bold text-amber-900 flex items-center gap-2">
+              <h2 className="text-lg fantasy-title flex items-center gap-2">
                 <span className="w-1 h-6 bg-amber-600 rounded-full" />
                 🎲 Scelte
               </h2>

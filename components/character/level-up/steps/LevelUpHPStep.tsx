@@ -2,7 +2,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { AntiqueButton } from '@/components/custom/AntiqueButton';
+import { WizardNav } from '@/components/shared/WizardNav';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Dice6, Heart } from 'lucide-react';
@@ -69,18 +70,18 @@ export default function LevelUpHPStep({
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <div className="inline-flex items-center justify-center p-3 bg-amber-100 rounded-full mb-4">
+        <div className="fantasy-icon-wrap">
           <Heart className="w-8 h-8 text-amber-700" />
         </div>
-        <h2 className="text-xl font-serif font-bold text-amber-900">
+        <h2 className="text-xl fantasy-title">
           Punti Ferita
         </h2>
-        <p className="text-amber-600 text-sm mt-1">
+        <p className="fantasy-subtitle mt-1">
           Scegli come aumentare i tuoi PF
         </p>
       </div>
 
-      <div className="bg-amber-50/50 rounded-lg p-4 border border-amber-200">
+      <div className="fantasy-section p-4">
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div className="text-center">
             <p className="text-xs text-amber-500">PF attuali</p>
@@ -134,39 +135,26 @@ export default function LevelUpHPStep({
                 <span>Non ancora tirato</span>
               )}
             </div>
-            <Button
+            <AntiqueButton
               type="button"
               variant="outline"
               size="sm"
               onClick={rollHitDice}
               disabled={isRolling || method !== 'roll'}
-              className="mt-2 border-amber-600 text-amber-700 hover:bg-amber-100"
+              icon={<Dice6 className={cn("w-4 h-4", isRolling && "animate-spin")} />}
             >
-              <Dice6 className={cn("w-4 h-4 mr-1", isRolling && "animate-spin")} />
               {isRolling ? 'Tirando...' : 'Tira il dado'}
-            </Button>
+            </AntiqueButton>
           </Label>
         </div>
       </RadioGroup>
 
-      <div className="flex justify-between pt-4 border-t border-amber-200">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onBack}
-          className="border-amber-600 text-amber-700"
-        >
-          Indietro
-        </Button>
-        <Button
-          type="button"
-          onClick={handleNext}
-          disabled={method === 'roll' && !rolledValue}
-          className="bg-amber-700 hover:bg-amber-800 text-white"
-        >
-          {isLast ? 'Conferma' : 'Avanti'}
-        </Button>
-      </div>
+      <WizardNav
+        onBack={onBack}
+        onNext={handleNext}
+        nextLabel={isLast ? 'Conferma ✓' : 'Avanti →'}
+        nextDisabled={method === 'roll' && !rolledValue}
+      />
     </div>
   );
 }

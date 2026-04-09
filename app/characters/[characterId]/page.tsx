@@ -21,9 +21,9 @@ import InventoryGrouped from '@/components/custom/InventoryGrouped'
 import Spellbook from '@/components/character/sheet/Spellbook'
 import type { ProficiencyType } from '@/types/character'
 import { getItalianAbilityFull, getEnglishClass } from '@/lib/utils/nameMappers'
-import { CharacterLevelBadge } from '@/components/custom/CharacterLevelBadge'
-import  HpBar from '@/components/custom/HpBar'
 import { PageWrapper } from '@/components/layout/PageWrapper'
+import { StatRow } from '@/components/shared/StatRow'
+import { SectionTitle } from '@/components/shared/SectionTitle'
 
 export default function CharacterPage() {
   const params = useParams()
@@ -65,6 +65,7 @@ export default function CharacterPage() {
   return (
     <PageWrapper
       withContainer={false}
+      variant='scroll'
       title={character.name}
       subtitle={`${character.races?.name ?? ''} · ${character.classes?.name ?? ''} · Livello ${character.level}`}
       action={
@@ -99,9 +100,7 @@ export default function CharacterPage() {
         </FanCardGroup>
         <AncientScroll variant='rolled'>
           <div >
-            <h2 className="text-2xl font-serif font-bold text-amber-900 mb-4 text-center border-b border-amber-200 pb-2">
-              Caratteristiche
-            </h2>
+            <SectionTitle size="lg">Caratteristiche</SectionTitle>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {STATS.map(({ label, key }) => (
                 <StatDiamond
@@ -125,53 +124,25 @@ export default function CharacterPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Caratteristiche */}
         <AncientScroll className="p-6">
-          <h2 className="text-2xl font-serif font-bold text-amber-900 mb-4 text-center border-b border-amber-200 pb-2">
-            Info Personaggio
-          </h2>
+          <SectionTitle size="lg">Info Combattimento</SectionTitle>
           <div className="space-y-4">
-            <div className="flex justify-between items-center p-2 bg-amber-50 rounded">
-              <span className="text-amber-800">Punti Ferita</span>
-              <HpBar size='large'  current={character.combat_stats?.current_hp ?? 0} max={character.combat_stats?.max_hp ?? 0} />
-              <span className="font-bold text-amber-900">{character.combat_stats?.current_hp}/{character.combat_stats?.max_hp}</span>
-            </div>
-            <div className="flex justify-between items-center p-2 bg-amber-50 rounded">
-              <span className="text-amber-800">Classe Armatura</span>
-              <span className="font-bold text-amber-900">{character.combat_stats?.armor_class}</span>
-            </div>
-            <div className="flex justify-between items-center p-2 bg-amber-50 rounded">
-              <span className="text-amber-800">Velocità</span>
-              <span className="font-bold text-amber-900">{character.combat_stats?.speed} ft</span>
-            </div>
-            <div className="flex justify-between items-center p-2 bg-amber-50 rounded">
-              <span className="text-amber-800">Iniziativa</span>
-              <span className="font-bold text-amber-900 text-xl">+{proficiencyBonus}</span>
-            </div>
+            <StatRow label="Punti Ferita" value={`${character.combat_stats?.current_hp}/${character.combat_stats?.max_hp}`} />
+            <StatRow label="Classe Armatura" value={character.combat_stats?.armor_class} />
+            <StatRow label="Velocità" value={`${character.combat_stats?.speed} ft`} />
+            <StatRow label="Iniziativa" value={`+${proficiencyBonus}`} />
           </div>
         </AncientScroll>
         {/* Info Personaggio */}
         <AncientScroll className="p-6">
-          <h2 className="text-2xl font-serif font-bold text-amber-900 mb-4 text-center border-b border-amber-200 pb-2">
-            Info Personaggio
-          </h2>
+          <SectionTitle size="lg">Info Personaggio</SectionTitle>
           <div className="space-y-4">
-            <div className="flex justify-between items-center p-2 bg-amber-50 rounded">
-              <span className="text-amber-800">Background</span>
-              <span className="font-bold text-amber-900">{character.background || 'Nessuno'}</span>
-            </div>
-            <div className="flex justify-between items-center p-2 bg-amber-50 rounded">
-              <span className="text-amber-800">Allineamento</span>
-              <span className="font-bold text-amber-900">{character.alignment || 'Neutrale'}</span>
-            </div>
-            <div className="flex justify-between items-center p-2 bg-amber-50 rounded">
-              <span className="text-amber-800">Bonus Competenza</span>
-              <span className="font-bold text-amber-900 text-xl">+{proficiencyBonus}</span>
-            </div>
-            <div className="flex justify-between items-center p-2 bg-amber-50 rounded">
-              <span className="text-amber-800">Tiri Salvezza</span>
-              <span className="font-bold text-amber-900">
-                {character.classes?.saving_throws?.map((s: string) => getItalianAbilityFull(s)).join(' · ')}
-              </span>
-            </div>
+            <StatRow label="Background" value={character.background || 'Nessuno'} />
+            <StatRow label="Allineamento" value={character.alignment || 'Neutrale'} />
+            <StatRow label="Bonus Competenza" value={`+${proficiencyBonus}`} />
+            <StatRow
+              label="Tiri Salvezza"
+              value={character.classes?.saving_throws?.map((s: string) => getItalianAbilityFull(s)).join(' · ')}
+            />
           </div>
         </AncientScroll>
       </div>
@@ -211,7 +182,7 @@ export default function CharacterPage() {
 
         <TabsContent value="inventory">
           <AncientCardContainer className="p-6">
-            <h3 className="text-xl font-serif font-bold text-amber-900 mb-4">
+            <h3 className="text-xl fantasy-title mb-4">
               Inventario
             </h3>
             <InventoryGrouped items={inventory?.items} />

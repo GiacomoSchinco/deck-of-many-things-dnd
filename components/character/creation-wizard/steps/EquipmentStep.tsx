@@ -201,13 +201,13 @@ export function EquipmentStep({ classId, onConfirm, onChange, initialSelectedIte
       {/* Oggetti fissi */}
       {selectedPreset.items && selectedPreset.items.length > 0 && (
         <AncientCardContainer className="p-4">
-          <h3 className="font-serif font-bold text-amber-900 mb-3 flex items-center gap-2">
+          <h3 className="fantasy-title mb-3 flex items-center gap-2">
             <Package className="w-4 h-4" />
             Equipaggiamento base (tutti lo ricevono)
           </h3>
           <div className="space-y-2">
             {selectedPreset.items.map((item: EquipmentItem, idx: number) => (
-              <div key={idx} className="flex items-center gap-2 p-2 bg-amber-50 rounded">
+              <div key={idx} className="fantasy-row">
                 <Check className="w-4 h-4 text-green-600" />
                 <span className="text-amber-900">
                   {item.name}
@@ -226,7 +226,7 @@ export function EquipmentStep({ classId, onConfirm, onChange, initialSelectedIte
         
         return (
           <AncientCardContainer key={idx} className="p-4">
-            <h3 className="font-serif font-bold text-amber-900 mb-3 flex items-center justify-between">
+            <h3 className="fantasy-title mb-3 flex items-center justify-between">
               <span>
                 {choice.description}
                 {isSingle && <span className="text-sm font-normal text-amber-500 ml-2">(scegline una)</span>}

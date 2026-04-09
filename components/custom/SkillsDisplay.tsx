@@ -92,7 +92,7 @@ export function SkillsDisplay({
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <h3 className="text-xl font-serif font-bold text-amber-900 flex items-center gap-2">
+        <h3 className="text-xl fantasy-title flex items-center gap-2">
           <span>🎯</span>Abilità
           {information && (
             selectedCount > 0 && (

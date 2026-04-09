@@ -95,7 +95,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Area account */}
           <AncientScroll className="p-6 h-full">
-            <h2 className="text-xl font-serif font-bold text-amber-900 mb-4 flex items-center gap-2">
+            <h2 className="text-xl fantasy-title mb-4 flex items-center gap-2">
               <Key className="w-5 h-5 text-amber-700" />
               Il Tuo Account
             </h2>
@@ -129,7 +129,7 @@ export default function DashboardPage() {
           </AncientScroll>
           {/* Personaggi */}
           <AncientScroll className="p-6 h-full">
-            <h2 className="text-xl font-serif font-bold text-amber-900 mb-4 flex items-center gap-2">
+            <h2 className="text-xl fantasy-title mb-4 flex items-center gap-2">
               <Sword className="w-5 h-5 text-amber-700" />
               Personaggi
             </h2>
@@ -171,7 +171,7 @@ export default function DashboardPage() {
             <AncientCardContainer className="p-0 m-8 w-64 h-80 transform hover:scale-105 transition-transform">
               <div className="p-4 text-center">
                 <div className="text-4xl mb-3">👥</div>
-                <h3 className="font-serif font-bold text-amber-900 mb-2">I Miei Personaggi</h3>
+                <h3 className="fantasy-title mb-2">I Miei Personaggi</h3>
                 <p className="text-sm text-amber-700">Gestisci i tuoi eroi esistenti</p>
               </div>
             </AncientCardContainer>
@@ -181,7 +181,7 @@ export default function DashboardPage() {
               <div className="h-full flex flex-col items-center justify-center p-6 text-center">
                 <div className="p-4 text-center">
                   <div className="text-4xl mb-3">🏰</div>
-                  <h3 className="font-serif font-bold text-amber-900 mb-2">Campagne</h3>
+                  <h3 className="fantasy-title mb-2">Campagne</h3>
                   <p className="text-sm text-amber-700">Le tue avventure in corso</p>
                 </div>
               </div>
@@ -192,7 +192,7 @@ export default function DashboardPage() {
               <div className="h-full flex flex-col items-center justify-center p-6 text-center">
                 <div className="p-4 text-center">
                   <div className="text-4xl mb-3">🎴</div>
-                  <h3 className="font-serif font-bold text-amber-900 mb-2">Nuovo Personaggio</h3>
+                  <h3 className="fantasy-title mb-2">Nuovo Personaggio</h3>
                   <p className="text-sm text-amber-700">Crea un nuovo eroe per la tua avventura</p>
                 </div>
               </div>

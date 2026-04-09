@@ -2,8 +2,7 @@
 'use client';
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { WizardNav } from '@/components/shared/WizardNav';
 
 interface WizardStepProps {
   title: string;
@@ -37,36 +36,22 @@ export function WizardStep({
   children,
 }: WizardStepProps) {
   const nav = (
-    <div className={`flex pt-4 ${onBack ? 'justify-between' : 'justify-end'}`}>
-      {onBack && (
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onBack}
-          className="border-amber-700 text-amber-700"
-        >
-          {backLabel}
-        </Button>
-      )}
-      <div className="flex gap-2 items-center">
-        {extraActions}
-        <Button
-          type={asForm ? 'submit' : 'button'}
-          onClick={!asForm ? onNext : undefined}
-          disabled={nextDisabled || nextLoading}
-          className="bg-amber-700 hover:bg-amber-800 text-amber-50 disabled:opacity-50"
-        >
-          {nextLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-          {nextLabel}
-        </Button>
-      </div>
-    </div>
+    <WizardNav
+      onBack={onBack}
+      backLabel={backLabel}
+      onNext={onNext}
+      nextLabel={nextLabel}
+      nextDisabled={nextDisabled}
+      nextLoading={nextLoading}
+      extraActions={extraActions}
+      asForm={asForm}
+    />
   );
 
   const inner = (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-serif font-bold text-amber-900 mb-2">{title}</h2>
+        <h2 className="text-2xl fantasy-title mb-2">{title}</h2>
         {subtitle && <p className="text-amber-700 text-sm">{subtitle}</p>}
       </div>
       {nav}

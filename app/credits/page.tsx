@@ -50,7 +50,7 @@ export default function CreditsPage() {
       <div className="not-prose space-y-6">
         {/* Icone principali */}
         <AncientCardContainer className="p-8 mb-8">
-          <h2 className="text-2xl font-serif font-bold text-amber-900 mb-4 flex items-center gap-2">
+          <h2 className="text-2xl fantasy-title mb-4 flex items-center gap-2">
             <span className="text-3xl">🎴</span> Game Icons
           </h2>
           
@@ -76,7 +76,7 @@ export default function CreditsPage() {
 
         {/* Autori */}
         <AncientCardContainer className="p-8 mb-8">
-          <h2 className="text-2xl font-serif font-bold text-amber-900 mb-6 flex items-center gap-2">
+          <h2 className="text-2xl fantasy-title mb-6 flex items-center gap-2">
             <span className="text-3xl">✍️</span> Autori
           </h2>
 
@@ -88,7 +88,7 @@ export default function CreditsPage() {
               >
 
                 <div className="flex-1">
-                  <h3 className="font-serif font-bold text-amber-900">
+                  <h3 className="fantasy-title">
                     {author.name}
                   </h3>
                   <a 
@@ -108,7 +108,7 @@ export default function CreditsPage() {
 
         {/* Licenza */}
         <AncientCardContainer className="p-8 mb-8">
-          <h2 className="text-2xl font-serif font-bold text-amber-900 mb-4 flex items-center gap-2">
+          <h2 className="text-2xl fantasy-title mb-4 flex items-center gap-2">
             <span className="text-3xl">📋</span> Licenza
           </h2>
 
@@ -142,7 +142,7 @@ export default function CreditsPage() {
 
         {/* Ringraziamenti extra */}
         <AncientCardContainer className="p-8">
-          <h2 className="text-2xl font-serif font-bold text-amber-900 mb-4 flex items-center gap-2">
+          <h2 className="text-2xl fantasy-title mb-4 flex items-center gap-2">
             <span className="text-3xl">🙏</span> Ringraziamenti Speciali
           </h2>
 

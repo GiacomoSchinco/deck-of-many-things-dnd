@@ -76,7 +76,7 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
         <div className="space-y-6">
           {/* Header con nome e allineamento */}
           <div className="text-center border-b-2 border-amber-700/30 pb-4">
-            <h1 className="text-3xl font-serif font-bold text-amber-900">
+            <h1 className="text-3xl fantasy-title">
               {data.name || 'Senza Nome'}
             </h1>
             <div className="flex justify-center gap-2 mt-2">
@@ -106,7 +106,7 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
           {/* Caratteristiche */}
           {data.abilityScores && (
             <div>
-              <h3 className="font-serif font-semibold text-amber-900 mb-3 text-center">
+              <h3 className="fantasy-title mb-3 text-center">
                 Caratteristiche
               </h3>
 
@@ -129,10 +129,10 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
                   const finalValue = value + bonus;
                   const modifier = calculateModifier(finalValue);
                   return (
-                    <div key={key} className="flex items-center justify-between bg-amber-50 p-3 rounded">
+                    <div key={key} className="fantasy-row">
                       <div>
                         <div className="text-sm font-semibold text-amber-800">{getItalianAbilityFull(key)}</div>
-                        <div className="text-lg font-serif font-bold text-amber-900">
+                        <div className="text-lg fantasy-title">
                           {finalValue} <span className="text-sm text-amber-600 ml-2">({modifier >= 0 ? `+${modifier}` : modifier})</span>
                         </div>
                       </div>
@@ -196,13 +196,13 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
           {/* Equipaggiamento */}
           {equipmentList.length > 0 && (
             <AncientCardContainer className="p-4">
-              <h3 className="font-serif font-bold text-amber-900 mb-3 flex items-center gap-2">
+              <h3 className="fantasy-title mb-3 flex items-center gap-2">
                 <Package className="w-4 h-4" />
                 Equipaggiamento Iniziale
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {equipmentList.map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-2 p-2 bg-amber-50 rounded">
+                  <div key={idx} className="fantasy-row">
                     <Package className="w-4 h-4 text-amber-700" />
                     <span className="text-amber-900 flex-1">{item.name ?? `Item #${item.item_id}`}</span>
                     {item.quantity > 1 && (

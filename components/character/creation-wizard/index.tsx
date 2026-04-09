@@ -170,6 +170,7 @@ export function CreationWizard() {
   return (
     <PageWrapper
       withContainer={false}
+      variant='minimal'
       title="Creazione Personaggio"
       subtitle="Segui i passi per dare vita al tuo eroe"
       centerHeader

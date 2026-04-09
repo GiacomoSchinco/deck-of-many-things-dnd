@@ -94,6 +94,43 @@
 
 /* 🎭 Componenti personalizzati */
 @layer components {
+
+  /* ── Typography ─────────────────────────────────────────────── */
+  /** Titolo sezione: "Info Personaggio", "Caratteristiche", ... */
+  .fantasy-title {
+    @apply font-serif font-bold text-amber-900;
+  }
+  /** Sottotitolo / label descrittiva */
+  .fantasy-subtitle {
+    @apply text-amber-600 text-sm;
+  }
+  /** Label inline (etichetta a sinistra nelle righe info) */
+  .fantasy-label {
+    @apply text-amber-800;
+  }
+  /** Valore inline (valore a destra nelle righe info) */
+  .fantasy-value {
+    @apply font-bold text-amber-900;
+  }
+
+  /* ── Contenitori ─────────────────────────────────────────────── */
+  /** Card sezione con sfondo ambra leggero (step wizard, sezioni sheet) */
+  .fantasy-section {
+    @apply bg-amber-50/50 rounded-lg border border-amber-200;
+  }
+  /** Riga label/valore con sfondo chiaro */
+  .fantasy-row {
+    @apply flex justify-between items-center p-2 bg-amber-50 rounded;
+  }
+  /** Intestazione di sezione con bordo inferiore */
+  .fantasy-section-header {
+    @apply font-serif font-bold text-amber-900 mb-4 text-center border-b border-amber-200 pb-2;
+  }
+  /** Cerchio icona */
+  .fantasy-icon-wrap {
+    @apply inline-flex items-center justify-center p-3 bg-amber-100 rounded-full mb-4;
+  }
+
   .antique-card {
     position: relative;
     border-radius: 0.5rem;

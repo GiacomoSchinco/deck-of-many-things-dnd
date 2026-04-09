@@ -2,13 +2,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { WizardNav } from '@/components/shared/WizardNav';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Shield, Swords, Wand2, Users, Zap, Star } from 'lucide-react';
+import { Character } from '@/types';
 
 interface LevelUpFeaturesStepProps {
-  character: any;
+  character: Character;
   currentLevel: number;
   newLevel: number;
   changes: {
@@ -53,34 +54,22 @@ export default function LevelUpFeaturesStep({
     return (
       <div className="space-y-6">
         <div className="text-center">
-          <div className="inline-flex items-center justify-center p-3 bg-amber-100 rounded-full mb-4">
+          <div className="fantasy-icon-wrap">
             <Shield className="w-8 h-8 text-amber-700" />
           </div>
-          <h2 className="text-xl font-serif font-bold text-amber-900">
+          <h2 className="text-xl fantasy-title">
             Nuove Abilità
           </h2>
-          <p className="text-amber-600 text-sm mt-1">
+          <p className="fantasy-subtitle mt-1">
             Al livello {newLevel} non ottieni nuove abilità di classe.
           </p>
         </div>
 
-        <div className="flex justify-between pt-4 border-t border-amber-200">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onBack}
-            className="border-amber-600 text-amber-700"
-          >
-            Indietro
-          </Button>
-          <Button
-            type="button"
-            onClick={() => onNext({ featuresConfirmed: true })}
-            className="bg-amber-700 hover:bg-amber-800 text-white"
-          >
-            {isLast ? 'Conferma' : 'Avanti'}
-          </Button>
-        </div>
+        <WizardNav
+          onBack={onBack}
+          onNext={() => onNext({ featuresConfirmed: true })}
+          nextLabel={isLast ? 'Conferma ✓' : 'Avanti →'}
+        />
       </div>
     );
   }
@@ -88,13 +77,13 @@ export default function LevelUpFeaturesStep({
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <div className="inline-flex items-center justify-center p-3 bg-amber-100 rounded-full mb-4">
+        <div className="fantasy-icon-wrap">
           <Zap className="w-8 h-8 text-amber-700" />
         </div>
-        <h2 className="text-xl font-serif font-bold text-amber-900">
+        <h2 className="text-xl fantasy-title">
           Nuove Abilità
         </h2>
-        <p className="text-amber-600 text-sm mt-1">
+        <p className="fantasy-subtitle mt-1">
           Al livello {newLevel} ottieni le seguenti abilità
         </p>
       </div>
@@ -103,11 +92,11 @@ export default function LevelUpFeaturesStep({
         {features.map((feature, idx) => {
           const Icon = featureIcons[feature.icon || 'default'] || Star;
           return (
-            <div key={idx} className="bg-amber-50/50 rounded-lg border border-amber-200 overflow-hidden">
+            <div key={idx} className="fantasy-section overflow-hidden">
               <div className="flex items-center gap-3 p-4 border-b border-amber-200 bg-amber-100/30">
                 <Icon className="w-5 h-5 text-amber-700" />
                 <div>
-                  <h3 className="font-serif font-bold text-amber-900">{feature.name}</h3>
+                  <h3 className="fantasy-title">{feature.name}</h3>
                   <Badge className="bg-amber-200 text-amber-800 text-xs">Livello {feature.level}</Badge>
                 </div>
               </div>
@@ -121,23 +110,11 @@ export default function LevelUpFeaturesStep({
         })}
       </div>
 
-      <div className="flex justify-between pt-4 border-t border-amber-200">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onBack}
-          className="border-amber-600 text-amber-700"
-        >
-          Indietro
-        </Button>
-        <Button
-          type="button"
-          onClick={() => onNext({ featuresConfirmed: true })}
-          className="bg-amber-700 hover:bg-amber-800 text-white"
-        >
-          {isLast ? 'Conferma' : 'Avanti'}
-        </Button>
-      </div>
+      <WizardNav
+        onBack={onBack}
+        onNext={() => onNext({ featuresConfirmed: true })}
+        nextLabel={isLast ? 'Conferma ✓' : 'Avanti →'}
+      />
     </div>
   );
 }

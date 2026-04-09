@@ -153,7 +153,7 @@ export function ClassStep({ initialClassId, onBack, onSelect }: ClassStepProps) 
       <AncientCardContainer className="mt-6 p-6">
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-2xl font-serif font-bold text-amber-900">
+            <h3 className="text-2xl fantasy-title">
               {getItalianClass(selectedClass.name)}
             </h3>
             <Badge variant="outline" className="bg-amber-100">

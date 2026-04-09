@@ -113,7 +113,7 @@ export default function SpellDetailPage() {
                                 <SchoolIcon className="w-7 h-7" />
                             </div>
                             <div>
-                                <h1 className="text-3xl md:text-4xl font-serif font-bold text-amber-900">
+                                <h1 className="text-3xl md:text-4xl fantasy-title">
                                     {spell.name}
                                 </h1>
                                 <div className="flex items-center gap-3 mt-1 flex-wrap">

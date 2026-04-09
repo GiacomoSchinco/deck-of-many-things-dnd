@@ -77,7 +77,7 @@ export default function SpellSlotsManager({
   return (
     <div className={cn("w-full mb-4", className)}>
       <div className="flex justify-between items-center mb-2">
-        <h3 className="text-sm font-serif font-bold text-amber-900">Slot Incantesimo</h3>
+        <h3 className="text-sm fantasy-title">Slot Incantesimo</h3>
         {showRefresh && (
           <Button
             variant="ghost"
@@ -95,7 +95,7 @@ export default function SpellSlotsManager({
         {normalSlots.map(slot => {
           const Icon = levelIcons[slot.level] || Star;
           return (
-            <div key={slot.level} className="flex items-center justify-between p-1.5 bg-amber-50/50 rounded border border-amber-200">
+            <div key={slot.level} className="fantasy-section flex items-center justify-between p-1.5">
               <div className="flex items-center gap-1">
                 <Icon className="w-3 h-3 text-amber-600" />
                 <span className="font-serif font-medium text-amber-800 text-xs">{levelNames[slot.level]}</span>

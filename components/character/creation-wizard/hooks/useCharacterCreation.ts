@@ -12,18 +12,15 @@ import { useApplySavingThrows } from '@/hooks/mutations/useSavingThrowMutations'
 import { useAddCharacterSpells, useInitSpellSlots } from '@/hooks/mutations/useCharacterSpellMutations';
 import { useCreationStore } from '@/store/useCreationStore';
 import type { CreationStep } from '@/types/creation';
+import { getSpellProgression } from '@/lib/rules/spellcasting';
+import type { SpellCastingClass } from '@/lib/rules/spellcasting';
+import { getEnglishClass } from '@/lib/utils/nameMappers';
 
 // Ordine canonico degli step del wizard
 const BASE_STEPS: CreationStep[] = [
   'basic-info', 'race', 'class', 'campaign',
   'abilities', 'skills', 'equipment', 'spells', 'review',
 ];
-
-// Mappa nome slot → numero livello (usata per inizializzare gli spell slot)
-const SLOT_LEVEL: Record<string, number> = {
-  '1st': 1, '2nd': 2, '3rd': 3, '4th': 4, '5th': 5,
-  '6th': 6, '7th': 7, '8th': 8, '9th': 9,
-};
 
 export function useCharacterCreation() {
   const router = useRouter();
@@ -67,7 +64,6 @@ export function useCharacterCreation() {
   const idx      = steps.indexOf(currentStep);
   const nextStep = () => idx < steps.length - 1 && setStep(steps[idx + 1]);
   const prevStep = () => idx > 0                 && setStep(steps[idx - 1]);
-  const goToStep = (step: CreationStep)          => setStep(step);
 
   // ─── Salvataggio dati aggiuntivi ──────────────────────────────────────────
   /**
@@ -110,23 +106,23 @@ export function useCharacterCreation() {
       if (spellIds.length) await addSpells.mutateAsync({ characterId, spellIds });
     }
 
-    // 5) Spell slot iniziali (solo per classi incantatori)
-    //    Fetch GET alla progression-table → unica chiamata raw rimasta (read-only, non è una mutation)
+    // 5) Spell slot iniziali (da regole locali, senza DB)
     if (classData?.spellcasting) {
-      const res = await fetch(
-        `/api/spellcasting-progression?class=${classData.name?.toLowerCase()}&level=${data.level ?? 1}`
-      );
-      if (!res.ok) throw new Error('Errore recupero progressione spell slot');
+      const englishClass = getEnglishClass(classData.name) as SpellCastingClass;
+      const spellAbility = classData.spellcasting.spellcasting_ability as 'intelligence' | 'wisdom' | 'charisma';
+      const score = data.abilityScores?.[spellAbility] ?? 10;
+      const abilityMod = Math.floor((score - 10) / 2);
+      const prog = getSpellProgression(englishClass, data.level ?? 1, abilityMod);
 
-      const prog = await res.json();
-      const slots = [
-        ...Object.entries<number>(prog?.spell_slots ?? {})
-          .map(([k, n]) => ({ spell_level: SLOT_LEVEL[k], total_slots: n, used_slots: 0 }))
-          .filter(s => s.spell_level && s.total_slots > 0),
-        ...(prog?.pact_slots > 0 && SLOT_LEVEL[prog.pact_slot_level]
-          ? [{ spell_level: SLOT_LEVEL[prog.pact_slot_level], total_slots: prog.pact_slots, used_slots: 0 }]
-          : []),
-      ];
+      const slots = Object.entries(prog.spellSlots)
+        .map(([lvl, n]) => ({ spell_level: Number(lvl), total_slots: n, used_slots: 0 }))
+        .filter(s => s.total_slots > 0);
+
+      // Warlock: pact magic
+      if (prog.pactMagic && prog.pactMagic.slots > 0) {
+        slots.push({ spell_level: prog.pactMagic.level, total_slots: prog.pactMagic.slots, used_slots: 0 });
+      }
+
       if (slots.length) await initSpellSlots.mutateAsync({ characterId, slots });
     }
   };
@@ -208,7 +204,6 @@ export function useCharacterCreation() {
     updateData,
     nextStep,
     prevStep,
-    goToStep,
     saveCharacter,
     calculations,
     isFirstStep:  currentStep === 'basic-info',

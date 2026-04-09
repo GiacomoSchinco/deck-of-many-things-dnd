@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { WizardNav } from '@/components/shared/WizardNav';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -84,13 +84,13 @@ export default function LevelUpASIStep({
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <div className="inline-flex items-center justify-center p-3 bg-amber-100 rounded-full mb-4">
+        <div className="fantasy-icon-wrap">
           <TrendingUp className="w-8 h-8 text-amber-700" />
         </div>
-        <h2 className="text-xl font-serif font-bold text-amber-900">
+        <h2 className="text-xl fantasy-title">
           Aumento delle Caratteristiche
         </h2>
-        <p className="text-amber-600 text-sm mt-1">
+        <p className="fantasy-subtitle mt-1">
           Aumenta le tue statistiche o scegli un talento
         </p>
       </div>
@@ -100,7 +100,7 @@ export default function LevelUpASIStep({
         onValueChange={(v) => setAsiType(v as 'increase' | 'feat')}
         className="space-y-3"
       >
-        <div className="flex items-start gap-3 p-3 rounded-lg border border-amber-200">
+        <div className="flex items-start gap-3 p-3 rounded-lg border border-amber-200 bg-amber-50/30">
           <RadioGroupItem value="increase" id="increase" className="mt-1" />
           <Label htmlFor="increase" className="flex-1 cursor-pointer">
             <div className="font-medium text-amber-900">Aumenta caratteristiche</div>
@@ -110,7 +110,7 @@ export default function LevelUpASIStep({
           </Label>
         </div>
 
-        <div className="flex items-start gap-3 p-3 rounded-lg border border-amber-200">
+        <div className="flex items-start gap-3 p-3 rounded-lg border border-amber-200 bg-amber-50/30">
           <RadioGroupItem value="feat" id="feat" className="mt-1" />
           <Label htmlFor="feat" className="flex-1 cursor-pointer">
             <div className="font-medium text-amber-900 flex items-center gap-1">
@@ -194,7 +194,7 @@ export default function LevelUpASIStep({
       )}
 
       {asiType === 'feat' && (
-        <div className="mt-4 p-4 bg-amber-50/50 rounded-lg border border-amber-200 text-center">
+        <div className="mt-4 p-4 fantasy-section text-center">
           <p className="text-amber-700 text-sm">
             ⚠️ Selezione talenti in arrivo
           </p>
@@ -204,23 +204,11 @@ export default function LevelUpASIStep({
         </div>
       )}
 
-      <div className="flex justify-between pt-4 border-t border-amber-200">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onBack}
-          className="border-amber-600 text-amber-700"
-        >
-          Indietro
-        </Button>
-        <Button
-          type="button"
-          onClick={handleNext}
-          className="bg-amber-700 hover:bg-amber-800 text-white"
-        >
-          {isLast ? 'Conferma' : 'Avanti'}
-        </Button>
-      </div>
+      <WizardNav
+        onBack={onBack}
+        onNext={handleNext}
+        nextLabel={isLast ? 'Conferma ✓' : 'Avanti →'}
+      />
     </div>
   );
 }

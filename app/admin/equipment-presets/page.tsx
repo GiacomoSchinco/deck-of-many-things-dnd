@@ -54,7 +54,7 @@ export default function EquipmentPresetsPage() {
         <div className="bg-amber-900/10 border-b border-amber-900/20 px-6 py-5">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-serif font-bold text-amber-900 flex items-center gap-2">
+              <h1 className="text-3xl fantasy-title flex items-center gap-2">
                 <Package className="w-7 h-7 text-amber-700" />
                 Gestione Preset Equipaggiamento
               </h1>
@@ -74,11 +74,11 @@ export default function EquipmentPresetsPage() {
 
         <div className="p-6 space-y-6">
           {/* Filtro per classe - migliorato */}
-          <div className="bg-amber-50/50 rounded-lg border border-amber-200 p-4">
+          <div className="fantasy-section p-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <div className="flex items-center gap-2">
                 <Filter className="w-4 h-4 text-amber-600" />
-                <span className="text-amber-800 font-serif font-medium">Filtra per classe:</span>
+                <span className="fantasy-label font-serif font-medium">Filtra per classe:</span>
               </div>
               <select
                 value={selectedClass}

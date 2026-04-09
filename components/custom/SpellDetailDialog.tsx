@@ -84,7 +84,7 @@ export default function SpellDetailDialog({ spell, open, onClose }: SpellDetailD
               <SchoolIcon className="w-6 h-6" />
             </div>
             <div>
-              <DialogTitle className="text-2xl font-serif font-bold text-amber-900">
+              <DialogTitle className="text-2xl fantasy-title">
                 {spell.name}
               </DialogTitle>
               <div className="flex items-center gap-2 mt-0.5 text-amber-700 text-sm font-serif">

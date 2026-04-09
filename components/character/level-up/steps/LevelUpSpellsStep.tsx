@@ -3,7 +3,7 @@
 
 import { useState, useMemo } from 'react';
 import { useSpells, useCharacterSpells } from '@/hooks/queries/useSpells';
-import { Button } from '@/components/ui/button';
+import { WizardNav } from '@/components/shared/WizardNav';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -179,24 +179,21 @@ export default function LevelUpSpellsStep({
     return (
       <div className="space-y-6">
         <div className="text-center">
-          <div className="inline-flex items-center justify-center p-3 bg-amber-100 rounded-full mb-4">
+          <div className="fantasy-icon-wrap">
             <BookOpen className="w-8 h-8 text-amber-700" />
           </div>
-          <h2 className="text-xl font-serif font-bold text-amber-900">
+          <h2 className="text-xl fantasy-title">
             Incantesimi
           </h2>
-          <p className="text-amber-600 text-sm mt-1">
+          <p className="fantasy-subtitle mt-1">
             Al livello {newLevel} non ottieni nuovi incantesimi o slot.
           </p>
         </div>
-        <div className="flex justify-between pt-4 border-t border-amber-200">
-          <Button variant="outline" onClick={onBack} className="border-amber-600 text-amber-700">
-            Indietro
-          </Button>
-          <Button onClick={() => onNext({ newSpells: [] })} className="bg-amber-700 hover:bg-amber-800 text-white">
-            {isLast ? 'Conferma' : 'Avanti'}
-          </Button>
-        </div>
+        <WizardNav
+          onBack={onBack}
+          onNext={() => onNext({ newSpells: [] })}
+          nextLabel={isLast ? 'Conferma ✓' : 'Avanti →'}
+        />
       </div>
     );
   }
@@ -205,13 +202,13 @@ export default function LevelUpSpellsStep({
     <>
       <div className="space-y-6">
         <div className="text-center">
-          <div className="inline-flex items-center justify-center p-3 bg-amber-100 rounded-full mb-4">
+          <div className="fantasy-icon-wrap">
             <BookOpen className="w-8 h-8 text-amber-700" />
           </div>
-          <h2 className="text-xl font-serif font-bold text-amber-900">
+          <h2 className="text-xl fantasy-title">
             Nuovi Incantesimi
           </h2>
-          <p className="text-amber-600 text-sm mt-1">
+          <p className="fantasy-subtitle mt-1">
             {isPreparer 
               ? `Al livello ${newLevel} puoi preparare più incantesimi`
               : `Scegli ${changes.spellChanges.newSpellsKnown} nuovi incantesimi da imparare`
@@ -221,7 +218,7 @@ export default function LevelUpSpellsStep({
 
         {/* Nuovi slot sbloccati */}
         {newSlots.length > 0 && (
-          <div className="bg-amber-50/50 rounded-lg p-4 border border-amber-200">
+          <div className="fantasy-section p-4">
             <h3 className="font-serif font-medium text-amber-800 mb-2 flex items-center gap-2">
               <ArrowUpCircle className="w-4 h-4" />
               Nuovi slot incantesimo
@@ -238,7 +235,7 @@ export default function LevelUpSpellsStep({
 
         {/* Nuovi trucchetti */}
         {changes.spellChanges.newCantrips > 0 && (
-          <div className="bg-amber-50/50 rounded-lg p-4 border border-amber-200">
+          <div className="fantasy-section p-4">
             <h3 className="font-serif font-medium text-amber-800 mb-2 flex items-center gap-2">
               <Sparkles className="w-4 h-4" />
               Nuovi trucchetti ({changes.spellChanges.newCantrips})
@@ -431,7 +428,7 @@ export default function LevelUpSpellsStep({
                               className={cn(
                                 'w-full flex items-center gap-2 p-2 rounded-lg border text-left text-sm transition-all',
                                 swapTo === String(spell.id)
-                                  ? 'border-green-400 bg-green-50 text-green-800'
+                                  ? 'border-amber-500 bg-amber-50 text-amber-900'
                                   : 'border-amber-200 hover:border-amber-400 hover:bg-amber-50/50 text-amber-800'
                               )}
                             >
@@ -485,31 +482,19 @@ export default function LevelUpSpellsStep({
 
         {/* Messaggio per classi che non hanno cambiamenti significativi */}
         {!isPreparer && changes.spellChanges.newSpellsKnown === 0 && changes.spellChanges.newCantrips === 0 && (
-          <div className="bg-amber-50/50 rounded-lg p-4 border border-amber-200 text-center">
+          <div className="fantasy-section p-4 text-center">
             <p className="text-sm text-amber-700">
               Al livello {newLevel} non impari nuovi incantesimi.
             </p>
           </div>
         )}
 
-        <div className="flex justify-between pt-4 border-t border-amber-200">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onBack}
-            className="border-amber-600 text-amber-700"
-          >
-            Indietro
-          </Button>
-          <Button
-            type="button"
-            onClick={handleNext}
-            disabled={!canProceed()}
-            className="bg-amber-700 hover:bg-amber-800 text-white"
-          >
-            {isLast ? 'Conferma' : 'Avanti'}
-          </Button>
-        </div>
+        <WizardNav
+          onBack={onBack}
+          onNext={handleNext}
+          nextLabel={isLast ? 'Conferma ✓' : 'Avanti →'}
+          nextDisabled={!canProceed()}
+        />
       </div>
 
       <SpellDetailDialog

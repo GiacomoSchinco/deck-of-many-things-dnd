@@ -150,8 +150,8 @@ export default function PreparedSpellsManager({
       {/* Header */}
       <div className="flex justify-between items-center flex-wrap gap-2">
         <div>
-          <h3 className="text-lg font-serif font-bold text-amber-900">Incantesimi Preparati</h3>
-          <p className="text-sm text-amber-600">
+          <h3 className="text-lg fantasy-title">Incantesimi Preparati</h3>
+          <p className="fantasy-subtitle">
             {preparedSpellIds.size} di {maxPreparable} preparati
           </p>
         </div>
@@ -183,7 +183,7 @@ export default function PreparedSpellsManager({
         .sort((a, b) => a - b)
         .map((level) => (
           <div key={level} className="space-y-2">
-            <h4 className="font-serif font-semibold text-amber-800 border-b border-amber-200 pb-1">
+            <h4 className="fantasy-title font-semibold border-b border-amber-200 pb-1">
               Livello {level}
             </h4>
             <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
@@ -196,7 +196,7 @@ export default function PreparedSpellsManager({
                       flex items-center justify-between p-3 rounded-lg border transition-all
                       ${isPrepared 
                         ? 'bg-green-50 border-green-300' 
-                        : 'bg-amber-50/50 border-amber-200 hover:bg-amber-100/50'
+                        : 'fantasy-section hover:bg-amber-100/50'
                       }
                     `}
                   >

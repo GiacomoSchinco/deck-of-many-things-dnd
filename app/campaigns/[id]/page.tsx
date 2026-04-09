@@ -75,7 +75,7 @@ export default function CampaignPage() {
 
             {/* Personaggi con CharacterCard */}
             <div className="space-y-4">
-                <h2 className="text-2xl font-serif font-bold text-amber-900 flex items-center gap-2">
+                <h2 className="text-2xl fantasy-title flex items-center gap-2">
                     <Users className="w-5 h-5" />
                     Personaggi della Campagna
                     <span className="text-sm font-normal text-amber-600 ml-2">

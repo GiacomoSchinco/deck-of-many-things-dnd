@@ -1,7 +1,7 @@
 // components/character/level-up/LevelUpSummaryStep.tsx
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { WizardNav } from '@/components/shared/WizardNav';
 import { CheckCircle2, Heart, TrendingUp, BookOpen, Zap } from 'lucide-react';
 
 interface SummaryCharacter {
@@ -55,20 +55,20 @@ export default function LevelUpSummaryStep({
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <div className="inline-flex items-center justify-center p-3 bg-green-100 rounded-full mb-4">
+        <div className="fantasy-icon-wrap">
           <CheckCircle2 className="w-8 h-8 text-green-600" />
         </div>
-        <h2 className="text-xl font-serif font-bold text-amber-900">
+        <h2 className="text-xl fantasy-title">
           Riepilogo Level Up
         </h2>
-        <p className="text-amber-600 text-sm mt-1">
+        <p className="fantasy-subtitle mt-1">
           {character.name} sale al livello {newLevel}
         </p>
       </div>
 
       <div className="space-y-3">
         {/* HP */}
-        <div className="bg-amber-50/50 rounded-lg p-3 border border-amber-200">
+        <div className="fantasy-section p-3">
           <div className="flex items-center gap-2 text-amber-700 mb-1">
             <Heart className="w-4 h-4" />
             <span className="font-medium">Punti Ferita</span>
@@ -80,7 +80,7 @@ export default function LevelUpSummaryStep({
 
         {/* ASI */}
         {data.asiType !== undefined && (
-          <div className="bg-amber-50/50 rounded-lg p-3 border border-amber-200">
+          <div className="fantasy-section p-3">
             <div className="flex items-center gap-2 text-amber-700 mb-1">
               <TrendingUp className="w-4 h-4" />
               <span className="font-medium">Aumento Caratteristiche</span>
@@ -101,7 +101,7 @@ export default function LevelUpSummaryStep({
 
         {/* Incantesimi */}
         {data.newSpells && data.newSpells.length > 0 && (
-          <div className="bg-amber-50/50 rounded-lg p-3 border border-amber-200">
+          <div className="fantasy-section p-3">
             <div className="flex items-center gap-2 text-amber-700 mb-1">
               <BookOpen className="w-4 h-4" />
               <span className="font-medium">Nuovi Incantesimi</span>
@@ -114,7 +114,7 @@ export default function LevelUpSummaryStep({
 
         {/* Nuovi slot */}
         {changes.spellChanges?.newSpellSlots && (
-          <div className="bg-amber-50/50 rounded-lg p-3 border border-amber-200">
+          <div className="fantasy-section p-3">
             <div className="flex items-center gap-2 text-amber-700 mb-1">
               <Zap className="w-4 h-4" />
               <span className="font-medium">Nuovi Slot</span>
@@ -133,7 +133,7 @@ export default function LevelUpSummaryStep({
 
         {/* Nuove feature */}
         {changes.newFeatures && changes.newFeatures.length > 0 && (
-          <div className="bg-amber-50/50 rounded-lg p-3 border border-amber-200">
+          <div className="fantasy-section p-3">
             <div className="flex items-center gap-2 text-amber-700 mb-1">
               <Zap className="w-4 h-4" />
               <span className="font-medium">Nuove Abilità</span>
@@ -147,24 +147,13 @@ export default function LevelUpSummaryStep({
         )}
       </div>
 
-      <div className="flex justify-between pt-4 border-t border-amber-200">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onBack}
-          className="border-amber-600 text-amber-700"
-        >
-          Indietro
-        </Button>
-        <Button
-          type="button"
-          onClick={() => onNext({ confirmed: true })}
-          disabled={isSaving}
-          className="bg-green-600 hover:bg-green-700 text-white"
-        >
-          {isSaving ? 'Salvataggio...' : 'Completa Level Up'}
-        </Button>
-      </div>
+      <WizardNav
+        onBack={onBack}
+        onNext={() => onNext({ confirmed: true })}
+        nextLabel={isSaving ? 'Salvataggio...' : 'Completa Level Up ✓'}
+        nextLoading={isSaving}
+        nextDisabled={isSaving}
+      />
     </div>
   );
 }

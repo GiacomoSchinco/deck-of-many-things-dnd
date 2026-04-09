@@ -45,13 +45,13 @@ export default function AncientContainer({
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               {title && (
-                <h1 className="text-2xl md:text-3xl font-serif font-bold text-amber-900 flex items-center gap-2">
+                <h1 className="text-2xl md:text-3xl fantasy-title flex items-center gap-2">
                   {Icon && <Icon className="w-6 h-6 md:w-7 md:h-7 text-amber-700" />}
                   {title}
                 </h1>
               )}
               {subtitle && (
-                <p className="text-amber-600 text-sm mt-1">{subtitle}</p>
+                <p className="fantasy-subtitle mt-1">{subtitle}</p>
               )}
             </div>
             {action && (

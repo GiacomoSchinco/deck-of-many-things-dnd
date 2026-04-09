@@ -38,6 +38,74 @@
 | [Zustand](https://github.com/pmndrs/zustand) | Gestione stato client |
 | [Supabase](https://supabase.com/) | Database e autenticazione |
 
+## 🎨 **Sistema CSS Fantasy**
+
+Questo progetto usa classi CSS custom definite in `app/globals.css` (`@layer components`) per mantenere uno stile coerente su tutta l'app. **Non usare Tailwind inline per questi pattern — usa le classi fantasy.**
+
+### Classi di testo
+
+| Classe | Tailwind equivalente | Quando usarla |
+|---|---|---|
+| `fantasy-title` | `font-serif font-bold text-amber-900` | Titoli di sezione, nomi, intestazioni card |
+| `fantasy-subtitle` | `text-amber-600 text-sm` | Sottotitoli, descrizioni secondarie |
+| `fantasy-label` | `text-amber-800` | Etichetta a sinistra in una riga info |
+| `fantasy-value` | `font-bold text-amber-900` | Valore a destra in una riga info |
+
+### Classi contenitore
+
+| Classe | Tailwind equivalente | Quando usarla |
+|---|---|---|
+| `fantasy-section` | `bg-amber-50/50 rounded-lg border border-amber-200` | Card/box sezione (wizard step, sheet section) |
+| `fantasy-row` | `flex justify-between items-center p-2 bg-amber-50 rounded` | Riga label/valore singola |
+| `fantasy-section-header` | `font-serif font-bold text-amber-900 mb-4 text-center border-b border-amber-200 pb-2` | Intestazione con bordo inferiore (usare via `SectionTitle`) |
+| `fantasy-icon-wrap` | `inline-flex items-center justify-center p-3 bg-amber-100 rounded-full mb-4` | Cerchio attorno a un'icona decorativa |
+
+### Componenti condivisi (`components/shared/`)
+
+Preferisci i componenti invece delle classi dirette quando possibile:
+
+**`<StatRow>`** — riga label/valore con `fantasy-row`
+```tsx
+import { StatRow } from '@/components/shared/StatRow';
+
+<StatRow label="Classe Armatura" value={character.armor_class} />
+// opzionale: className per override/aggiunta classi
+```
+
+**`<SectionTitle>`** — intestazione sezione con `fantasy-section-header`
+```tsx
+import { SectionTitle } from '@/components/shared/SectionTitle';
+
+<SectionTitle>Info Combattimento</SectionTitle>
+<SectionTitle size="sm">Sottosezione</SectionTitle>
+// size: 'sm' (text-lg) | 'md' (text-xl, default) | 'lg' (text-2xl)
+```
+
+**`<WizardNav>`** — navigazione wizard con back/next
+```tsx
+import { WizardNav } from '@/components/shared/WizardNav';
+
+<WizardNav
+  onBack={handleBack}
+  backLabel="Indietro"        // default: "Indietro"
+  onNext={handleNext}
+  nextLabel="Avanti"          // default: "Avanti"
+  nextDisabled={!isValid}
+  nextLoading={isSaving}
+/>
+```
+
+### Esempio pattern completo
+
+```tsx
+<div className="fantasy-section p-4 space-y-2">
+  <SectionTitle>Info Personaggio</SectionTitle>
+  <StatRow label="Razza" value={character.race} />
+  <StatRow label="Classe" value={character.class} />
+  <StatRow label="Livello" value={character.level} />
+</div>
+```
+
 ## 📋 **Prerequisiti**
 
 - Node.js 18+

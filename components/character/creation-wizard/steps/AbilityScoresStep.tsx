@@ -125,7 +125,7 @@ export function AbilityScoresStep({
 
                 <div className="flex-1 flex items-center justify-center z-10">
                   <div className="text-center">
-                    <h3 className="font-serif font-bold text-amber-900 mb-4 text-4xl">
+                    <h3 className="fantasy-title mb-4 text-4xl">
                       {baseScore}
                       {raceBonus > 0 && (
                         <span className="text-green-600 text-xl ml-1">+{raceBonus}</span>
@@ -157,10 +157,10 @@ export function AbilityScoresStep({
           const raceBonus = raceBonuses[key] || 0;
 
           return (
-            <div key={key} className="flex items-center justify-between bg-amber-50 p-3 rounded">
+            <div key={key} className="fantasy-row">
               <div>
                 <div className="text-sm font-semibold text-amber-800">{name}</div>
-                <div className="text-2xl font-serif font-bold text-amber-900">
+                <div className="text-2xl fantasy-title">
                   {baseScore}
                   {raceBonus > 0 && <span className="text-green-600 text-lg ml-1">+{raceBonus}</span>}
                 </div>

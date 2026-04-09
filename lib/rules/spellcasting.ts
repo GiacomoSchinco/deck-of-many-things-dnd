@@ -127,14 +127,24 @@ const halfCasterSlots: Record<number, Record<number, number>> = {
   20:{1:4,2:3,3:3,4:3,5:1},
 };
 
+// Classi che hanno magia
+const CASTER_CLASSES = new Set<string>([
+  'wizard', 'sorcerer', 'bard', 'cleric', 'druid', 'paladin', 'ranger', 'warlock',
+]);
+
 // --------------------------------------------------------------
 // 4. FUNZIONE PRINCIPALE
 // --------------------------------------------------------------
 export function getSpellProgression(
-  className: SpellCastingClass,
+  className: string,
   level: number,
   abilityModifier: number = 0
 ): SpellProgression {
+  // Classi senza magia (guerriero, barbaro, monaco, ecc.) → progressione vuota
+  if (!CASTER_CLASSES.has(className)) {
+    return { cantrips: 0, spellsKnown: null, spellSlots: {} };
+  }
+  const cls = className as SpellCastingClass;
   const progression: SpellProgression = {
     cantrips: 0,
     spellsKnown: null,
@@ -142,31 +152,31 @@ export function getSpellProgression(
   };
 
   // 1. Cantrips
-  progression.cantrips = cantripsProgression[className]?.[level] ?? 0;
+  progression.cantrips = cantripsProgression[cls]?.[level] ?? 0;
 
   // 2. Spells known / preparazione
-  if (className === 'wizard') {
+  if (cls === 'wizard') {
     progression.spellsKnown = null;
     progression.wizardSpellbookSize = 6;
     progression.preparedModifier = 'int';
     progression.spellsPreparable = Math.max(1, level + abilityModifier);
     
-  } else if (className === 'cleric' || className === 'druid') {
+  } else if (cls === 'cleric' || cls === 'druid') {
     progression.spellsKnown = null;
     progression.preparedModifier = 'wis';
     progression.spellsPreparable = Math.max(1, level + abilityModifier);
     
-  } else if (className === 'paladin') {
+  } else if (cls === 'paladin') {
     progression.spellsKnown = null;
     progression.preparedModifier = 'cha';
     progression.spellsPreparable = Math.max(1, Math.floor(level / 2) + abilityModifier);
     
-  } else if (spellsKnownProgression[className]) {
-    progression.spellsKnown = spellsKnownProgression[className][level] ?? 0;
+  } else if (spellsKnownProgression[cls]) {
+    progression.spellsKnown = spellsKnownProgression[cls][level] ?? 0;
   }
 
   // 3. Slot incantesimi
-  if (className === 'warlock') {
+  if (cls === 'warlock') {
     let pactSlots = 1;
     let pactLevel = 1;
     if (level >= 1 && level <= 2) { pactSlots = 1; pactLevel = 1; }
@@ -183,7 +193,7 @@ export function getSpellProgression(
     if (level >= 15) progression.pactMagic.mysticArcanum!.push(8);
     if (level >= 17) progression.pactMagic.mysticArcanum!.push(9);
   } else {
-    const isFullCaster = ['wizard','sorcerer','bard','cleric','druid'].includes(className);
+    const isFullCaster = ['wizard','sorcerer','bard','cleric','druid'].includes(cls);
     const slotsTable = isFullCaster ? fullCasterSlots : halfCasterSlots;
     progression.spellSlots = slotsTable[level] ?? {};
   }
@@ -195,7 +205,7 @@ export function getSpellProgression(
 // 5. FUNZIONE PER IL LEVEL UP
 // --------------------------------------------------------------
 export function getLevelUpSpellChanges(
-  className: SpellCastingClass,
+  className: string,
   oldLevel: number,
   newLevel: number,
   abilityModifier: number = 0
