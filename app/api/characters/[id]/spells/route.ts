@@ -28,7 +28,7 @@ export async function GET(
 }
 
 // POST /api/characters/[id]/spells
-// Body: { spell_ids: number[], prepared?: boolean }
+// Body: { spell_ids: number[] }
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -45,7 +45,7 @@ export async function POST(
   }
 
   const body = await request.json()
-  const { spell_ids, prepared = false } = body as { spell_ids: number[]; prepared?: boolean }
+  const { spell_ids } = body as { spell_ids: number[] }
 
   if (!Array.isArray(spell_ids) || spell_ids.length === 0) {
     return NextResponse.json({ error: 'spell_ids richiesto' }, { status: 400 })
@@ -54,7 +54,6 @@ export async function POST(
   const rows = spell_ids.map((spell_id: number) => ({
     character_id: id,
     spell_id,
-    prepared,
   }))
 
   const { data, error } = await supabase

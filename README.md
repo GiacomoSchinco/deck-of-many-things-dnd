@@ -119,3 +119,67 @@ import { WizardNav } from '@/components/shared/WizardNav';
 ```bash
 git clone https://github.com/tuo-username/deck-of-many-things.git
 cd deck-of-many-things
+
+## 🔮 **Sistema Incantesimi**
+
+### Architettura (due tabelle separate)
+
+```
+spells_known      → incantesimi che il personaggio ha imparato/conosce permanentemente
+prepared_spells   → incantesimi attualmente preparati (subset di spells_known o dell'intera classe)
+spell_slots       → slot disponibili/usati per livello (1–9)
+```
+
+### Regole per tipo di classe
+
+| Classe | Impara (spells_known) | Prepara (prepared_spells) | Limite preparazione |
+|---|---|---|---|
+| **Bardo / Stregone / Warlock** | Sceglie un numero fisso di spell | Non prepara — usa direttamente le conosciute | N/A |
+| **Ranger / Ladro** | Sceglie un numero fisso di spell | Non prepara | N/A |
+| **Mago** | Tutte le spell nel grimorio (spells_known) | Sceglie ogni giorno dal grimorio | livello + mod INT |
+| **Chierico / Druido** | NON salva in spells_known — accede all'intera lista classe | Sceglie ogni giorno da tutta la lista | livello + mod SAG |
+| **Paladino** | NON salva in spells_known — accede all'intera lista classe | Sceglie ogni giorno da tutta la lista | livello/2 + mod CAR |
+
+> **Nota**: Il campo `isPreparer` in `Spellbook` attiva il tab "Preparati". Le classi preparatrici (chierico, druido, paladino, mago) hanno `isPreparerClass = true`.
+
+### Flusso dati — aggiungi/rimuovi spell
+
+```
+Utente clicca "Gestisci Incantesimi"
+  → Spellbook apre SpellsStep dialog
+  → onSave chiama useAddCharacterSpells / useRemoveCharacterSpells
+  → POST/DELETE /api/characters/[id]/spells
+  → tabella spells_known in Supabase
+```
+
+### Flusso dati — prepara/de-prepara spell
+
+```
+Utente è nel tab "Preparati" (PreparedSpellsManager)
+  → Per Mago: lista da spells_known (il grimorio)
+  → Per Chierico/Druido/Paladino: lista dall'intera classe (useSpells({ class: "cleric" }))
+    ⚠️  Il nome classe è in inglese lowercase nel DB (es. "cleric", "druid", "paladin")
+    Il componente riceve già il nome inglese da spells/page.tsx via getEnglishClass()
+  → useAddPreparedSpells / useRemovePreparedSpells
+  → POST/DELETE /api/characters/[id]/prepared-spells
+```
+
+### Flusso dati — usa/recupera slot
+
+```
+Utente clicca +/− sullo SpellSlotsManager in Spellbook
+  → onUpdate chiama usePatchSpellSlot
+  → PATCH /api/characters/[id]/spell-slots  { spell_level, used_slots }
+
+Utente clicca "Riposo lungo"
+  → onLongRest chiama useLongRestSpellSlots
+  → PUT /api/characters/[id]/spell-slots  (reset used_slots = 0 per tutti)
+```
+
+### Level-up e spell slots
+
+Durante il level-up, `getLevelUpSpellChanges()` in `lib/rules/spellcasting.ts` ritorna:
+- `newSpellSlots` — **delta** (slot guadagnati al nuovo livello, per la visualizzazione)
+- `totalSpellSlots` — **totale** al nuovo livello (usato per l'upsert nel DB)
+
+Non confondere i due: la visualizzazione mostra il delta, il salvataggio usa il totale.

@@ -161,11 +161,11 @@ export function useLevelUp({ characterId, currentLevel, onComplete }: UseLevelUp
       }
 
       // 3. Aggiorna spell slots (upsert total_slots, preserva used_slots)
-      const newSpellSlots = changes.spellChanges?.newSpellSlots;
-      if (newSpellSlots && Object.keys(newSpellSlots).length > 0) {
+      const totalSpellSlots = changes.spellChanges?.totalSpellSlots;
+      if (totalSpellSlots && Object.keys(totalSpellSlots).length > 0) {
         const existingSlots: Array<{ spell_level: number; total_slots: number; used_slots: number }> =
           character.spell_slots || [];
-        const slots = Object.entries(newSpellSlots)
+        const slots = Object.entries(totalSpellSlots)
           .filter(([, total]) => (total as number) > 0)
           .map(([lvl, total]) => {
             const spellLevel = Number(lvl);

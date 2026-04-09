@@ -1,17 +1,17 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-type AddPayload = { characterId: string; spellIds: number[]; prepared?: boolean }
+type AddPayload = { characterId: string; spellIds: number[] }
 type RemovePayload = { characterId: string; knownIds?: string[]; spellIds?: number[] }
 
 export function useAddCharacterSpells() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (payload: AddPayload) => {
-      const { characterId, spellIds, prepared = false } = payload
+      const { characterId, spellIds } = payload
       const res = await fetch(`/api/characters/${characterId}/spells`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ spell_ids: spellIds, prepared }),
+        body: JSON.stringify({ spell_ids: spellIds }),
       })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
@@ -152,6 +152,55 @@ export function useRemovePreparedSpells() {
     },
     onSuccess: (_data, { characterId }) => {
       queryClient.invalidateQueries({ queryKey: ['character', characterId, 'prepared-spells'] })
+    },
+  })
+}
+
+// ── Slot singolo (PATCH) ──────────────────────────────────────────────────────
+
+type PatchSpellSlotPayload = { characterId: string; spell_level: number; used_slots: number }
+
+export function usePatchSpellSlot() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ characterId, spell_level, used_slots }: PatchSpellSlotPayload) => {
+      const res = await fetch(`/api/characters/${characterId}/spell-slots`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ spell_level, used_slots }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || 'Errore aggiornamento slot')
+      }
+      return res.json()
+    },
+    onSuccess: (_data, { characterId }) => {
+      queryClient.invalidateQueries({ queryKey: ['character', characterId, 'spell-slots'] })
+    },
+  })
+}
+
+// Riposo lungo: reset tutti gli slot usati a 0
+type LongRestPayload = { characterId: string; slots: { spell_level: number; total_slots: number }[] }
+
+export function useLongRestSpellSlots() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ characterId, slots }: LongRestPayload) => {
+      const res = await fetch(`/api/characters/${characterId}/spell-slots`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slots: slots.map(s => ({ ...s, used_slots: 0 })) }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || 'Errore riposo lungo')
+      }
+      return res.json()
+    },
+    onSuccess: (_data, { characterId }) => {
+      queryClient.invalidateQueries({ queryKey: ['character', characterId, 'spell-slots'] })
     },
   })
 }

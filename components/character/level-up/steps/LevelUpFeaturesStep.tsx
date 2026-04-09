@@ -1,10 +1,9 @@
 // components/character/level-up/LevelUpFeaturesStep.tsx
 'use client';
 
-import { useState } from 'react';
 import { WizardNav } from '@/components/shared/WizardNav';
 import { Badge } from '@/components/ui/badge';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import type { LucideIcon } from 'lucide-react';
 import { Shield, Swords, Wand2, Users, Zap, Star } from 'lucide-react';
 import { Character } from '@/types';
 
@@ -20,14 +19,14 @@ interface LevelUpFeaturesStepProps {
       level: number;
     }>;
   };
-  data: any;
-  onNext: (data: any) => void;
+  data?: unknown;
+  onNext: (data: { featuresConfirmed: boolean }) => void;
   onBack: () => void;
   isLast: boolean;
 }
 
 // Mappa delle icone per tipo di feature (temporanea)
-const featureIcons: Record<string, any> = {
+const featureIcons: Record<string, LucideIcon> = {
   combat: Swords,
   magic: Wand2,
   utility: Users,
@@ -37,17 +36,12 @@ const featureIcons: Record<string, any> = {
 };
 
 export default function LevelUpFeaturesStep({
-  character,
-  currentLevel,
   newLevel,
   changes,
-  data,
   onNext,
   onBack,
   isLast,
 }: LevelUpFeaturesStepProps) {
-  const [confirmed, setConfirmed] = useState(false);
-
   const features = changes.newFeatures || [];
 
   if (features.length === 0) {

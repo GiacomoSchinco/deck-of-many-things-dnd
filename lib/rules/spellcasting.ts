@@ -213,17 +213,28 @@ export function getLevelUpSpellChanges(
   newCantrips: number;
   newSpellsKnown: number;
   newSpellsPreparable: number;
+  /** Slot GUADAGNATI al nuovo livello (delta ≥ 1 per livello). Usarli per la visualizzazione. */
   newSpellSlots: Record<number, number>;
+  /** Totale slot al nuovo livello (tutti i livelli). Usarli per l'upsert nel DB. */
+  totalSpellSlots: Record<number, number>;
   newPactMagic?: SpellProgression['pactMagic'];
 } {
   const oldProg = getSpellProgression(className, oldLevel, abilityModifier);
   const newProg = getSpellProgression(className, newLevel, abilityModifier);
 
+  // Solo i livelli in cui il personaggio guadagna slot aggiuntivi
+  const newSpellSlots: Record<number, number> = {};
+  for (const [lvl, count] of Object.entries(newProg.spellSlots)) {
+    const delta = (count as number) - (oldProg.spellSlots[Number(lvl)] ?? 0);
+    if (delta > 0) newSpellSlots[Number(lvl)] = delta;
+  }
+
   return {
     newCantrips: newProg.cantrips - oldProg.cantrips,
     newSpellsKnown: (newProg.spellsKnown ?? 0) - (oldProg.spellsKnown ?? 0),
     newSpellsPreparable: (newProg.spellsPreparable ?? 0) - (oldProg.spellsPreparable ?? 0),
-    newSpellSlots: newProg.spellSlots,
+    newSpellSlots,
+    totalSpellSlots: newProg.spellSlots,
     newPactMagic: newProg.pactMagic,
   };
 }

@@ -29,14 +29,14 @@ import {
     Crown,
     Star,
     ScrollText,
-    Bookmark,
     Users
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { getItalianSchool, getItalianClass } from '@/lib/utils/nameMappers';
 import { toast } from 'sonner';
 
 // Mappa delle icone per scuola
-const schoolIcons: Record<string, { icon: any, color: string }> = {
+const schoolIcons: Record<string, { icon: LucideIcon, color: string }> = {
     'abjuration': { icon: Shield, color: 'text-blue-500' },
     'conjuration': { icon: Wand2, color: 'text-purple-500' },
     'divination': { icon: Eye, color: 'text-indigo-500' },
@@ -48,7 +48,7 @@ const schoolIcons: Record<string, { icon: any, color: string }> = {
 };
 
 // Mappa dei livelli
-const levelIcons: Record<number, { icon: any, label: string }> = {
+const levelIcons: Record<number, { icon: LucideIcon, label: string }> = {
     0: { icon: Sparkles, label: 'Trucchetto' },
     1: { icon: Star, label: '1° Livello' },
     2: { icon: Star, label: '2° Livello' },
@@ -78,7 +78,7 @@ export default function SpellDetailPage() {
                 await deleteSpell.mutateAsync(spell.id);
                 toast.success('Incantesimo eliminato con successo');
                 router.push('/admin/spells');
-            } catch (_err) {
+            } catch {
                 toast.error('Errore durante l\'eliminazione');
             }
         }
@@ -211,7 +211,7 @@ export default function SpellDetailPage() {
                             <div>
                                 <p className="text-amber-900 font-serif text-base font-medium">
                                     {(() => {
-                                        const comp = spell.components as any;
+                                        const comp = spell.components;
                                         if (!comp) return '—';
                                         if (Array.isArray(comp)) {
                                             const text = comp.join(', ');

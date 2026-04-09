@@ -5,7 +5,7 @@ import { useState, useMemo } from 'react';
 import { useClass } from '@/hooks/queries/useClasses';
 import { useSpells } from '@/hooks/queries/useSpells';
 import { getSpellProgression, SpellCastingClass } from '@/lib/rules/spellcasting';
-import { getEnglishClass } from '@/lib/utils/nameMappers';
+import { getEnglishClass, getItalianSchool, schoolBadgeColors } from '@/lib/utils/nameMappers';
 import { useCreationStore } from '@/store/useCreationStore';
 import { WizardStep } from '../WizardStep';
 import Loading from '@/components/custom/Loading';
@@ -30,22 +30,13 @@ interface SpellsStepProps {
 
 const PREPARER_CLASSES = ['cleric', 'druid', 'paladin'];
 
-const schoolColors: Record<string, string> = {
-  abjuration:    'bg-blue-100 text-blue-700',
-  conjuration:   'bg-yellow-100 text-yellow-700',
-  divination:    'bg-purple-100 text-purple-700',
-  enchantment:   'bg-pink-100 text-pink-700',
-  evocation:     'bg-red-100 text-red-700',
-  illusion:      'bg-indigo-100 text-indigo-700',
-  necromancy:    'bg-gray-200 text-gray-800',
-  transmutation: 'bg-green-100 text-green-700',
-};
+
 
 export function SpellsStep({
   classId,
   // intelligenceScore: accettato per compatibilità ma non usato internamente
+  // existingSpellIds: accettato per compatibilità ma non usato (nessun lock in edit mode)
   mode = 'create',
-  existingSpellIds = [],
   characterLevel,
   onConfirm,
   onChange,
@@ -88,7 +79,11 @@ export function SpellsStep({
     return prog.spellsKnown ?? 0;
   }, [prog, isWizard]);
 
-  const wizardSpellbookSize = isWizard ? 6 : 0;
+  const wizardSpellbookSize = isWizard
+    ? (mode === 'create'
+        ? 6  // Al livello 1: 6 spell nel grimorio di partenza
+        : 6 + Math.max(0, effectiveLevel - 1) * 2)  // Livello N: 6 + 2*(N-1) attesi
+    : 0;
 
   // Massimo livello di incantesimo che può essere lanciato (basato sugli slot)
   const maxSpellLevel = useMemo(() => {
@@ -126,8 +121,6 @@ export function SpellsStep({
   const toggle = (spell: Spell, type: 'cantrip' | 'spell') => {
     const idStr = String(spell.id);
     const isSelected = selected.includes(idStr);
-
-    if (mode === 'edit' && existingSpellIds.includes(idStr)) return;
 
     if (isSelected) {
       const next = selected.filter((id) => id !== idStr);
@@ -218,14 +211,14 @@ export function SpellsStep({
                   />
                 </div>
                 <SpellSection
-                  title={`Cantip — scegli ${cantripsAllowed}`}
+                title={mode === 'edit' ? `Trucchetti conosciuti (max ${cantripsAllowed})` : `Trucchetti — scegli ${cantripsAllowed}`}
                   icon={<Sparkles className="w-4 h-4" />}
                   selected={selectedCantrips}
                   max={cantripsAllowed}
                   spells={filteredCantrips}
                   onToggle={(s) => toggle(s, 'cantrip')}
                   onDetail={setDetailSpell}
-                  lockedIds={mode === 'edit' ? existingSpellIds : []}
+                  lockedIds={[]}
                 />
               </>
             )}
@@ -278,13 +271,13 @@ export function SpellsStep({
                   ? 'bg-green-100 text-green-700'
                   : 'bg-amber-100 text-amber-700',
               )}>
-                Cantip: {selectedCantrips.length}/{cantripsAllowed}
+                Trucchetti: {selectedCantrips.length}/{cantripsAllowed}
               </span>
             )}
             {(spellsAllowed > 0 || isWizard) && (
               <span className={cn(
                 'px-2 py-0.5 rounded-full font-medium',
-                selectedSpells.length === (isWizard ? wizardSpellbookSize : spellsAllowed)
+                selectedSpells.length >= (isWizard ? wizardSpellbookSize : spellsAllowed)
                   ? 'bg-green-100 text-green-700'
                   : 'bg-amber-100 text-amber-700',
               )}>
@@ -307,14 +300,14 @@ export function SpellsStep({
                 />
               </div>
               <SpellSection
-                title={`Cantip — scegli ${cantripsAllowed}`}
+                title={mode === 'edit' ? `Trucchetti conosciuti (max ${cantripsAllowed})` : `Trucchetti — scegli ${cantripsAllowed}`}
                 icon={<Sparkles className="w-4 h-4" />}
                 selected={selectedCantrips}
                 max={cantripsAllowed}
                 spells={filteredCantrips}
                 onToggle={(s) => toggle(s, 'cantrip')}
                 onDetail={setDetailSpell}
-                lockedIds={mode === 'edit' ? existingSpellIds : []}
+                lockedIds={[]}
               />
             </>
           )}
@@ -330,14 +323,16 @@ export function SpellsStep({
                 return (
                   <SpellSection
                     key={`lvl-${lvl}`}
-                    title={isWizard ? `Grimorio — livello ${lvl}` : `Incantesimi livello ${lvl}`}
+                    title={mode === 'edit'
+                      ? `Incantesimi livello ${lvl}`
+                      : (isWizard ? `Grimorio — livello ${lvl}` : `Incantesimi livello ${lvl}`)}
                     icon={<BookOpen className="w-4 h-4" />}
                     selected={selectedSpells}
                     max={isWizard ? wizardSpellbookSize : spellsAllowed}
                     spells={spellsForLevel}
                     onToggle={(s) => toggle(s, 'spell')}
                     onDetail={setDetailSpell}
-                    lockedIds={mode === 'edit' ? existingSpellIds : []}
+                    lockedIds={[]}
                   />
                 );
               })}
@@ -398,34 +393,34 @@ function SpellSection({
                 disabled={isDisabled && !isLocked}
                 title={isLocked ? 'Incantesimo già conosciuto — rimuovilo dalla scheda del personaggio' : undefined}
                 className={cn(
-                  'flex items-start gap-2 p-2 rounded-lg border text-left transition-all',
+                  'flex items-start gap-2 p-2 rounded-lg border-2 text-left transition-all',
                   isSelected && isLocked
-                    ? 'border-amber-300 bg-amber-50/50 text-amber-700 cursor-default'
+                    ? 'border-amber-400 bg-amber-100 text-amber-800 cursor-default ring-1 ring-amber-300'
                     : isSelected
-                    ? 'border-amber-500 bg-amber-50 text-amber-900'
+                    ? 'border-amber-600 bg-amber-100 text-amber-900 shadow-sm ring-1 ring-amber-400'
                     : isDisabled
-                    ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
-                    : 'border-amber-200 hover:border-amber-400 hover:bg-amber-50/50 text-amber-800',
+                    ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed opacity-50'
+                    : 'border-amber-200 bg-white hover:border-amber-400 hover:bg-amber-50 text-amber-800',
                 )}
               >
                 {isLocked
-                  ? <Lock className="w-4 h-4 mt-0.5 shrink-0 text-amber-400" />
+                  ? <Lock className="w-4 h-4 mt-0.5 shrink-0 text-amber-500" />
                   : <CheckCircle2
                       className={cn(
-                        'w-4 h-4 mt-0.5 shrink-0',
+                        'w-4 h-4 mt-0.5 shrink-0 transition-colors',
                         isSelected ? 'text-amber-600' : 'text-gray-300',
                       )}
                     />
                 }
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium truncate">{spell.name}</p>
+                  <p className={cn('text-sm font-medium truncate', isSelected && 'font-bold')}>{spell.name}</p>
                   <div className="flex items-center gap-1 mt-0.5 flex-wrap">
                     {spell.school && (
                       <span className={cn(
                         'text-xs px-1.5 py-0.5 rounded-full',
-                        schoolColors[spell.school] ?? 'bg-gray-100 text-gray-600',
+                        schoolBadgeColors[spell.school] ?? 'bg-gray-100 text-gray-600',
                       )}>
-                        {spell.school}
+                        {getItalianSchool(spell.school)}
                       </span>
                     )}
                     {spell.ritual && (

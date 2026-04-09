@@ -106,6 +106,18 @@ export function getItalianSchool(name?: string): string {
   return schoolItalianNames[name.toLowerCase()] ?? name
 }
 
+/** Classi Tailwind per i badge delle scuole di magia (badge pill). */
+export const schoolBadgeColors: Record<string, string> = {
+  abjuration:    'bg-blue-100 text-blue-800',
+  conjuration:   'bg-amber-100 text-amber-800',
+  divination:    'bg-purple-100 text-purple-800',
+  enchantment:   'bg-pink-100 text-pink-800',
+  evocation:     'bg-red-100 text-red-800',
+  illusion:      'bg-teal-100 text-teal-800',
+  necromancy:    'bg-gray-800 text-gray-100',
+  transmutation: 'bg-indigo-100 text-indigo-800',
+}
+
 export const itemTypeItalianNames: Record<string, string> = {
   'weapon':     'Arma',
   'armor':      'Armatura',

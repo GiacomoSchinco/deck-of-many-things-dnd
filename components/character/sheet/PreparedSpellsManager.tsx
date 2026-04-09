@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Search, Check, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Spell } from '@/types/spell';
+import { getItalianSchool, schoolBadgeColors } from '@/lib/utils/nameMappers';
 
 interface PreparedSpellsManagerProps {
   characterId: string;
@@ -21,16 +22,7 @@ interface PreparedSpellsManagerProps {
   onRefresh?: () => void;
 }
 
-const schoolColors: Record<string, string> = {
-  abjuration: 'bg-blue-100 text-blue-800',
-  conjuration: 'bg-amber-100 text-amber-800',
-  divination: 'bg-purple-100 text-purple-800',
-  enchantment: 'bg-pink-100 text-pink-800',
-  evocation: 'bg-red-100 text-red-800',
-  illusion: 'bg-teal-100 text-teal-800',
-  necromancy: 'bg-gray-800 text-gray-100',
-  transmutation: 'bg-indigo-100 text-indigo-800',
-};
+
 
 export default function PreparedSpellsManager({
   characterId,
@@ -203,8 +195,8 @@ export default function PreparedSpellsManager({
                     <div className="flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-medium text-amber-900">{spell.name}</span>
-                        <Badge className={`text-xs ${schoolColors[spell.school] ?? 'bg-gray-100'}`}>
-                          {spell.school}
+                        <Badge className={`text-xs ${schoolBadgeColors[spell.school] ?? 'bg-gray-100'}`}>
+                          {getItalianSchool(spell.school)}
                         </Badge>
                         {spell.ritual && (
                           <Badge className="text-xs bg-emerald-100 text-emerald-800">Rituale</Badge>

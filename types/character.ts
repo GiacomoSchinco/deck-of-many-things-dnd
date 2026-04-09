@@ -192,40 +192,8 @@ export interface Currency {
 // ===========================================
 // INCANTESIMI
 // ===========================================
-
-export interface Spell {
-  id: string;
-  name: string;
-  level: number;
-  school: 'abjuration' | 'conjuration' | 'divination' | 'enchantment' | 'evocation' | 'illusion' | 'necromancy' | 'transmutation';
-  castingTime: string;
-  range: string;
-  components: {
-    verbal: boolean;
-    somatic: boolean;
-    material?: string;
-  };
-  duration: string;
-  description: string;
-  atHigherLevels?: string;
-  prepared: boolean;
-  spellcastingAbility: 'intelligence' | 'wisdom' | 'charisma';
-  ritual: boolean;
-  concentration: boolean;
-  source?: string;
-}
-
-export interface SpellSlots {
-  level1: { total: number; used: number };
-  level2: { total: number; used: number };
-  level3: { total: number; used: number };
-  level4: { total: number; used: number };
-  level5: { total: number; used: number };
-  level6: { total: number; used: number };
-  level7: { total: number; used: number };
-  level8: { total: number; used: number };
-  level9: { total: number; used: number };
-}
+// I tipi canonici vivono in types/spell.ts
+export type { Spell, SpellSlots } from './spell';
 
 // ===========================================
 // CARATTERISTICHE E TALENTI

@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Search, Sparkles, BookOpen, CheckCircle2, Info, ArrowUpCircle, RefreshCw, X } from 'lucide-react';
-import { getItalianSchool } from '@/lib/utils/nameMappers';
+import { getItalianSchool, schoolBadgeColors } from '@/lib/utils/nameMappers';
 import { getAvailableSpellLevels } from '@/lib/utils/spellLevels';
 import type { Spell, SpellKnown } from '@/types/spell';
 import SpellDetailDialog from '@/components/custom/SpellDetailDialog';
@@ -40,16 +40,7 @@ interface LevelUpSpellsStepProps {
   isLast: boolean;
 }
 
-const schoolColors: Record<string, string> = {
-  abjuration: 'bg-blue-100 text-blue-700',
-  conjuration: 'bg-yellow-100 text-yellow-700',
-  divination: 'bg-purple-100 text-purple-700',
-  enchantment: 'bg-pink-100 text-pink-700',
-  evocation: 'bg-red-100 text-red-700',
-  illusion: 'bg-indigo-100 text-indigo-700',
-  necromancy: 'bg-gray-200 text-gray-800',
-  transmutation: 'bg-green-100 text-green-700',
-};
+
 
 // Classi che preparano (non selezionano incantesimi al level up)
 const PREPARER_CLASSES = ['cleric', 'druid', 'paladin', 'wizard'];
@@ -310,7 +301,7 @@ export default function LevelUpSpellsStep({
                               <div className="flex items-center gap-1 mt-0.5 flex-wrap">
                                 <span className={cn(
                                   "text-xs px-1.5 py-0.5 rounded-full",
-                                  schoolColors[spell.school] ?? 'bg-gray-100 text-gray-600'
+                                  schoolBadgeColors[spell.school] ?? 'bg-gray-100 text-gray-600'
                                 )}>
                                   {getItalianSchool(spell.school)}
                                 </span>
@@ -435,7 +426,7 @@ export default function LevelUpSpellsStep({
                               <CheckCircle2 className={cn('w-3.5 h-3.5 shrink-0', swapTo === String(spell.id) ? 'text-green-500' : 'text-gray-300')} />
                               <div className="min-w-0 flex-1">
                                 <p className="truncate">{spell.name}</p>
-                                <span className={cn('text-xs px-1.5 py-0.5 rounded-full', schoolColors[spell.school] ?? 'bg-gray-100 text-gray-600')}>
+                                <span className={cn('text-xs px-1.5 py-0.5 rounded-full', schoolBadgeColors[spell.school] ?? 'bg-gray-100 text-gray-600')}>
                                   {getItalianSchool(spell.school)}
                                 </span>
                               </div>

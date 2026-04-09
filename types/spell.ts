@@ -98,7 +98,6 @@ export interface SpellKnown {
   id: string;                              // UUID PRIMARY KEY
   character_id: string;                     // UUID del personaggio
   spell_id: number;                         // FK verso spells
-  prepared: boolean;                         // Se preparato (per classi che preparano)
   spellcasting_ability: 'intelligence' | 'wisdom' | 'charisma';  // Caratteristica per lanciare
   
   // Dati dello spell (popolati dalla relazione)

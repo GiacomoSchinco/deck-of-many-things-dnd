@@ -7,10 +7,8 @@ import { cn } from '@/lib/utils';
 import { 
   Plus, 
   Minus, 
-  Sparkles, 
   Crown, 
   Star, 
-  Wand2,
   RefreshCw
 } from 'lucide-react';
 

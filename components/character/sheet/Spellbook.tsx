@@ -3,13 +3,14 @@
 
 import { useState } from 'react';
 import { useCharacterSpells, useCharacterSpellSlots, useCharacterPreparedSpells } from '@/hooks/queries/useSpells';
-import { useAddCharacterSpells, useRemoveCharacterSpells, useAddPreparedSpells, useRemovePreparedSpells } from '@/hooks/mutations/useCharacterSpellMutations';
+import { useAddCharacterSpells, useRemoveCharacterSpells, useAddPreparedSpells, useRemovePreparedSpells, usePatchSpellSlot, useLongRestSpellSlots } from '@/hooks/mutations/useCharacterSpellMutations';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { SpellsStep } from '@/components/character/creation-wizard/steps/SpellsStep';
 import SpellDetailDialog from '@/components/custom/SpellDetailDialog';
 import SpellSlotsManager from '@/components/custom/SpellSlotsManager';
+import { getItalianSchool, schoolBadgeColors } from '@/lib/utils/nameMappers';
 import { BookOpen, Trash, Check, Sparkles, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Spell, SpellKnown, PreparedSpell, SpellSlot } from '@/types/spell';
@@ -25,16 +26,7 @@ interface SpellbookProps {
   onSpellsChange?: () => void;
 }
 
-const schoolColors: Record<string, string> = {
-  abjuration: 'bg-blue-100 text-blue-800',
-  conjuration: 'bg-amber-100 text-amber-800',
-  divination: 'bg-purple-100 text-purple-800',
-  enchantment: 'bg-pink-100 text-pink-800',
-  evocation: 'bg-red-100 text-red-800',
-  illusion: 'bg-teal-100 text-teal-800',
-  necromancy: 'bg-gray-800 text-gray-100',
-  transmutation: 'bg-indigo-100 text-indigo-800',
-};
+
 
 export default function Spellbook({
   characterId,
@@ -54,6 +46,8 @@ export default function Spellbook({
   const removeSpells = useRemoveCharacterSpells();
   const addPrepared = useAddPreparedSpells();
   const removePrepared = useRemovePreparedSpells();
+  const patchSlot = usePatchSpellSlot();
+  const longRest = useLongRestSpellSlots();
 
   const existingSpellIds = (spellsKnown ?? []).map((sk: SpellKnown) => String(sk.spell_id));
   const preparedSpellIds = new Set((preparedSpells ?? []).map((p: PreparedSpell) => p.spell_id));
@@ -117,13 +111,19 @@ export default function Spellbook({
     used: slot.used_slots,
   }));
 
+  // Testo descrittivo per l'header (cantrip e spell separati come nel dialog)
+  const knownSummary = [
+    cantrips.length > 0 ? `${cantrips.length} trucchett${cantrips.length !== 1 ? 'i' : 'o'}` : null,
+    leveledSpells.length > 0 ? `${leveledSpells.length} incantesim${leveledSpells.length !== 1 ? 'i' : 'o'}` : null,
+  ].filter(Boolean).join(' · ') || 'Nessun incantesimo';
+
   return (
     <>
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <div>
           <p className="text-sm text-amber-700">
-            {existingSpellIds.length} incantesimo{existingSpellIds.length !== 1 ? 'i' : ''} conosciut{existingSpellIds.length !== 1 ? 'i' : 'o'}
+            {knownSummary}
             {isPreparer && (
               <span className="ml-2 text-amber-500">
                 · {preparedSpellIds.size} preparat{preparedSpellIds.size !== 1 ? 'i' : 'o'}
@@ -146,7 +146,26 @@ export default function Spellbook({
       {spellSlots && spellSlots.length > 0 && (
         <SpellSlotsManager
           slots={slotsForManager}
-          onUpdate={async () => {}}
+          onUpdate={async (updatedSlots) => {
+            // Trova lo slot che è cambiato e invia il PATCH
+            for (const updated of updatedSlots) {
+              const current = slotsForManager.find(s => s.level === updated.level);
+              if (current && current.used !== updated.used) {
+                await patchSlot.mutateAsync({
+                  characterId,
+                  spell_level: updated.level,
+                  used_slots: updated.used,
+                });
+              }
+            }
+          }}
+          onLongRest={async () => {
+            await longRest.mutateAsync({
+              characterId,
+              slots: slotsForManager.map(s => ({ spell_level: s.level, total_slots: s.total })),
+            });
+            toast.success('Riposo lungo completato — slot ripristinati');
+          }}
           showRefresh
         />
       )}
@@ -262,7 +281,7 @@ function SpellRow({
 }) {
   const [deleting, setDeleting] = useState(false);
   const schoolKey = spell.school;
-  const schoolColor = schoolColors[schoolKey] ?? 'bg-gray-100 text-gray-800';
+  const schoolColor = schoolBadgeColors[schoolKey] ?? 'bg-gray-100 text-gray-800';
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -279,7 +298,7 @@ function SpellRow({
       <div className="flex-1">
         <div className="flex flex-wrap items-center gap-2">
           <span className="font-semibold text-amber-900">{spell.name}</span>
-          <Badge className={`text-xs ${schoolColor}`}>{spell.school}</Badge>
+          <Badge className={`text-xs ${schoolColor}`}>{getItalianSchool(spell.school)}</Badge>
           {spell.ritual && <Badge className="text-xs bg-emerald-100 text-emerald-800">Rituale</Badge>}
           {spell.concentration && <Badge className="text-xs bg-orange-100 text-orange-800">Concentrazione</Badge>}
         </div>
