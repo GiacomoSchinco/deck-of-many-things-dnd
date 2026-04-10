@@ -5,7 +5,7 @@ import { Package, Shield, Swords, FlaskConical, Wrench, Coins, ArrowUpDown } fro
 import AddItemsModal from './AddItemsModal';
 import InventoryTable from './InventoryTable';
 import type { InventoryItem } from '@/types/inventory';
-import { getItalianItemType } from '@/lib/utils/nameMappers';
+import { getItalianItemType, itemTypeBorderColors } from '@/lib/utils/nameMappers';
 import { cn } from '@/lib/utils';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -24,16 +24,6 @@ const TYPE_ORDER = ['weapon', 'armor', 'gear', 'consumable', 'ammunition', 'tool
 const TYPE_ICONS: Record<string, React.ElementType> = {
   weapon: Swords, armor: Shield, gear: Package,
   consumable: FlaskConical, ammunition: ArrowUpDown, tool: Wrench, currency: Coins,
-};
-
-const TYPE_COLORS: Record<string, string> = {
-  weapon:     'border-red-800/30 hover:border-red-700/50',
-  armor:      'border-blue-800/30 hover:border-blue-700/50',
-  gear:       'border-amber-800/30 hover:border-amber-700/50',
-  consumable: 'border-green-800/30 hover:border-green-700/50',
-  ammunition: 'border-yellow-800/30 hover:border-yellow-700/50',
-  tool:       'border-purple-800/30 hover:border-purple-700/50',
-  currency:   'border-amber-600/30 hover:border-amber-500/50',
 };
 
 // ─── Main Component ───────────────────────────────────────────────────────────
@@ -71,7 +61,7 @@ export default function InventoryGrouped({ items = [], onRowClick, onEdit, onDel
                 className={cn(
                   'rounded-lg border bg-gradient-to-br from-amber-50/80 to-amber-100/40',
                   'overflow-hidden transition-all duration-300 data-[state=open]:shadow-md',
-                  TYPE_COLORS[t],
+                  itemTypeBorderColors[t],
                 )}
               >
                 <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-amber-900/5 group transition-all duration-200">

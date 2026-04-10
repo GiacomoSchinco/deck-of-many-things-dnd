@@ -172,6 +172,18 @@ export interface Item {
   updated_at?: string;                  // Data aggiornamento
 }
 
+/** Dati passati al callback onSelect di ItemPicker */
+export type PickerItemData = {
+  id: number;
+  name: string;
+  type: string;
+  weight: number;
+  value: number;
+  currency: string;
+  description?: string | null;
+  properties?: Record<string, unknown> | null;
+};
+
 // ===========================================
 // INVENTORY (TABELLA INVENTORY - POSSESSO)
 // ===========================================

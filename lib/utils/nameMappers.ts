@@ -241,3 +241,39 @@ export const ALIGNMENTS: string[] = [
   'Neutrale Malvagio',
   'Caotico Malvagio',
 ]
+
+// ─── COLORI PER TIPO OGGETTO ──────────────────────────────────────────────────
+
+/** Colori testo Tailwind per icone del tipo oggetto (usato in ItemCard). */
+export const itemTypeIconColors: Record<string, string> = {
+  weapon:     'text-red-800',
+  armor:      'text-blue-800',
+  gear:       'text-amber-800',
+  consumable: 'text-green-800',
+  ammunition: 'text-yellow-800',
+  tool:       'text-purple-800',
+  currency:   'text-amber-600',
+}
+
+/** Colori bordo Tailwind per gruppi inventario (usato in InventoryGrouped). */
+export const itemTypeBorderColors: Record<string, string> = {
+  weapon:     'border-red-800/30 hover:border-red-700/50',
+  armor:      'border-blue-800/30 hover:border-blue-700/50',
+  gear:       'border-amber-800/30 hover:border-amber-700/50',
+  consumable: 'border-green-800/30 hover:border-green-700/50',
+  ammunition: 'border-yellow-800/30 hover:border-yellow-700/50',
+  tool:       'border-purple-800/30 hover:border-purple-700/50',
+  currency:   'border-amber-600/30 hover:border-amber-500/50',
+}
+
+// ─── COLORI PER RARITÀ ────────────────────────────────────────────────────────
+
+/** Colori testo Tailwind per badge rarità (usato in ItemCard, ItemForm). */
+export const rarityTextColors: Record<string, string> = {
+  common:     'text-gray-500',
+  uncommon:   'text-green-600',
+  rare:       'text-blue-600',
+  'very rare':'text-purple-600',
+  legendary:  'text-orange-600',
+  artifact:   'text-red-600',
+}

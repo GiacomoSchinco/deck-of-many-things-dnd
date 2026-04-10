@@ -34,9 +34,9 @@ import {
   Dice6
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import AncientContainer, { SimpleAncientContainer } from '@/components/custom/AncientContainer';
+import AncientContainer from '@/components/custom/AncientContainer';
 import { AntiqueButton } from '@/components/custom/AntiqueButton';
-import { getItalianItemType, getItalianRarity, getItalianCurrency } from '@/lib/utils/nameMappers';
+import { getItalianItemType, getItalianRarity, getItalianCurrency, rarityTextColors } from '@/lib/utils/nameMappers';
 import type { 
   CreateItemDTO, 
   ItemType, 
@@ -75,12 +75,12 @@ const itemTypes: { value: ItemType; label: string; icon: ComponentType<Record<st
 ];
 
 const rarities: { value: Rarity; label: string; color: string }[] = [
-  { value: 'common',    label: getItalianRarity('common'),    color: 'text-gray-500' },
-  { value: 'uncommon',  label: getItalianRarity('uncommon'),  color: 'text-green-600' },
-  { value: 'rare',      label: getItalianRarity('rare'),      color: 'text-blue-600' },
-  { value: 'very rare', label: getItalianRarity('very rare'), color: 'text-purple-600' },
-  { value: 'legendary', label: getItalianRarity('legendary'), color: 'text-orange-600' },
-  { value: 'artifact',  label: getItalianRarity('artifact'),  color: 'text-red-600' },
+  { value: 'common',    label: getItalianRarity('common'),    color: rarityTextColors['common'] },
+  { value: 'uncommon',  label: getItalianRarity('uncommon'),  color: rarityTextColors['uncommon'] },
+  { value: 'rare',      label: getItalianRarity('rare'),      color: rarityTextColors['rare'] },
+  { value: 'very rare', label: getItalianRarity('very rare'), color: rarityTextColors['very rare'] },
+  { value: 'legendary', label: getItalianRarity('legendary'), color: rarityTextColors['legendary'] },
+  { value: 'artifact',  label: getItalianRarity('artifact'),  color: rarityTextColors['artifact'] },
 ];
 
 const currencies: { value: CurrencyType; label: string; symbol: string }[] = [

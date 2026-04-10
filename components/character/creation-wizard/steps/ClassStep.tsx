@@ -4,7 +4,7 @@
 import { useClasses } from '@/hooks/queries/useClasses';
 import { Badge } from '@/components/ui/badge';
 import { SelectionStep } from './SelectionStep';
-import { getItalianClass } from '@/lib/utils/nameMappers';
+import { getItalianClass, getItalianAbilityFull } from '@/lib/utils/nameMappers';
 import type { DndClass, ClassFeature } from '@/types/class';
 
 interface ClassStepProps {
@@ -46,12 +46,7 @@ export function ClassStep({ initialClassId, onBack, onSelect }: ClassStepProps) 
           <div>
             <h4 className="font-semibold text-amber-800 mb-2">Incantesimi</h4>
             <Badge variant="outline" className="border-purple-700 text-purple-800">
-              {String.fromCharCode(10022)} Incantatore:{' '}
-              {cls.spellcasting.spellcasting_ability === 'intelligence'
-                ? 'Intelligenza'
-                : cls.spellcasting.spellcasting_ability === 'wisdom'
-                ? 'Saggezza'
-                : 'Carisma'}
+              {String.fromCharCode(10022)} Incantatore: {getItalianAbilityFull(cls.spellcasting.spellcasting_ability)}
             </Badge>
           </div>
         )}

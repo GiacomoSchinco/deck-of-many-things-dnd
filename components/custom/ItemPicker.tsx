@@ -1,11 +1,12 @@
 // components/ui/ItemPicker.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useItems , useItem } from '@/hooks/queries/useItems';
 import type {
   Item,
   ItemType,
+  PickerItemData,
 } from '@/types/item';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -35,7 +36,7 @@ type ItemTypeFilter = ItemType | 'all';
 interface ItemPickerProps {
   value?: number | null;
   name?: string;
-  onSelect: (item: { id: number; name: string; type: string; weight: number; value: number; currency: string; description?: string | null; properties?: Record<string, unknown> | null }) => void;
+  onSelect: (item: PickerItemData) => void;
   type?: ItemTypeFilter;
   placeholder?: string;
   disabled?: boolean;
@@ -83,13 +84,6 @@ export function ItemPicker({
   const [itemType, setItemType] = useState<ItemTypeFilter>(type);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 
-  // Reset internal selection when controlled `value` becomes null/0
-  useEffect(() => {
-    if (value == null || value === 0) {
-      setSelectedItem(null)
-    }
-  }, [value]);
-
   const { data: items, isLoading } = useItems({
     type: itemType === 'all' ? undefined : (itemType as ItemType),
     search: search || undefined,
@@ -100,7 +94,10 @@ export function ItemPicker({
   const { data: fetchedItem, isLoading: isLoadingItem } = useItem(value);
 
   // Priority: user just selected something > fetched by id > known name (from form state) > placeholder
-  const displayItem = selectedItem ?? fetchedItem ?? (value && name ? { id: value, name, type: 'all' } as unknown as Item : null);
+  // When value is null/0, ignore selectedItem (optimistic state no longer relevant)
+  const displayItem = (value == null || value === 0)
+    ? null
+    : selectedItem ?? fetchedItem ?? (name ? { id: value, name, type: 'all' } as unknown as Item : null);
 
   // True when an item_id is set but we're still waiting for the data
   const isLoadingDisplay = !!value && !displayItem && isLoadingItem;
