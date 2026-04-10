@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { createServerSupabase } from '@/lib/supabase/server'
+import { createServerSupabase, requireAuth } from '@/lib/supabase/server'
 
 export async function GET(request: Request) {
   const cookieStore = await cookies()
@@ -10,10 +10,8 @@ export async function GET(request: Request) {
 
   const supabase = createServerSupabase(cookieStore)
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
-  }
+  const { error: authError } = await requireAuth(supabase)
+  if (authError) return authError
 
   let query = supabase.from('items').select('*').order('name')
 
@@ -39,10 +37,8 @@ export async function POST(request: Request) {
   const cookieStore = await cookies()
   const supabase = createServerSupabase(cookieStore)
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
-  }
+  const { error: authError2 } = await requireAuth(supabase)
+  if (authError2) return authError2
 
   const body = await request.json()
 

@@ -7,10 +7,11 @@ import { WizardNav } from '@/components/shared/WizardNav';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
+import { cn, filterByName } from '@/lib/utils';
 import { Search, Sparkles, BookOpen, CheckCircle2, Info, ArrowUpCircle, RefreshCw, X } from 'lucide-react';
 import { getItalianSchool, schoolBadgeColors } from '@/lib/utils/nameMappers';
 import { getAvailableSpellLevels } from '@/lib/utils/spellLevels';
+import { PREPARER_CLASSES_LEVELUP, SWAP_CLASSES } from '@/lib/rules/spellcasting';
 import type { Spell, SpellKnown } from '@/types/spell';
 import SpellDetailDialog from '@/components/custom/SpellDetailDialog';
 
@@ -42,10 +43,6 @@ interface LevelUpSpellsStepProps {
 
 
 
-// Classi che preparano (non selezionano incantesimi al level up)
-const PREPARER_CLASSES = ['cleric', 'druid', 'paladin', 'wizard'];
-// Classi che conoscono E possono sostituire 1 incantesimo al level up
-const SWAP_CLASSES = ['bard', 'sorcerer', 'ranger', 'warlock'];
 
 type SpellKnownWithSpell = SpellKnown & { spell: Spell };
 
@@ -67,8 +64,8 @@ export default function LevelUpSpellsStep({
   const [swapSearch, setSwapSearch] = useState('');
 
   const className = character.classes?.name?.toLowerCase();
-  const isPreparer = className ? PREPARER_CLASSES.includes(className) : false;
-  const canSwap = className ? SWAP_CLASSES.includes(className) : false;
+  const isPreparer = className ? (PREPARER_CLASSES_LEVELUP as readonly string[]).includes(className) : false;
+  const canSwap = className ? (SWAP_CLASSES as readonly string[]).includes(className) : false;
 
   // Per le classi che conoscono, recupera gli incantesimi già conosciuti
   const { data: existingSpellsRaw } = useCharacterSpells(!isPreparer ? character.id ?? null : null);
@@ -89,9 +86,9 @@ export default function LevelUpSpellsStep({
   // Filtra gli incantesimi per livello e ricerca (nuovi incantesimi)
   const spellsByLevel = useMemo(() => {
     if (!allSpells) return {};
-    const spells = (allSpells as Spell[]).filter(s =>
-      availableLevels.includes(s.level) &&
-      s.name.toLowerCase().includes(search.toLowerCase())
+    const spells = filterByName(
+      (allSpells as Spell[]).filter(s => availableLevels.includes(s.level)),
+      search
     );
     const grouped: Record<number, Spell[]> = {};
     spells.forEach(spell => {
@@ -104,11 +101,13 @@ export default function LevelUpSpellsStep({
   // Incantesimi disponibili per la sostituzione (escludi già conosciuti e già selezionati)
   const swapToByLevel = useMemo(() => {
     if (!allSpells || !canSwap) return {};
-    const spells = (allSpells as Spell[]).filter(s =>
-      availableLevels.includes(s.level) &&
-      !existingSpellIds.includes(String(s.id)) &&
-      !selectedSpells.includes(String(s.id)) &&
-      s.name.toLowerCase().includes(swapSearch.toLowerCase())
+    const spells = filterByName(
+      (allSpells as Spell[]).filter(s =>
+        availableLevels.includes(s.level) &&
+        !existingSpellIds.includes(String(s.id)) &&
+        !selectedSpells.includes(String(s.id))
+      ),
+      swapSearch
     );
     const grouped: Record<number, Spell[]> = {};
     spells.forEach(spell => {

@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { createServerSupabase } from '@/lib/supabase/server'
+import { createServerSupabase, requireAuth } from '@/lib/supabase/server'
 
 export async function GET(
   request: Request,
@@ -31,11 +31,8 @@ export async function PUT(
   const { id } = await params
   const supabase = createServerSupabase(cookieStore)
 
-  // require authenticated user
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
-  }
+  const { user, error: authError } = await requireAuth(supabase)
+  if (authError) return authError
 
   const body = await request.json().catch(() => ({})) as { name?: string; dungeon_master_id?: string }
 
@@ -50,11 +47,11 @@ export async function PUT(
     return NextResponse.json({ error: fetchErr?.message || 'Campagna non trovata' }, { status: 404 })
   }
 
-  if (existing.dungeon_master_id !== user.id) {
+  if (existing.dungeon_master_id !== user!.id) {
     return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 })
   }
 
-  const updates: Record<string, any> = {}
+  const updates: Record<string, unknown> = {}
   if (typeof body.name === 'string') updates.name = body.name
   if (typeof body.dungeon_master_id === 'string') updates.dungeon_master_id = body.dungeon_master_id
 
@@ -84,10 +81,8 @@ export async function DELETE(
   const { id } = await params
   const supabase = createServerSupabase(cookieStore)
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
-  }
+  const { user, error: authError } = await requireAuth(supabase)
+  if (authError) return authError
 
   // ensure campaign exists and user is DM
   const { data: existing, error: fetchErr } = await supabase
@@ -100,7 +95,7 @@ export async function DELETE(
     return NextResponse.json({ error: fetchErr?.message || 'Campagna non trovata' }, { status: 404 })
   }
 
-  if (existing.dungeon_master_id !== user.id) {
+  if (existing.dungeon_master_id !== user!.id) {
     return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 })
   }
 

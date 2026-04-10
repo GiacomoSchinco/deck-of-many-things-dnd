@@ -1,7 +1,7 @@
 // app/api/characters/[id]/spell-slots/route.ts
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { createServerSupabase } from '@/lib/supabase/server'
+import { createServerSupabase, requireAuth } from '@/lib/supabase/server'
 
 // GET /api/characters/[id]/spell-slots
 export async function GET(
@@ -35,10 +35,8 @@ export async function POST(
   const { id } = await params
   const supabase = createServerSupabase(cookieStore)
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
-  }
+  const { error: authErrorPost } = await requireAuth(supabase)
+  if (authErrorPost) return authErrorPost
 
   const body = await request.json()
   const { slots } = body as {
@@ -74,10 +72,8 @@ export async function PUT(
   const { id } = await params
   const supabase = createServerSupabase(cookieStore)
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
-  }
+  const { error: authErrorPut } = await requireAuth(supabase)
+  if (authErrorPut) return authErrorPut
 
   const body = await request.json()
   const { slots } = body as {
@@ -117,10 +113,8 @@ export async function PATCH(
   const { id } = await params
   const supabase = createServerSupabase(cookieStore)
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
-  }
+  const { error: authErrorPatch } = await requireAuth(supabase)
+  if (authErrorPatch) return authErrorPatch
 
   const { spell_level, used_slots } = await request.json()
 

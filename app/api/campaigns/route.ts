@@ -1,16 +1,14 @@
 // app/api/classes/route.ts
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { createServerSupabase } from '@/lib/supabase/server'
+import { createServerSupabase, requireAuth } from '@/lib/supabase/server'
 
 export async function GET() {
   const cookieStore = await cookies()
   const supabase = createServerSupabase(cookieStore)
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
-  }
+  const { error: authError } = await requireAuth(supabase)
+  if (authError) return authError
 
   const { data: campaigns, error } = await supabase
     .from('campaigns')
@@ -38,14 +36,12 @@ export async function POST(request: Request) {
   }
 
   // require authenticated user and set them as dungeon master by default
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
-  }
+  const { user, error: authError2 } = await requireAuth(supabase)
+  if (authError2) return authError2
 
   const { data: campaign, error } = await supabase
     .from('campaigns')
-    .insert({ name, description: description ?? null, created_by: user.id, dungeon_master_id: user.id })
+    .insert({ name, description: description ?? null, created_by: user!.id, dungeon_master_id: user!.id })
     .select()
     .single()
 

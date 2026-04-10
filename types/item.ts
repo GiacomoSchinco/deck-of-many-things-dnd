@@ -214,25 +214,6 @@ export interface UpdateItemDTO extends Partial<CreateItemDTO> {
   id: number;
 }
 
-export interface CreateInventoryItemDTO {
-  character_id: string;
-  item_id?: number | null;               // Se null, è oggetto personalizzato
-  name: string;
-  type: ItemType;
-  quantity?: number;
-  weight: number;
-  equipped?: boolean;
-  description?: string | null;
-  notes?: string | null;
-  value?: number | null;
-  currency?: CurrencyType | null;
-  properties?: ItemProperties | null;
-}
-
-export interface UpdateInventoryItemDTO extends Partial<CreateInventoryItemDTO> {
-  id: string;
-}
-
 // ===========================================
 // RISPOSTE API
 // ===========================================

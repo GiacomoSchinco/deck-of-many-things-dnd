@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { createServerSupabase } from '@/lib/supabase/server'
+import { createServerSupabase, requireAuth } from '@/lib/supabase/server'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase/types'
 
@@ -28,11 +28,8 @@ export async function GET(
   const supabase = createServerSupabase(cookieStore)
 
   // Ottieni l'utente loggato
-  const { data: { user } } = await supabase.auth.getUser()
-  
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
-  }
+  const { user, error: authError } = await requireAuth(supabase)
+  if (authError) return authError
 
   const admin = await isAdmin(supabase)
 
@@ -57,10 +54,7 @@ export async function GET(
     `)
     .eq('id', id)
 
-  // Se non è admin, filtra per user_id
-  if (!admin) {
-    query = query.eq('user_id', user.id)
-  }
+  // Se non è admin, filtra per user_id\n  if (!admin) {\n    query = query.eq('user_id', user!.id)\n  }
 
   const { data: character, error } = await query.single()
 
@@ -82,11 +76,8 @@ export async function PUT(
 
   const supabase = createServerSupabase(cookieStore)
 
-  const { data: { user } } = await supabase.auth.getUser()
-  
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
-  }
+  const { user: userPut, error: authErrorPut } = await requireAuth(supabase)
+  if (authErrorPut) return authErrorPut
 
   const admin = await isAdmin(supabase)
 
@@ -109,7 +100,7 @@ export async function PUT(
 
     // Se non è admin, filtra per user_id
     if (!admin) {
-      updateQuery = updateQuery.eq('user_id', user.id)
+      updateQuery = updateQuery.eq('user_id', userPut!.id)
     }
 
     const { data: character, error: charError } = await updateQuery.select().single()
@@ -163,11 +154,8 @@ export async function DELETE(
   const { id } = await params
   const supabase = createServerSupabase(cookieStore)
 
-  const { data: { user } } = await supabase.auth.getUser()
-  
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
-  }
+  const { user: userDel, error: authErrorDel } = await requireAuth(supabase)
+  if (authErrorDel) return authErrorDel
 
   const admin = await isAdmin(supabase)
 
@@ -178,7 +166,7 @@ export async function DELETE(
 
   // Se non è admin, filtra per user_id
   if (!admin) {
-    deleteQuery = deleteQuery.eq('user_id', user.id)
+    deleteQuery = deleteQuery.eq('user_id', userDel!.id)
   }
 
   const { error } = await deleteQuery

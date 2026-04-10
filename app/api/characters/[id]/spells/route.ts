@@ -1,7 +1,7 @@
 // app/api/characters/[id]/spells/route.ts
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { createServerSupabase } from '@/lib/supabase/server'
+import { createServerSupabase, requireAuth } from '@/lib/supabase/server'
 
 export async function GET(
   request: Request,
@@ -38,11 +38,8 @@ export async function POST(
 
   const supabase = createServerSupabase(cookieStore)
 
-  // Verifica autenticazione
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
-  }
+  const { error: authError } = await requireAuth(supabase)
+  if (authError) return authError
 
   const body = await request.json()
   const { spell_ids } = body as { spell_ids: number[] }
@@ -79,11 +76,8 @@ export async function DELETE(
 
   const supabase = createServerSupabase(cookieStore)
 
-  // Verifica autenticazione
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
-  }
+  const { error: authError2 } = await requireAuth(supabase)
+  if (authError2) return authError2
 
   const body = await request.json().catch(() => ({})) as { known_ids?: string[]; spell_ids?: number[] }
   const { known_ids = [], spell_ids = [] } = body

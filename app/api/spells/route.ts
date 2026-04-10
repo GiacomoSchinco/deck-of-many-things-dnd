@@ -1,7 +1,7 @@
 // app/api/spells/route.ts
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { createServerSupabase } from '@/lib/supabase/server'
+import { createServerSupabase, requireAuth } from '@/lib/supabase/server'
 
 export async function GET(request: Request) {
   const cookieStore = await cookies()
@@ -48,10 +48,8 @@ export async function POST(request: Request) {
   const cookieStore = await cookies()
   const supabase = createServerSupabase(cookieStore)
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
-  }
+  const { user, error: authError } = await requireAuth(supabase)
+  if (authError) return authError
 
   const body = await request.json()
 

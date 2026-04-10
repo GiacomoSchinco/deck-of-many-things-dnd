@@ -12,6 +12,7 @@ import { Search, Check, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Spell } from '@/types/spell';
 import { getItalianSchool, schoolBadgeColors } from '@/lib/utils/nameMappers';
+import { filterByName } from '@/lib/utils';
 
 interface PreparedSpellsManagerProps {
   characterId: string;
@@ -73,12 +74,7 @@ export default function PreparedSpellsManager({
     }
   }, [isWizard, spellsKnown, allClassSpells]);
 
-  // Filtra per ricerca e livello
-  const filteredSpells = useMemo(() => {
-    return availableSpells.filter((spell) =>
-      spell.name.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [availableSpells, search]);
+  const filteredSpells = useMemo(() => filterByName(availableSpells, search), [availableSpells, search]);
 
   // Raggruppa per livello
   const byLevel: Record<number, Spell[]> = {};

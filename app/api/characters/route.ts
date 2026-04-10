@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { createServerSupabase } from '@/lib/supabase/server'
+import { createServerSupabase, requireAuth } from '@/lib/supabase/server'
 //GET /api/characters -> lista personaggi dell'utente loggato
 export async function GET() {
   const cookieStore = await cookies()
@@ -38,11 +38,8 @@ export async function POST(request: Request) {
 
   const supabase = createServerSupabase(cookieStore)
 
-  // 2. Utente non autenticato
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
-  }
+  const { user, error: authError } = await requireAuth(supabase)
+  if (authError) return authError
 
   // 3. Validazione campi obbligatori
   const name = typeof body.name === 'string' ? body.name.trim() : ''

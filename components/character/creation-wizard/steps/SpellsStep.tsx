@@ -4,14 +4,14 @@
 import { useState, useMemo } from 'react';
 import { useClass } from '@/hooks/queries/useClasses';
 import { useSpells } from '@/hooks/queries/useSpells';
-import { getSpellProgression, SpellCastingClass } from '@/lib/rules/spellcasting';
+import { getSpellProgression, SpellCastingClass, SPELLCASTING_CLASSES, PREPARER_CLASSES } from '@/lib/rules/spellcasting';
 import { getEnglishClass, getItalianSchool, schoolBadgeColors } from '@/lib/utils/nameMappers';
 import { useCreationStore } from '@/store/useCreationStore';
 import { WizardStep } from '../WizardStep';
 import Loading from '@/components/custom/Loading';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
+import { cn, filterByName } from '@/lib/utils';
 import { Sparkles, BookOpen, Search, CheckCircle2, Info, Lock } from 'lucide-react';
 import type { Spell } from '@/types/spell';
 import SpellDetailDialog from '@/components/custom/SpellDetailDialog';
@@ -28,7 +28,6 @@ interface SpellsStepProps {
   onBack: () => void;
 }
 
-const PREPARER_CLASSES = ['cleric', 'druid', 'paladin'];
 
 
 
@@ -53,13 +52,10 @@ export function SpellsStep({
   const savedLevel = useCreationStore((s) => s.data?.level ?? 1);
   const effectiveLevel = characterLevel ?? savedLevel;
 
-  const isPreparerClass = englishClassName ? PREPARER_CLASSES.includes(englishClassName) : false;
+  const isPreparerClass = englishClassName ? (PREPARER_CLASSES as readonly string[]).includes(englishClassName) : false;
   const isWizard = englishClassName === 'wizard';
   const hasSpellcasting = !!classData?.spellcasting;
 
-  const SPELLCASTING_CLASSES: SpellCastingClass[] = [
-    'wizard', 'sorcerer', 'bard', 'cleric', 'druid', 'paladin', 'ranger', 'warlock'
-  ];
   const spellcastingClass = (englishClassName && SPELLCASTING_CLASSES.includes(englishClassName as SpellCastingClass))
     ? (englishClassName as SpellCastingClass)
     : null;
@@ -114,9 +110,7 @@ export function SpellsStep({
     Object.values(spellsByLevel).flat().some((s: Spell) => String(s.id) === id)
   );
 
-  const filteredCantrips = cantrips.filter((s: Spell) =>
-    s.name.toLowerCase().includes(searchCantrips.toLowerCase()),
-  );
+  const filteredCantrips = filterByName<Spell>(cantrips, searchCantrips);
 
   const toggle = (spell: Spell, type: 'cantrip' | 'spell') => {
     const idStr = String(spell.id);
@@ -315,9 +309,7 @@ export function SpellsStep({
           {(spellsAllowed > 0 || isWizard) && (
             <div className="space-y-4">
               {Array.from({ length: maxSpellLevel }, (_, i) => i + 1).map((lvl) => {
-                const spellsForLevel = spellsByLevel[lvl]?.filter((s) =>
-                  s.name.toLowerCase().includes(searchSpells.toLowerCase()),
-                ) ?? [];
+                const spellsForLevel = filterByName<Spell>(spellsByLevel[lvl] ?? [], searchSpells);
                 if (spellsForLevel.length === 0) return null;
 
                 return (

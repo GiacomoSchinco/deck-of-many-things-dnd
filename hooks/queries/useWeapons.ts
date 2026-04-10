@@ -11,7 +11,7 @@ async function fetchWeapons(): Promise<WeaponsResponse> {
 
 export function useWeapons() {
   return useQuery({
-    queryKey: ["weapons"],
+    queryKey: ['weapons'],
     queryFn: fetchWeapons,
     staleTime: 1000 * 60 * 5,
   });

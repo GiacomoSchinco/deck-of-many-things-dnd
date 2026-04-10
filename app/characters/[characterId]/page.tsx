@@ -21,6 +21,7 @@ import InventoryGrouped from '@/components/custom/InventoryGrouped'
 import Spellbook from '@/components/character/sheet/Spellbook'
 import type { ProficiencyType } from '@/types/character'
 import { getItalianAbilityFull, getEnglishClass } from '@/lib/utils/nameMappers'
+import { PREPARER_CLASSES } from '@/lib/rules/spellcasting'
 import { PageWrapper } from '@/components/layout/PageWrapper'
 import { StatRow } from '@/components/shared/StatRow'
 import { SectionTitle } from '@/components/shared/SectionTitle'
@@ -51,8 +52,7 @@ export default function CharacterPage() {
     { label: 'CAR', key: 'charisma' },
   ]
 
-  const PREPARER_CLASSES = ['cleric', 'druid', 'paladin']
-  const isPreparerClass = PREPARER_CLASSES.includes(getEnglishClass(character?.classes?.name ?? ''))
+  const isPreparerClass = (PREPARER_CLASSES as readonly string[]).includes(getEnglishClass(character?.classes?.name ?? ''))
 
   const proficiencyBonus = 2 + Math.floor((character.level - 1) / 4)
 

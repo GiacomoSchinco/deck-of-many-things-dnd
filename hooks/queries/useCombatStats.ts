@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 
 export function useCombatStats(characterId: string | null) {
   return useQuery({
-    queryKey: ['combatStats', characterId],
+    queryKey: ['combat-stats', characterId],
     queryFn: async () => {
       if (!characterId) return null;
       

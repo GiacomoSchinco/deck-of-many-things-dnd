@@ -10,6 +10,23 @@ export type SpellCastingClass =
   | 'ranger'
   | 'warlock';
 
+/** Tutte le classi che usano magia. */
+export const SPELLCASTING_CLASSES: SpellCastingClass[] = [
+  'wizard', 'sorcerer', 'bard', 'cleric', 'druid', 'paladin', 'ranger', 'warlock',
+];
+
+/** Classi che preparano incantesimi (non li selezionano come "conosciuti"). */
+export const PREPARER_CLASSES = ['cleric', 'druid', 'paladin'] as const;
+
+/**
+ * Classi che preparano al level-up (include il Mago che aggiunge al grimorio
+ * invece di scegliere incantesimi conosciuti).
+ */
+export const PREPARER_CLASSES_LEVELUP = ['cleric', 'druid', 'paladin', 'wizard'] as const;
+
+/** Classi che conoscono incantesimi E possono sostituirne uno al level-up. */
+export const SWAP_CLASSES = ['bard', 'sorcerer', 'ranger', 'warlock'] as const;
+
 export interface SpellProgression {
   /** Numero di trucchetti (cantrips) conosciuti */
   cantrips: number;
