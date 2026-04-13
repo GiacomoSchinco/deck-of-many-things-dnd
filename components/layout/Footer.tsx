@@ -1,6 +1,4 @@
 // components/custom/Footer.tsx
-"use client";
-
 import Link from "next/link";
 import { appMetadata } from "@/lib/metadata";
 import { 
@@ -18,7 +16,6 @@ import {
   Crown,
   Gem
 } from "lucide-react";
-import { useState } from "react";
 
 const footerLinks = {
   esplora: [
@@ -42,7 +39,7 @@ const footerLinks = {
 };
 
 export default function Footer() {
-  const [year] = useState(() => new Date().getFullYear());
+  const year = new Date().getFullYear();
 
   return (
     <footer className="relative mt-auto">
