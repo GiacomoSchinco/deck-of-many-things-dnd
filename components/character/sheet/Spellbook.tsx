@@ -61,9 +61,7 @@ export default function Spellbook({
       setManaging(false);
       onSpellsChange?.();
       toast.success('Incantesimi aggiornati');
-    } catch {
-      toast.error('Errore durante il salvataggio');
-    }
+    } catch { /* gestito dal global onError */ }
   };
 
   const handleRemoveSpell = async (knownId: string, spellName: string) => {
@@ -71,9 +69,7 @@ export default function Spellbook({
       await removeSpells.mutateAsync({ characterId, knownIds: [knownId] });
       toast.success(`${spellName} rimosso`);
       onSpellsChange?.();
-    } catch {
-      toast.error('Errore durante la rimozione');
-    }
+    } catch { /* gestito dal global onError */ }
   };
 
   const handleTogglePrepared = async (spellId: number, currentlyPrepared: boolean) => {
@@ -85,9 +81,7 @@ export default function Spellbook({
         await addPrepared.mutateAsync({ characterId, spellIds: [spellId] });
         toast.success('Incantesimo preparato!');
       }
-    } catch {
-      toast.error('Errore durante la preparazione');
-    }
+    } catch { /* gestito dal global onError */ }
   };
 
   if (isLoading) {

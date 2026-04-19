@@ -64,7 +64,7 @@ export default function AddItemsModal({ characterIdFromItems }: { characterIdFro
       handleClose();
     } catch (e) {
       console.error(e);
-      toast.error('Errore aggiunta oggetti');
+      /* toast gestito dal global onError in providers.tsx */
     }
   }, [pending, create, characterId, handleClose]);
 

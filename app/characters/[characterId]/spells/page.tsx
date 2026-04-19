@@ -16,7 +16,7 @@ import { PageWrapper } from '@/components/layout/PageWrapper';
 export default function SpellPage() {
   const params = useParams();
   const characterId = params.characterId as string;
-  const { data: character, isLoading, refetch } = useCharacter(characterId);
+  const { data: character, isLoading, isError, refetch } = useCharacter(characterId);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const englishClass = getEnglishClass(character?.classes?.name ?? '');
@@ -37,6 +37,7 @@ export default function SpellPage() {
   };
 
   if (isLoading) return <Loading />;
+  if (isError || !character) return <div className="text-center text-red-600 p-8">Errore nel caricamento del personaggio.</div>;
 
   return (
     <PageWrapper

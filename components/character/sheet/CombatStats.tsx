@@ -27,6 +27,7 @@ export function CombatStatsCard({ characterId }: { characterId: string }) {
   };
 
   if (isLoading) return <div>Caricamento...</div>;
+  if (!stats) return <div>Nessun dato di combattimento disponibile.</div>;
 
   return (
     <div>

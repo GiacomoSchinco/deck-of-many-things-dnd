@@ -81,9 +81,10 @@ export default function SpellsPage() {
     return () => clearTimeout(t);
   }, [query, levelQuery, schoolQuery, classQuery]);
 
-  const { data: spells, isLoading } = useSpells(debouncedFilters);
+  const { data: spells, isLoading, isError } = useSpells(debouncedFilters);
   
   if (isLoading) return <Loading />;
+  if (isError) return <div className="text-center text-red-600 p-8">Errore nel caricamento degli incantesimi.</div>;
 
   return (
     <AncientContainer 

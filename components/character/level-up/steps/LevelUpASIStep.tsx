@@ -20,6 +20,8 @@ interface LevelUpASIStepProps {
   isLast: boolean;
 }
 
+const featsEnabled = process.env.NEXT_PUBLIC_ENABLE_FEATS === 'true';
+
 export default function LevelUpASIStep({
   character,
   data,
@@ -27,7 +29,7 @@ export default function LevelUpASIStep({
   onBack,
   isLast,
 }: LevelUpASIStepProps) {
-  const [asiType, setAsiType] = useState<'increase' | 'feat'>((data.asiType as 'increase' | 'feat') || 'increase');
+  const [asiType, setAsiType] = useState<'increase' | 'feat'>(featsEnabled ? ((data.asiType as 'increase' | 'feat') || 'increase') : 'increase');
   const [selectedStat, setSelectedStat] = useState<string>((data.selectedStat as string) || 'strength');
   const [increaseType, setIncreaseType] = useState<'single' | 'double'>((data.increaseType as 'single' | 'double') || 'single');
   const [secondStat, setSecondStat] = useState<string>((data.secondStat as string) || 'dexterity');
@@ -91,38 +93,40 @@ export default function LevelUpASIStep({
           Aumento delle Caratteristiche
         </h2>
         <p className="fantasy-subtitle mt-1">
-          Aumenta le tue statistiche o scegli un talento
+          {featsEnabled ? 'Aumenta le tue statistiche o scegli un talento' : 'Aumenta le tue statistiche'}
         </p>
       </div>
 
-      <RadioGroup
-        value={asiType}
-        onValueChange={(v) => setAsiType(v as 'increase' | 'feat')}
-        className="space-y-3"
-      >
-        <div className="flex items-start gap-3 p-3 rounded-lg border border-amber-200 bg-amber-50/30">
-          <RadioGroupItem value="increase" id="increase" className="mt-1" />
-          <Label htmlFor="increase" className="flex-1 cursor-pointer">
-            <div className="font-medium text-amber-900">Aumenta caratteristiche</div>
-            <div className="text-sm text-amber-600">
-              Aumenta una caratteristica di 2 o due caratteristiche di 1
-            </div>
-          </Label>
-        </div>
+      {featsEnabled && (
+        <RadioGroup
+          value={asiType}
+          onValueChange={(v) => setAsiType(v as 'increase' | 'feat')}
+          className="space-y-3"
+        >
+          <div className="flex items-start gap-3 p-3 rounded-lg border border-amber-200 bg-amber-50/30">
+            <RadioGroupItem value="increase" id="increase" className="mt-1" />
+            <Label htmlFor="increase" className="flex-1 cursor-pointer">
+              <div className="font-medium text-amber-900">Aumenta caratteristiche</div>
+              <div className="text-sm text-amber-600">
+                Aumenta una caratteristica di 2 o due caratteristiche di 1
+              </div>
+            </Label>
+          </div>
 
-        <div className="flex items-start gap-3 p-3 rounded-lg border border-amber-200 bg-amber-50/30">
-          <RadioGroupItem value="feat" id="feat" className="mt-1" />
-          <Label htmlFor="feat" className="flex-1 cursor-pointer">
-            <div className="font-medium text-amber-900 flex items-center gap-1">
-              <Sparkles className="w-4 h-4" />
-              Scegli un talento
-            </div>
-            <div className="text-sm text-amber-600">
-              Sostituisci l&apos;ASI con un talento speciale
-            </div>
-          </Label>
-        </div>
-      </RadioGroup>
+          <div className="flex items-start gap-3 p-3 rounded-lg border border-amber-200 bg-amber-50/30">
+            <RadioGroupItem value="feat" id="feat" className="mt-1" />
+            <Label htmlFor="feat" className="flex-1 cursor-pointer">
+              <div className="font-medium text-amber-900 flex items-center gap-1">
+                <Sparkles className="w-4 h-4" />
+                Scegli un talento
+              </div>
+              <div className="text-sm text-amber-600">
+                Sostituisci l&apos;ASI con un talento speciale
+              </div>
+            </Label>
+          </div>
+        </RadioGroup>
+      )}
 
       {asiType === 'increase' && (
         <div className="mt-4 space-y-4">

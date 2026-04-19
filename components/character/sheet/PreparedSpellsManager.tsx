@@ -100,9 +100,7 @@ export default function PreparedSpellsManager({
       }
       refetchPrepared();
       if (onRefresh) onRefresh();
-    } catch (error) {
-      toast.error('Errore durante la preparazione' + (error instanceof Error ? `: ${error.message}` : ''));
-    }
+    } catch { /* gestito dal global onError */ }
   };
 
   const handleReset = async () => {

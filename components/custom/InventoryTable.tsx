@@ -181,7 +181,7 @@ export default function InventoryTable({ items = [], onRowClick, onEdit, onDelet
               // Armor-specific: don't duplicate armor props (they have their own column)
               // keep description as-is
             } else {
-              if (Array.isArray(p?.properties)) parts.push(...(p!.properties as string[]));
+              if (Array.isArray(p?.properties)) parts.push(...(p?.properties as string[]));
             }
 
             return base + (parts.length ? ` (${parts.join(' · ')})` : '');

@@ -9,7 +9,7 @@ import { PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { PageWrapper } from '@/components/layout/PageWrapper';
 export default function CampaignsPage() {
-    const { data: campaigns, isLoading } = useCampaigns();
+    const { data: campaigns, isLoading, isError } = useCampaigns();
     const router = useRouter();
 
     function getCharactersCount(chars: unknown): number {
@@ -28,6 +28,9 @@ export default function CampaignsPage() {
     }
     if (isLoading) {
         return <Loading />;
+    }
+    if (isError) {
+        return <div className="text-center text-red-600 p-8">Errore nel caricamento delle campagne.</div>;
     }
 
     return (

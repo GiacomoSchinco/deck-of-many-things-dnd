@@ -37,8 +37,9 @@ export default function ItemsPage() {
         return () => clearTimeout(t)
     }, [query, typeQuery])
 
-    const { data: items, isLoading } = useItems(debouncedFilters);
+    const { data: items, isLoading, isError } = useItems(debouncedFilters);
     if (isLoading) return <Loading />;
+    if (isError) return <div className="text-center text-red-600 p-8">Errore nel caricamento degli oggetti.</div>;
     return (
         <AncientContainer
             title="Catalogo Oggetti"
