@@ -40,7 +40,12 @@ export function useCharacterCreation() {
   const applySavingThrows  = useApplySavingThrows();
 
   // ─── Store & calcoli derivati ─────────────────────────────────────────────
-  const { currentStep, data, setStep, updateData, reset, _hasHydrated } = useCreationStore();
+  const currentStep  = useCreationStore((s) => s.currentStep);
+  const data         = useCreationStore((s) => s.data);
+  const setStep      = useCreationStore((s) => s.setStep);
+  const updateData   = useCreationStore((s) => s.updateData);
+  const reset        = useCreationStore((s) => s.reset);
+  const isHydrated   = useCreationStore((s) => s.hasHydrated);
 
   const calculations = useCharacterCalculations(
     data.raceId   ?? null,
@@ -208,6 +213,6 @@ export function useCharacterCreation() {
     calculations,
     isFirstStep:  currentStep === 'basic-info',
     isLastStep:   currentStep === 'review',
-    isHydrated:   _hasHydrated,
+    isHydrated,
   };
 }

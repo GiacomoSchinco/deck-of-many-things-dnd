@@ -8,7 +8,6 @@ import PreparedSpellsManager from '@/components/character/sheet/PreparedSpellsMa
 import { useCharacter } from '@/hooks/queries/useCharacter';
 import { getEnglishClass } from '@/lib/utils/nameMappers';
 import Loading from '@/components/custom/Loading';
-import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AncientScroll } from '@/components/custom/AncientScroll';
 import { PageWrapper } from '@/components/layout/PageWrapper';
