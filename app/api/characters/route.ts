@@ -1,10 +1,13 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { createServerSupabase, requireAuth } from '@/lib/supabase/server'
-//GET /api/characters -> lista personaggi dell'utente loggato
+import { createServerSupabase, requireAuth, requireAdmin } from '@/lib/supabase/server'
+//GET /api/characters -> lista tutti i personaggi (solo admin)
 export async function GET() {
   const cookieStore = await cookies()
   const supabase = createServerSupabase(cookieStore)
+
+  const { error: adminError } = await requireAdmin(supabase)
+  if (adminError) return adminError
 
   // TUTTI i personaggi (admin)
   const { data: characters, error } = await supabase

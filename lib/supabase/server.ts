@@ -35,6 +35,29 @@ export async function requireAuth(supabase: SupabaseClient) {
 }
 
 /**
+ * Verifica che l'utente autenticato abbia ruolo 'admin'.
+ * Restituisce `{ user }` se admin, o `{ error: NextResponse }` con 401/403 se no.
+ */
+export async function requireAdmin(supabase: SupabaseClient<Database>) {
+  const { user, error: authError } = await requireAuth(supabase)
+  if (authError) return { user: null, error: authError }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user!.id)
+    .single()
+
+  if (profile?.role !== 'admin') {
+    return {
+      user: null,
+      error: NextResponse.json({ error: 'Accesso negato. Solo admin.' }, { status: 403 }),
+    }
+  }
+  return { user, error: null }
+}
+
+/**
  * Genera un handler GET che restituisce tutti i record di una tabella ordinati per nome.
  * Usato per le route semplici: /api/classes, /api/races, /api/skills
  */

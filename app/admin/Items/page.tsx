@@ -8,7 +8,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { useItems } from "@/hooks/queries/useItems";
 import type { Item } from '@/types/item';
 import { getItalianItemType, getItalianCurrency } from "@/lib/utils/nameMappers";
-import { Plus, Sword, Shield, Package, FlaskConical, ArrowUpDown, Wrench, Coins } from "lucide-react";
+import { Plus, Sword, Shield, Package, FlaskConical, ArrowUpDown, Wrench, Coins, Loader2 } from "lucide-react";
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
@@ -29,15 +29,15 @@ export default function ItemsPage() {
 
     useEffect(() => {
         const t = setTimeout(() => {
-            setDebouncedFilters({
-                search: query?.trim() ? query.trim() : undefined,
-                type: typeQuery?.trim() ? typeQuery.trim() : undefined,
-            })
-        }, 300)
+            const filters: { search?: string; type?: string } = {};
+            if (query.trim())  filters.search = query.trim();
+            if (typeQuery)     filters.type   = typeQuery;
+            setDebouncedFilters(filters);
+        }, 500)
         return () => clearTimeout(t)
     }, [query, typeQuery])
 
-    const { data: items, isLoading, isError } = useItems(debouncedFilters);
+    const { data: items, isLoading, isFetching, isError } = useItems(debouncedFilters, { keepPrevious: true });
     if (isLoading) return <Loading />;
     if (isError) return <div className="text-center text-red-600 p-8">Errore nel caricamento degli oggetti.</div>;
     return (
@@ -54,8 +54,7 @@ export default function ItemsPage() {
             showDecorations={false}>
 
             <div className="mb-4">
-                <div className="flex gap-2">
-                    <Input placeholder="Cerca (nome/desc)" value={query} onChange={(e) => setQuery(e.target.value)} />
+                <div className="flex gap-2 mb-2">                    <Input placeholder="Cerca (nome/desc)" value={query} onChange={(e) => setQuery(e.target.value)} />
                     <Select value={typeQuery ?? ''} onValueChange={(v) => setTypeQuery(v || '')}>
                         <SelectTrigger className="w-56">
                             <SelectValue placeholder="Tipo (seleziona)">
@@ -89,6 +88,10 @@ export default function ItemsPage() {
                             })}
                         </SelectContent>
                     </Select>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-amber-600">
+                    {isFetching && <Loader2 className="w-3 h-3 animate-spin" />}
+                    {items?.length || 0} oggetti trovati
                 </div>
             </div>
 

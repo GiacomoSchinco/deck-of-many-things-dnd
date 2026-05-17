@@ -35,7 +35,7 @@ export default function CharactersPage() {
   const [debouncedQuery, setDebouncedQuery] = useState('');
 
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedQuery(query.trim()), 300);
+    const t = setTimeout(() => setDebouncedQuery(query.trim()), 500);
     return () => clearTimeout(t);
   }, [query]);
 

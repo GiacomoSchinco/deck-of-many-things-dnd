@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, keepPreviousData } from '@tanstack/react-query'
 import type { Item } from '@/types/item'
 
 export type { Item }
@@ -8,7 +8,7 @@ interface UseItemsFilters {
   search?: string
 }
 
-export function useItems(filters?: UseItemsFilters) {
+export function useItems(filters?: UseItemsFilters, options?: { keepPrevious?: boolean }) {
   const params = new URLSearchParams()
 
   if (filters?.type) params.set('type', filters.type)
@@ -23,6 +23,7 @@ export function useItems(filters?: UseItemsFilters) {
       return response.json() as Promise<Item[]>
     },
     staleTime: 1000 * 60 * 5,
+    placeholderData: options?.keepPrevious ? keepPreviousData : undefined,
   })
 }
 export function useItem(id?: number | null) {
