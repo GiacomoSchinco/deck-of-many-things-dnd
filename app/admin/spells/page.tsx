@@ -10,7 +10,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { useSpells } from "@/hooks/queries/useSpells";
 import type { Spell } from '@/types/spell';
 import { getItalianSchool, getItalianClass } from "@/lib/utils/nameMappers";
-import { Plus, BookOpen, Wand2, ScrollText, Sparkles, Crown, Flame, Shield, Eye, Heart, Moon, Zap, Skull, Brain, Star } from "lucide-react";
+import { Plus, BookOpen, Wand2, ScrollText, Sparkles, Crown, Flame, Shield, Eye, Heart, Moon, Zap, Skull, Brain, Star, Loader2 } from "lucide-react";
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
@@ -71,17 +71,22 @@ export default function SpellsPage() {
 
   useEffect(() => {
     const t = setTimeout(() => {
-      setDebouncedFilters({
-        search: query?.trim() ? query.trim() : undefined,
-        level: levelQuery?.trim() ? levelQuery.trim() : undefined,
-        school: schoolQuery?.trim() ? schoolQuery.trim() : undefined,
-        class: classQuery?.trim() ? classQuery.trim() : undefined,
-      });
-    }, 300);
+      // Costruisce l'oggetto senza proprietà undefined per mantenere
+      // la query key stabile e non generare fetch inutili
+      const filters: { search?: string; level?: string; school?: string; class?: string } = {};
+      if (query.trim())   filters.search = query.trim();
+      if (levelQuery)     filters.level  = levelQuery;
+      if (schoolQuery)    filters.school = schoolQuery;
+      if (classQuery)     filters.class  = classQuery;
+      setDebouncedFilters(filters);
+    }, 500);
     return () => clearTimeout(t);
   }, [query, levelQuery, schoolQuery, classQuery]);
 
-  const { data: spells, isLoading, isError } = useSpells(debouncedFilters);
+  const { data: spells, isLoading, isFetching, isError } = useSpells(
+    debouncedFilters,
+    { keepPrevious: true }
+  );
   
   if (isLoading) return <Loading />;
   if (isError) return <div className="text-center text-red-600 p-8">Errore nel caricamento degli incantesimi.</div>;
@@ -199,8 +204,9 @@ export default function SpellsPage() {
           </Select>
         </div>
 
-        {/* Contatore risultati */}
-        <div className="text-sm text-amber-600">
+        {/* Contatore risultati + indicatore di ricerca in corso */}
+        <div className="flex items-center gap-2 text-sm text-amber-600">
+          {isFetching && <Loader2 className="w-3 h-3 animate-spin" />}
           {spells?.length || 0} incantesimi trovati
         </div>
       </div>

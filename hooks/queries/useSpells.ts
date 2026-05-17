@@ -1,8 +1,11 @@
 // hooks/queries/useSpells.ts
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import type { PreparedSpell } from '@/types/spell';
 
-export function useSpells(filters?: { class?: string; level?: string | number; school?: string; search?: string }) {
+export function useSpells(
+  filters?: { class?: string; level?: string | number; school?: string; search?: string },
+  options?: { keepPrevious?: boolean }
+) {
   const params = new URLSearchParams()
   if (filters?.class) params.set('class', filters.class)
   if (filters?.level !== undefined && filters.level !== '') params.set('level', String(filters.level))
@@ -17,6 +20,7 @@ export function useSpells(filters?: { class?: string; level?: string | number; s
       return res.json()
     },
     staleTime: 1000 * 60 * 60, // 1 ora
+    placeholderData: options?.keepPrevious ? keepPreviousData : undefined,
   })
 }
 

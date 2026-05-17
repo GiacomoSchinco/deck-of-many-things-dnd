@@ -1,11 +1,13 @@
 // components/character/level-up/hooks/useLevelUp.ts
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useCharacter } from '@/hooks/queries/useCharacter';
 import { getLevelUpSpellChanges, getSpellProgression } from '@/lib/rules/spellcasting';
 import { useUpdateCharacter } from '@/hooks/mutations/useCharacterMutations';
 import { useAddCharacterSpells, useRemoveCharacterSpells, useUpdateSpellSlots } from '@/hooks/mutations/useCharacterSpellMutations';
+import { useLevelUpStore } from '@/store/useLevelUpStore';
+import type { LevelUpData } from '@/store/useLevelUpStore';
 import LevelUpHPStep from '../steps/LevelUpHPStep';
 import LevelUpASIStep from '../steps/LevelUpASIStep';
 import LevelUpSpellsStep from '../steps/LevelUpSpellsStep';
@@ -16,20 +18,6 @@ const hitDiceValues: Record<string, number> = {
   d6: 4, d8: 5, d10: 6, d12: 7,
 };
 
-export type LevelUpData = {
-  hpGain: number;
-  hpMethod: string;
-  rolledValue: number | null;
-  asiType?: 'increase' | 'feat';
-  increaseType?: 'single' | 'double';
-  selectedStat?: string;
-  secondStat?: string;
-  changes?: Record<string, number>;
-  newSpells: string[];
-  swapFrom?: string; // known_id dell'incantesimo da rimuovere
-  swapTo?: string;   // spell_id del sostituto
-};
-
 interface UseLevelUpOptions {
   characterId: string;
   currentLevel: number;
@@ -38,14 +26,24 @@ interface UseLevelUpOptions {
 
 export function useLevelUp({ characterId, currentLevel, onComplete }: UseLevelUpOptions) {
   const newLevel = currentLevel + 1;
-  const [step, setStep] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
-  const [levelUpData, setLevelUpData] = useState<LevelUpData>({
-    hpGain: 0,
-    hpMethod: 'average',
-    rolledValue: null,
-    newSpells: [],
-  });
+
+  // ─── Store ────────────────────────────────────────────────────────────────
+  const storedCharacterId = useLevelUpStore((s) => s.characterId);
+  const step              = useLevelUpStore((s) => s.step);
+  const levelUpData       = useLevelUpStore((s) => s.data);
+  const setStep           = useLevelUpStore((s) => s.setStep);
+  const updateLevelUpData = useLevelUpStore((s) => s.updateData);
+  const setCharacterId    = useLevelUpStore((s) => s.setCharacterId);
+  const resetStore        = useLevelUpStore((s) => s.reset);
+
+  // Resetta lo store se si fa level-up di un personaggio diverso
+  useEffect(() => {
+    if (storedCharacterId !== characterId) {
+      resetStore();
+      setCharacterId(characterId);
+    }
+  }, [characterId, storedCharacterId, resetStore, setCharacterId]);
 
   const { data: character, isLoading } = useCharacter(characterId);
   const updateCharacter = useUpdateCharacter(characterId);
@@ -114,7 +112,7 @@ export function useLevelUp({ characterId, currentLevel, onComplete }: UseLevelUp
   const currentStep = steps[step] ?? steps[steps.length - 1];
 
   const handleNext = (data: Partial<LevelUpData> & Record<string, unknown>) => {
-    setLevelUpData(prev => ({ ...prev, ...data }));
+    updateLevelUpData(data as Partial<LevelUpData>);
     if (step < steps.length - 1) {
       setStep(step + 1);
     } else {
@@ -128,36 +126,38 @@ export function useLevelUp({ characterId, currentLevel, onComplete }: UseLevelUp
 
   const saveLevelUp = async () => {
     if (!character || !changes) return;
+    // Legge il dato più aggiornato dallo store (evita chiusure stale)
+    const latestData = useLevelUpStore.getState().data;
     setIsSaving(true);
     try {
       // 1. Aggiorna livello, HP (e ability scores se ASI)
-      const newMaxHp = (character.combat_stats?.max_hp || 0) + levelUpData.hpGain;
+      const newMaxHp = (character.combat_stats?.max_hp || 0) + latestData.hpGain;
       const updateBody: Record<string, unknown> = {
         level: newLevel,
         combatStats: {
           max_hp: newMaxHp,
-          current_hp: (character.combat_stats?.current_hp ?? 0) + levelUpData.hpGain,
+          current_hp: (character.combat_stats?.current_hp ?? 0) + latestData.hpGain,
         },
       };
 
-      if (levelUpData.asiType === 'increase' && levelUpData.changes) {
+      if (latestData.asiType === 'increase' && latestData.changes) {
         updateBody.abilityScores = {
           ...(character.ability_scores || {}),
-          ...levelUpData.changes,
+          ...latestData.changes,
         };
       }
       await updateCharacter.mutateAsync(updateBody);
 
       // 2. Nuovi incantesimi (+ sostituto se swap)
-      const spellsToAdd = [...levelUpData.newSpells];
-      if (levelUpData.swapTo) spellsToAdd.push(levelUpData.swapTo);
+      const spellsToAdd = [...latestData.newSpells];
+      if (latestData.swapTo) spellsToAdd.push(latestData.swapTo);
       if (spellsToAdd.length > 0) {
         await addSpells.mutateAsync({ characterId, spellIds: spellsToAdd.map(Number) });
       }
 
       // 2b. Rimozione incantesimo sostituito
-      if (levelUpData.swapFrom) {
-        await removeSpells.mutateAsync({ characterId, knownIds: [levelUpData.swapFrom] });
+      if (latestData.swapFrom) {
+        await removeSpells.mutateAsync({ characterId, knownIds: [latestData.swapFrom] });
       }
 
       // 3. Aggiorna spell slots (upsert total_slots, preserva used_slots)
@@ -181,6 +181,7 @@ export function useLevelUp({ characterId, currentLevel, onComplete }: UseLevelUp
         }
       }
 
+      resetStore();
       onComplete();
     } catch (err) {
       console.error('Errore durante il level up:', err);
