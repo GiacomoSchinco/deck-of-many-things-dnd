@@ -1,2 +1,2 @@
-// TODO: implement character queries
+// TODO: implementare le query dei personaggi
 export {};

@@ -36,7 +36,7 @@ export async function PUT(
 
   const body = await request.json().catch(() => ({})) as { name?: string; dungeon_master_id?: string }
 
-  // fetch current campaign to check ownership
+  // recupera la campagna corrente per verificare la proprietà
   const { data: existing, error: fetchErr } = await supabase
     .from('campaigns')
     .select('*')
@@ -84,7 +84,7 @@ export async function DELETE(
   const { user, error: authError } = await requireAuth(supabase)
   if (authError) return authError
 
-  // ensure campaign exists and user is DM
+  // verifica che la campagna esista e che l'utente sia il DM
   const { data: existing, error: fetchErr } = await supabase
     .from('campaigns')
     .select('*')

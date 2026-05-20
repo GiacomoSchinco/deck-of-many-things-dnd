@@ -1,2 +1,2 @@
-// TODO: implement user queries
+// TODO: implementare le query degli utenti
 export {};

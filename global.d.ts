@@ -1,2 +1,2 @@
-// Allows TypeScript to accept CSS side-effect imports (e.g. import './globals.css')
+// Permette a TypeScript di accettare import CSS come side-effect (es. import './globals.css')
 declare module '*.css';

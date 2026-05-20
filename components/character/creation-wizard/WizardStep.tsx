@@ -13,9 +13,9 @@ interface WizardStepProps {
   nextLabel?: string;
   nextDisabled?: boolean;
   nextLoading?: boolean;
-  /** Slot for extra buttons between Back and Next (e.g. "Skip"). */
+  /** Slot per pulsanti extra tra Indietro e Avanti (es. "Salta"). */
   extraActions?: React.ReactNode;
-  /** Wrap children in a <form>; Next button becomes type="submit". */
+  /** Wrappa il contenuto in un <form>; il pulsante Avanti diventa type="submit". */
   asForm?: boolean;
   onFormSubmit?: (e: React.FormEvent) => void;
   children: React.ReactNode;

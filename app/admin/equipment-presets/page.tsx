@@ -112,7 +112,7 @@ export default function EquipmentPresetsPage() {
 
           {/* Tabella preset - con stile migliorato */}
           {
-            // Build props as `any` to avoid excess-property issues while DataTable supports customRenderers
+            // Costruisce le props come `any` per evitare errori di proprietà in eccesso mentre DataTable supporta customRenderers
           }
           {(() => {
             type Row = {

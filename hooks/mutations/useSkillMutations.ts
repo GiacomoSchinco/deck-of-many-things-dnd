@@ -29,7 +29,7 @@ export function useCreateSkills() {
       }
       return res.json()
     },    onSuccess: (_data, variables) => {
-      // variables.characterId is available here
+      // variables.characterId è disponibile qui
       queryClient.invalidateQueries({ queryKey: ['skills', variables.characterId] })
     },
   })

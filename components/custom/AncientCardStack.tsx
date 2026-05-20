@@ -9,7 +9,7 @@ interface AncientCardStackProps {
   animation?: 'float' | string; // classe di animazione (es. 'animate-float')
 }
 
-// Use Tailwind width/height classes; md is canonical (w-64 h-80)
+// Usa classi Tailwind per width/height; md è il riferimento canonico (w-64 h-80)
 const sizeMap = CARD_SIZES;
 
 export default function AncientCardStack({
@@ -21,7 +21,7 @@ export default function AncientCardStack({
   const cl = sizeMap[cardSize] || sizeMap.md;
   const count = Math.max(1, Math.floor(stackCount));
 
-  // generate simple offsets for back cards - solo rotate migliorato
+  // genera offset semplici per le carte posteriori — solo rotazioni migliorate
   const offsets = Array.from({ length: count }, (_, i) => {
     const idx = i; // 0 = bottom
     
@@ -48,7 +48,7 @@ export default function AncientCardStack({
       {/* Mazzo di carte animate */}
       <div className={`relative ${cl}`}>
         {offsets.map((o, idx) => {
-          // render back cards for all except top (last)
+          // mostra le carte posteriori per tutte tranne la superiore (ultima)
           const isTop = idx === offsets.length - 1;
           if (!isTop) {
             return (

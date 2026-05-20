@@ -14,7 +14,7 @@ export type ColumnDef<T extends AnyRecord = AnyRecord> = {
 
 export type DataTableProps<T extends AnyRecord> = {
     initialData: T[];
-    /** Shorthand: define columns in one place instead of visibleColumns + labels + customRenderers */
+    /** Abbreviazione: definisce le colonne in un unico posto invece di visibleColumns + labels + customRenderers */
     columns?: ColumnDef<T>[];
     idKey?: keyof T & string;
     hiddenColumns?: Array<keyof T & string>;
@@ -51,7 +51,7 @@ export default function DataTable<T extends AnyRecord>({
     emptyMessage = "Nessun record trovato",
     className,
 }: DataTableProps<T>) {
-    // Resolve from `columns` shorthand or individual props
+    // Risolve dalla scorciatoia `columns` o dalle prop individuali
     const labels = columnDefs
         ? Object.fromEntries(columnDefs.map((c) => [c.key, c.label]))
         : (labelsRaw as Record<string, string>);

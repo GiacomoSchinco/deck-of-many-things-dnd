@@ -19,8 +19,8 @@ export async function GET(
     const page = Number(searchParams.get('page') ?? '1')
     const pageSize = Number(searchParams.get('pageSize') ?? '50')
 
-    // Detect whether the inventory table uses the legacy `item_name`/`item_type` columns
-    // or the simplified `name`/`type` columns. We try `name` first and fall back.
+    // Rileva se la tabella inventory usa le colonne legacy `item_name`/`item_type`
+    // oppure le colonne semplificate `name`/`type`. Proviamo prima `name` e poi il fallback.
     let nameCol = 'name'
     let typeCol = 'type'
     try {
@@ -109,7 +109,7 @@ export async function POST(
     const body = await request.json()
     const newItems = body?.items
 
-    // Accept item identifiers in several shapes: { item_id }, { itemId }, { id }, numeric strings
+    // Accetta identificatori oggetto in più formati: { item_id }, { itemId }, { id }, stringhe numeriche
     const validShape = Array.isArray(newItems) && newItems.every((i) => {
       const rawId = i?.item_id ?? i?.itemId ?? i?.id
       return typeof rawId === 'number' || (typeof rawId === 'string' && /^\d+$/.test(rawId))
@@ -155,7 +155,7 @@ export async function POST(
     const toInsert = []
     const toUpdate = []
 
-    // Detect inventory column names once for the POST flow
+    // Rileva i nomi delle colonne dell'inventario una volta sola per il flusso POST
     let nameCol = 'name'
     let typeCol = 'type'
     let valueCol = 'value'
@@ -198,7 +198,7 @@ export async function POST(
           properties: props ?? {},
         }
 
-        // Assign detected keys (nameCol/typeCol/valueCol detected once above)
+        // Assegna le chiavi rilevate (nameCol/typeCol/valueCol rilevate in precedenza)
         ;(row as any)[nameCol] = cat.name
         ;(row as any)[typeCol] = itemType
         ;(row as any)[valueCol] = cat.value ?? null

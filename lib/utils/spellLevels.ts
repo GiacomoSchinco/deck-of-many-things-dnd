@@ -1,27 +1,27 @@
 // lib/utils/spellLevels.ts
 //
-// Returns the array of spell levels a class can access at a given character level.
-// Level 0 = cantrips (always included when the class has spellcasting).
-// Used to filter the spell list so a player cannot learn spells they can't yet cast.
+// Restituisce l'array dei livelli di incantesimo accessibili a una classe per un dato livello personaggio.
+// Livello 0 = trucchetti (sempre inclusi se la classe ha capacità di lancio incantesimi).
+// Usato per filtrare la lista incantesimi in modo che un giocatore non possa imparare spell troppo avanzate.
 
 const FULL_CASTERS   = ['wizard', 'sorcerer', 'bard', 'cleric', 'druid'];
 const HALF_CASTERS   = ['paladin', 'ranger'];
-const THIRD_CASTERS  = ['fighter', 'rogue']; // Eldritch Knight / Arcane Trickster
+const THIRD_CASTERS  = ['fighter', 'rogue']; // Eldritch Knight / Arcane Trickster (un terzo dei livelli)
 const PACT_CASTERS   = ['warlock'];
 
 /**
- * Full caster spell slot progression (PHB table).
- * Index = character level (1-based), value = max spell level available.
+ * Progressione slot incantesimo per lanciatori completi (tabella PHB).
+ * Indice = livello personaggio (base 1), valore = livello massimo incantesimo disponibile.
  */
 const FULL_CASTER_MAX: number[] = [
-  0, // placeholder for index 0
+  0, // segnaposto per indice 0
   1, 1, 2, 2, 3, 3, 4, 4, 5, 5,
   6, 6, 7, 7, 8, 8, 9, 9, 9, 9,
 ];
 
 /**
- * Half caster spell slot progression.
- * Paladin/Ranger get their first slots at level 2.
+ * Progressione slot incantesimo per lanciatori metà (half caster).
+ * Paladino/Ranger ottengono i primi slot al livello 2.
  */
 const HALF_CASTER_MAX: number[] = [
   0,
@@ -30,8 +30,8 @@ const HALF_CASTER_MAX: number[] = [
 ];
 
 /**
- * Third caster (Eldritch Knight / Arcane Trickster).
- * First spells at level 3.
+ * Lanciatori a un terzo (Eldritch Knight / Arcane Trickster).
+ * I primi incantesimi sbloccano al livello 3.
  */
 const THIRD_CASTER_MAX: number[] = [
   0,
@@ -40,7 +40,7 @@ const THIRD_CASTER_MAX: number[] = [
 ];
 
 /**
- * Warlock pact magic slot level (equals the max spell level they can cast).
+ * Livello slot patto del Warlock (corrisponde al livello massimo incantesimo lanciabile).
  */
 const WARLOCK_PACT_MAX: number[] = [
   0,
@@ -49,11 +49,11 @@ const WARLOCK_PACT_MAX: number[] = [
 ];
 
 /**
- * Returns all spell levels [0..maxLevel] that a class can access at a given
- * character level. Returns [0] (cantrips only) for non-casters or before
- * they unlock their first slots.
+ * Restituisce tutti i livelli incantesimo [0..maxLevel] accessibili a una classe per un dato
+ * livello personaggio. Restituisce [0] (solo trucchetti) per non-lanciatori o prima che
+ * sblocchino i loro slot.
  *
- * @param className - English, lowercase class name (e.g. 'wizard')
+ * @param className - nome classe in inglese, minuscolo (es. 'wizard')
  * @param characterLevel - 1-20
  */
 export function getAvailableSpellLevels(
@@ -74,6 +74,6 @@ export function getAvailableSpellLevels(
     maxLevel = THIRD_CASTER_MAX[clamp];
   }
 
-  // Build [0, 1, 2, ... maxLevel]
+  // Costruisce [0, 1, 2, ... maxLevel]
   return Array.from({ length: maxLevel + 1 }, (_, i) => i);
 }

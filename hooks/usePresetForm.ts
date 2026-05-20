@@ -55,7 +55,7 @@ export function usePresetForm(initialData?: EquipmentPreset) {
 
   const selectedClass = classes?.find((c) => String(c.id) === preset.class_id)
 
-  // ---------- Fixed items ----------
+  // ---------- Oggetti fissi ----------
   const addItem = () =>
     setPreset((p) => ({ ...p, items: [...p.items, createEmptyItem()] }))
 
@@ -70,7 +70,7 @@ export function usePresetForm(initialData?: EquipmentPreset) {
   const removeItem = (index: number) =>
     setPreset((p) => ({ ...p, items: p.items.filter((_, i) => i !== index) }))
 
-  // ---------- Choices ----------
+  // ---------- Scelte ----------
   const addChoice = () =>
     setPreset((p) => ({ ...p, choices: [...p.choices, createEmptyChoice()] }))
 
@@ -122,7 +122,7 @@ export function usePresetForm(initialData?: EquipmentPreset) {
       return { ...p, choices: newChoices }
     })
 
-  // ---------- Submit ----------
+  // ---------- Invio form ----------
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!preset.name || !preset.class_id) {
@@ -164,7 +164,7 @@ export function usePresetForm(initialData?: EquipmentPreset) {
     setPreset,
     classes,
     selectedClass,
-    // fixed items
+    // oggetti fissi
     addItem,
     updateItem,
     removeItem,

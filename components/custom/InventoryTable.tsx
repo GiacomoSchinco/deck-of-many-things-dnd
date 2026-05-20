@@ -174,7 +174,7 @@ export default function InventoryTable({ items = [], onRowClick, onEdit, onDelet
             const base = String(v ?? '');
             const parts: string[] = [];
 
-            // Avoid duplicating damage/damageType in description (they have their own column now)
+            // Evita di duplicare danno/tipoDanno nella descrizione (hanno già una colonna dedicata)
             if (p?.itemType === 'weapon') {
               if (Array.isArray(p.properties)) parts.push(...(p.properties as string[]));
             } else if (p?.itemType === 'armor') {

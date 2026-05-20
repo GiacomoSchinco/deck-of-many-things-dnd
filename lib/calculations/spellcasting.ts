@@ -1,2 +1,2 @@
-// TODO: implement spellcasting calculations (spell save DC, spell attack bonus, slots)
+// TODO: implementare i calcoli di magia (CD tiro salvezza, bonus attacco incantesimo, slot)
 export {};

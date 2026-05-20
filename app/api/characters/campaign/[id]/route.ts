@@ -45,7 +45,7 @@ export async function POST(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
 
-  // check DM ownership
+  // verifica che l'utente sia il DM della campagna
   const { data: campaign, error: campErr } = await supabase
     .from('campaigns')
     .select('dungeon_master_id')
@@ -84,7 +84,7 @@ export async function DELETE(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
 
-  // check DM ownership
+  // verifica che l'utente sia il DM della campagna
   const { data: campaign, error: campErr } = await supabase
     .from('campaigns')
     .select('dungeon_master_id')

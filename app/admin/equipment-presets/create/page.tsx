@@ -85,7 +85,7 @@ export default function CreateEquipmentPresetPage({ initialData }: Props) {
     }
   }
 
-  // Delete handler for modal
+  // Handler per eliminazione dal modal
   const handleDelete = async () => {
     if (!preset.id) return
     await deletePreset.mutateAsync(preset.id)

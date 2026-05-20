@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Il nome della campagna è obbligatorio' }, { status: 400 })
   }
 
-  // require authenticated user and set them as dungeon master by default
+  // richiede utente autenticato e lo imposta come dungeon master di default
   const { user, error: authError2 } = await requireAuth(supabase)
   if (authError2) return authError2
 

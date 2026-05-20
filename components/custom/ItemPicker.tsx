@@ -89,8 +89,8 @@ export function ItemPicker({
     search: search || undefined,
   });
 
-  // Fetch the item by id when a value is provided (e.g. editing an existing preset).
-  // Use the shared `useItem` hook which handles caching and staleTime.
+  // Recupera l'oggetto tramite id quando viene fornito un valore (es. modifica di un preset esistente).
+  // Usa l'hook condiviso `useItem` che gestisce la cache e lo staleTime.
   const { data: fetchedItem, isLoading: isLoadingItem } = useItem(value);
 
   // Priority: user just selected something > fetched by id > known name (from form state) > placeholder
