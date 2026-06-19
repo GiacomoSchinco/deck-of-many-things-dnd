@@ -140,6 +140,87 @@ export default function CreditsPage() {
           </div>
         </AncientCardContainer>
 
+        {/* SRD — Dati di gioco */}
+        <AncientCardContainer className="p-8 mb-8">
+          <h2 className="text-2xl fantasy-title mb-4 flex items-center gap-2">
+            <span className="text-3xl">📖</span> SRD — Dati di Gioco
+          </h2>
+
+          <div className="space-y-4 text-amber-800">
+            <p>
+              Tutti i dati di gioco presenti in questa applicazione (magie, oggetti, equipaggiamento,
+              mostri, classi, razze, talenti e qualsiasi altro contenuto proveniente dal regolamento)
+              sono basati sulle System Reference Document di Dungeons &amp; Dragons 5e e 5.5,
+              rese disponibili da Wizards of the Coast.
+            </p>
+
+            <p>
+              <strong>Licenza:</strong>{' '}
+              <a
+                href="https://creativecommons.org/licenses/by/4.0/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-amber-700 underline hover:text-amber-900"
+              >
+                Creative Commons Attribution 4.0 International (CC BY 4.0)
+              </a>{' '}
+              — <a
+                href="https://creativecommons.org/licenses/by/3.0/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-amber-700 underline hover:text-amber-900"
+              >
+                CC BY 3.0
+              </a>
+            </p>
+
+            <p>
+              Ciò significa che questi contenuti sono liberamente utilizzabili, condivisibili
+              e modificabili, purché venga fornito il credito appropriato a Wizards of the Coast.
+            </p>
+
+            <div className="bg-amber-100/50 p-4 rounded-lg border border-amber-900/20 font-mono text-sm">
+              <p>
+                This work includes material taken from the System Reference Document 5.1 (&quot;SRD 5.1&quot;)
+                and System Reference Document 5.2 (&quot;SRD 5.2&quot;) by Wizards of the Coast LLC.
+              </p>
+              <p className="mt-1">
+                Available at{' '}
+                <a
+                  href="https://dnd.wizards.com/resources/systems-reference-document"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-amber-700 underline hover:text-amber-900"
+                >
+                  dnd.wizards.com
+                </a>
+                .
+              </p>
+              <p className="mt-1">
+                Licensed under{' '}
+                <a
+                  href="https://creativecommons.org/licenses/by/4.0/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-amber-700 underline hover:text-amber-900"
+                >
+                  CC BY 4.0
+                </a>
+                {' '}and{' '}
+                <a
+                  href="https://creativecommons.org/licenses/by/3.0/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-amber-700 underline hover:text-amber-900"
+                >
+                  CC BY 3.0
+                </a>
+                .
+              </p>
+            </div>
+          </div>
+        </AncientCardContainer>
+
         {/* Ringraziamenti extra */}
         <AncientCardContainer className="p-8">
           <h2 className="text-2xl fantasy-title mb-4 flex items-center gap-2">
