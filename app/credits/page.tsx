@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import { Button } from '@/components/ui/button';
-import { Heart, ExternalLink, ArrowLeft } from 'lucide-react';
+import { ExternalLink, ArrowLeft } from 'lucide-react';
 import { PageWrapper } from '@/components/layout/PageWrapper';
 
 export default function CreditsPage() {

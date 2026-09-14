@@ -34,8 +34,8 @@ export default function SwiperCardsTestPage() {
                     level={3}
                     background="Folk"
                     alignment="Neutral"
-                    hp={10}
-                    maxhp={10}
+                    currentHp={10}
+                    maxHp={10}
                     isFlippable
                     size="md"
                 />
@@ -53,8 +53,8 @@ export default function SwiperCardsTestPage() {
                     level={2}
                     background="Thief"
                     alignment="Chaotic"
-                    hp={8}
-                    maxhp={8}
+                    currentHp={8}
+                    maxHp={8}
                     isFlippable
                     size="md"
                 />

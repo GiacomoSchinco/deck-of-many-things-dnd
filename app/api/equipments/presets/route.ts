@@ -3,6 +3,9 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { createServerSupabase } from '@/lib/supabase/server'
 import { CreateEquipmentPresetDTO } from '@/types/equipment'
+import type { Database } from '@/lib/supabase/types'
+
+type Tables = Database['public']['Tables']
 
 // GET /api/equipment/presets - Lista tutti i preset
 export async function GET(request: Request) {
@@ -81,7 +84,7 @@ export async function POST(request: Request) {
       items: body.items as unknown as import('@/lib/supabase/types').Json,
       choices: (body.choices || []) as unknown as import('@/lib/supabase/types').Json,
       is_default: body.is_default || false
-    } as any)
+    } as Tables['equipment_presets']['Insert'])
     .select()
     .single()
 

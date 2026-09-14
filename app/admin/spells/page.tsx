@@ -8,9 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { useSpells } from "@/hooks/queries/useSpells";
-import type { Spell } from '@/types/spell';
-import { getItalianSchool, getItalianClass } from "@/lib/utils/nameMappers";
-import { Plus, BookOpen, Wand2, ScrollText, Sparkles, Crown, Flame, Shield, Eye, Heart, Moon, Zap, Skull, Brain, Star, Loader2 } from "lucide-react";
+import { getItalianSchool } from "@/lib/utils/nameMappers";
+import { Plus, BookOpen, Wand2, ScrollText, Sparkles, Crown, Shield, Eye, Heart, Moon, Zap, Skull, Brain, Star, Loader2 } from "lucide-react";
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 

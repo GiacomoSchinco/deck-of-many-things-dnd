@@ -10,8 +10,7 @@ import {
   Key,
   Sword,
   Scroll,
-  PlusCircle,
-  User as UserIcon
+  PlusCircle
 } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';

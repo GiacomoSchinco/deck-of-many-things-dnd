@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useCreateCampaign } from '@/hooks/mutations/useCampaignMutations'
 import { PlusCircle, Loader2 } from 'lucide-react'
-import { AncientScroll } from '@/components/custom/AncientScroll'
 import { PageWrapper } from '@/components/layout/PageWrapper'
 
 export default function CreateCampaignPage() {

@@ -2,6 +2,9 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { createServerSupabase } from '@/lib/supabase/server'
+import type { Database } from '@/lib/supabase/types'
+
+type Tables = Database['public']['Tables']
 
 export async function GET(
   request: Request,
@@ -28,7 +31,7 @@ export async function GET(
       if (test.error) {
         nameCol = 'item_name'
       }
-    } catch (e) {
+    } catch {
       nameCol = 'item_name'
     }
 
@@ -37,7 +40,7 @@ export async function GET(
       if (test2.error) {
         typeCol = 'item_type'
       }
-    } catch (e) {
+    } catch {
       typeCol = 'item_type'
     }
 
@@ -152,8 +155,8 @@ export async function POST(
     const existingMap = new Map((existingItems ?? []).map((i) => [i.item_id as number, i.quantity as number]))
 
     // 4. Prepara insert / update
-    const toInsert = []
-    const toUpdate = []
+    const toInsert: Record<string, unknown>[] = []
+    const toUpdate: { item_id: number; new_quantity: number }[] = []
 
     // Rileva i nomi delle colonne dell'inventario una volta sola per il flusso POST
     let nameCol = 'name'
@@ -162,19 +165,19 @@ export async function POST(
     try {
       const tn = await supabase.from('inventory').select('name').limit(1).maybeSingle()
       if (tn.error) nameCol = 'item_name'
-    } catch (e) {
+    } catch {
       nameCol = 'item_name'
     }
     try {
       const tt = await supabase.from('inventory').select('type').limit(1).maybeSingle()
       if (tt.error) typeCol = 'item_type'
-    } catch (e) {
+    } catch {
       typeCol = 'item_type'
     }
     try {
       const tv = await supabase.from('inventory').select('value').limit(1).maybeSingle()
       if (tv.error) valueCol = 'cost'
-    } catch (e) {
+    } catch {
       valueCol = 'cost'
     }
 
@@ -199,9 +202,9 @@ export async function POST(
         }
 
         // Assegna le chiavi rilevate (nameCol/typeCol/valueCol rilevate in precedenza)
-        ;(row as any)[nameCol] = cat.name
-        ;(row as any)[typeCol] = itemType
-        ;(row as any)[valueCol] = cat.value ?? null
+        row[nameCol] = cat.name
+        row[typeCol] = itemType
+        row[valueCol] = cat.value ?? null
 
         toInsert.push(row)
       }
@@ -217,15 +220,15 @@ export async function POST(
     }
 
     // 5. Inserisci nuovi oggetti
-    let inserted = []
+    let inserted: Record<string, unknown>[] = []
     if (toInsert.length > 0) {
       // Filtra righe valide (devono avere almeno il nome nella colonna rilevata)
-      const validRows = toInsert.filter(row => Boolean((row as any)[nameCol]))
+      const validRows = toInsert.filter(row => Boolean(row[nameCol]))
 
       if (validRows.length > 0) {
         const { data, error } = await supabase
           .from('inventory')
-          .insert(validRows as any)
+          .insert(validRows as Tables['inventory']['Insert'][])
           .select()
 
         if (error) {

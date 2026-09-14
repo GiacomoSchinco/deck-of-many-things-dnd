@@ -4,13 +4,10 @@
 import { useCombatStats } from '@/hooks/queries/useCombatStats';
 import { useUpdateCombatStats } from '@/hooks/mutations/useCombatStatsMutations';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useState } from 'react';
 
 export function CombatStatsCard({ characterId }: { characterId: string }) {
   const { data: stats, isLoading } = useCombatStats(characterId);
   const updateStats = useUpdateCombatStats(characterId);
-  const [hp, setHp] = useState(stats?.current_hp);
 
   const handleDamage = (amount: number) => {
     const newHp = Math.max(0, stats.current_hp - amount);

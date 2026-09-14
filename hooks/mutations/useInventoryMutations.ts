@@ -31,7 +31,7 @@ export function useCreateInventory(characterId?: string | null) {
         try {
           const parsed = JSON.parse(text)
           message = parsed?.error || parsed?.message || message
-        } catch (_) {
+        } catch {
           // non è JSON, mantieni il testo grezzo
         }
         throw new Error(message)

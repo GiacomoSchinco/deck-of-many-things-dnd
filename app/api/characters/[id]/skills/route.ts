@@ -73,7 +73,7 @@ export async function POST(
     }
 
     // 🔥 CAMBIO: usa skill_id invece di skill_name
-    const rows = skills.map((skill: any) => ({
+    const rows = skills.map((skill: { skill_id: number; proficiency_type?: string }) => ({
       character_id: id,
       skill_id: skill.skill_id,           // ← ora è ID numerico
       proficiency_type: skill.proficiency_type || 'proficient'

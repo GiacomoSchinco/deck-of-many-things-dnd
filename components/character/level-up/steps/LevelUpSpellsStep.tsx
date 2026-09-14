@@ -69,8 +69,14 @@ export default function LevelUpSpellsStep({
 
   // Per le classi che conoscono, recupera gli incantesimi già conosciuti
   const { data: existingSpellsRaw } = useCharacterSpells(!isPreparer ? character.id ?? null : null);
-  const existingSpells = (existingSpellsRaw ?? []) as SpellKnownWithSpell[];
-  const existingSpellIds = existingSpells.map(ks => String(ks.spell_id));
+  const existingSpells = useMemo(
+    () => (existingSpellsRaw ?? []) as SpellKnownWithSpell[],
+    [existingSpellsRaw]
+  );
+  const existingSpellIds = useMemo(
+    () => existingSpells.map(ks => String(ks.spell_id)),
+    [existingSpells]
+  );
 
   // Ottieni gli incantesimi disponibili per la classe (solo per classi che conoscono)
   const { data: allSpells } = useSpells(

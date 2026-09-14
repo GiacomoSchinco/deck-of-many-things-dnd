@@ -54,7 +54,10 @@ export async function GET(
     `)
     .eq('id', id)
 
-  // Se non è admin, filtra per user_id\n  if (!admin) {\n    query = query.eq('user_id', user!.id)\n  }
+  // Se non è admin, filtra per user_id
+  if (!admin) {
+    query = query.eq('user_id', user!.id)
+  }
 
   const { data: character, error } = await query.single()
 

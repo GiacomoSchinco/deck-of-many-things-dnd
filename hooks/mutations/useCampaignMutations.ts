@@ -1,4 +1,5 @@
 import { createCRUDMutations } from './createCRUDMutations'
+import type { Campaign } from '@/types/campaign'
 
 export interface CreateCampaignData {
   name: string
@@ -12,7 +13,7 @@ export interface UpdateCampaignData {
 }
 
 const { useCreate, useUpdate, useDelete } = createCRUDMutations<
-  unknown,
+  Campaign,
   CreateCampaignData,
   UpdateCampaignData,
   string

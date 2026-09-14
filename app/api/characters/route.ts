@@ -1,6 +1,10 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { createServerSupabase, requireAuth, requireAdmin } from '@/lib/supabase/server'
+import type { Database } from '@/lib/supabase/types'
+
+type Tables = Database['public']['Tables']
+
 //GET /api/characters -> lista tutti i personaggi (solo admin)
 export async function GET() {
   const cookieStore = await cookies()
@@ -98,7 +102,7 @@ export async function POST(request: Request) {
         experience: body.experience || 0,
         background: body.background || null,
         alignment: body.alignment || null,
-      } as any)
+      } as Tables['characters']['Insert'])
       .select()
       .single()
 
@@ -139,7 +143,7 @@ export async function POST(request: Request) {
           initiative_bonus: cs.initiative_bonus ?? 0,
           speed:            cs.speed            ?? 30,
           inspiration:      cs.inspiration      ?? false,
-        } as any)
+        } as Tables['combat_stats']['Insert'])
 
       if (combatError) throw combatError
     }

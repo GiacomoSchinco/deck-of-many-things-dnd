@@ -70,7 +70,7 @@ export async function POST(
       return NextResponse.json({ error: 'saving_throws deve essere un array' }, { status: 400 })
     }
 
-    const rows = saves.map((save: any) => ({
+    const rows = saves.map((save: { ability: string; proficient?: boolean }) => ({
       character_id: id,
       ability: save.ability,
       proficient: save.proficient || false

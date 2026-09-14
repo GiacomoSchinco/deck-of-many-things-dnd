@@ -147,7 +147,7 @@ export function usePresetForm(initialData?: EquipmentPreset) {
         is_default: preset.is_default,
       }
       if (preset.id) {
-        await updatePreset.mutateAsync({ id: preset.id, ...payload })
+        await updatePreset.mutateAsync({ id: preset.id, data: { ...payload, id: preset.id } })
         toast.success('Preset aggiornato con successo')
       } else {
         await createPreset.mutateAsync(payload)

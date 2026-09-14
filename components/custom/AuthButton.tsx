@@ -35,10 +35,6 @@ export default function AuthButton() {
         router.refresh();
     };
 
-    const handleDashboard = () => {
-        router.push('/dashboard');
-    };
-
     // Stato di caricamento
     if (loading) {
         return (

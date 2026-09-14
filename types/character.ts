@@ -1,5 +1,7 @@
 // types/character.ts
 
+import type { Spell, SpellSlots } from './spell';
+
 // ===========================================
 // ABILITÀ E CARATTERISTICHE BASE
 // ===========================================

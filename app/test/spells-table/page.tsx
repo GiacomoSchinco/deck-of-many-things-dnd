@@ -5,7 +5,6 @@ import { useSpells } from '@/hooks/queries/useSpells';
 import DataTable from '@/components/custom/DataTable';
 import Loading from '@/components/custom/Loading';
 import { getItalianClasses, getItalianSchool } from '@/lib/utils/nameMappers';
-import { AncientPageWrapper, ScrollPageWrapper } from '@/components/layout/AncientPageWrapper';
 import { PageWrapper } from '@/components/layout/PageWrapper';
 
 type SpellRow = {

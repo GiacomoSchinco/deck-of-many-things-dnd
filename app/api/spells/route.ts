@@ -48,7 +48,7 @@ export async function POST(request: Request) {
   const cookieStore = await cookies()
   const supabase = createServerSupabase(cookieStore)
 
-  const { user, error: authError } = await requireAuth(supabase)
+  const { error: authError } = await requireAuth(supabase)
   if (authError) return authError
 
   const body = await request.json()
