@@ -1,4 +1,8 @@
 @import "tailwindcss";
+/* Fornisce animate-in/out, fade-*, zoom-*: senza questo import le classi di
+   animazione dei primitivi (dialog, drawer, dropdown, tooltip) non hanno effetto
+   e i popup restano in stato "ending" invece di sparire. */
+@import "tw-animate-css";
 
 @theme {
   /* 🎨 Colori personalizzati */
@@ -399,6 +403,16 @@
 
   ::-webkit-scrollbar-thumb:hover {
     background-color: var(--color-frame);
+  }
+
+  /* base-ui lascia montati i popup in fase di chiusura: senza disattivare i
+     pointer events, l'overlay invisibile intercetta i click e la pagina resta
+     bloccata dopo la chiusura di un dialog. */
+  [data-slot$="-overlay"][data-closed],
+  [data-slot$="-overlay"][data-ending-style],
+  [data-slot$="-content"][data-closed],
+  [data-slot$="-content"][data-ending-style] {
+    pointer-events: none;
   }
 
   /* Rispetta chi riduce le animazioni a livello di sistema */

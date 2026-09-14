@@ -1,7 +1,11 @@
-export default function EditCharacterPage({
+import WorkInProgress from '@/components/custom/WorkInProgress';
+
+export default async function EditCharacterPage({
   params,
 }: {
-  params: { characterId: string };
+  // In Next 16 i params sono una Promise e vanno attesi prima dell'uso
+  params: Promise<{ characterId: string }>;
 }) {
-  return <div>Edit Character: {params.characterId}</div>;
+  await params;
+  return <WorkInProgress />;
 }

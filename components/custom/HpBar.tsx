@@ -32,10 +32,10 @@ export default function HpBar({
   
   // Colore dinamico in base alla percentuale
   const getBarColor = () => {
-    if (percent <= 25) return 'bg-red-600';
-    if (percent <= 50) return 'bg-orange-500';
-    if (percent <= 75) return 'bg-amber-500';
-    return 'bg-green-600';
+    if (percent <= 25) return 'bg-destructive';
+    if (percent <= 50) return 'bg-antique-bronze';
+    if (percent <= 75) return 'bg-antique-gold';
+    return 'bg-success';
   };
 
   return (
@@ -73,8 +73,8 @@ export default function HpBar({
           {/* HP temporanei (opzionali) */}
           {tempHp > 0 && (
             <div className="flex items-center gap-1">
-              <Shield className={cn('text-blue-200 drop-shadow-md', iconSize)} />
-              <span className={cn('text-blue-100 font-medium drop-shadow-md', textClass)}>
+              <Shield className={cn('text-parchment-100 drop-shadow-md', iconSize)} />
+              <span className={cn('font-medium text-parchment-50 drop-shadow-md', textClass)}>
                 +{tempHp}
               </span>
             </div>
