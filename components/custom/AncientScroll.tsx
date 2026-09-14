@@ -77,11 +77,13 @@ export const AncientScroll = forwardRef<HTMLDivElement, AncientScrollProps>(
         {/* 🔥 BORDI BRUCIACCHIATI PIÙ SFUMATI */}
  
 
-        {/* ⚜️ DECORAZIONI AGLI ANGOLI */}
-        <div className="absolute top-3 left-3 text-antique-gold/20 text-2xl font-serif transform rotate-12">⚜️</div>
-        <div className="absolute top-3 right-3 text-antique-gold/20 text-2xl font-serif transform -rotate-12">⚜️</div>
-        <div className="absolute bottom-3 left-3 text-antique-gold/20 text-2xl font-serif transform -rotate-12">⚜️</div>
-        <div className="absolute bottom-3 right-3 text-antique-gold/20 text-2xl font-serif transform rotate-12">⚜️</div>
+        {/* Decorazioni agli angoli (forme CSS, invisibili agli screen reader) */}
+        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+          <span className="ornament-diamond absolute top-4 left-4 h-1.5 w-1.5 bg-antique-gold/30" />
+          <span className="ornament-diamond absolute top-4 right-4 h-1.5 w-1.5 bg-antique-gold/30" />
+          <span className="ornament-diamond absolute bottom-4 left-4 h-1.5 w-1.5 bg-antique-gold/30" />
+          <span className="ornament-diamond absolute bottom-4 right-4 h-1.5 w-1.5 bg-antique-gold/30" />
+        </div>
 
         {/* 🖋️ MACCHIE D'INCHIOSTRO (effetto vintage) */}
         <div className="absolute top-1/4 right-1/4 w-16 h-16 bg-amber-800/5 rounded-full blur-xl" />

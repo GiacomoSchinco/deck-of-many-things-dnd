@@ -36,7 +36,7 @@ export function ForgotPasswordForm() {
     return (
       <AncientScroll variant="rolled" className="max-w-md mx-auto p-6 text-center space-y-4">
         <div className="text-4xl">✉️</div>
-        <h2 className="text-amber-900">Email inviata!</h2>
+        <h1 className="mb-0 text-amber-900">Email inviata!</h1>
         <p className="text-amber-700 text-sm">
           Abbiamo inviato un link a <strong>{email}</strong> per reimpostare la password.
           Controlla anche la cartella spam.
@@ -50,7 +50,7 @@ export function ForgotPasswordForm() {
 
   return (
     <AncientScroll variant="rolled" className="max-w-md mx-auto p-6">
-      <h2 className="text-center mb-2">Recupera Password</h2>
+      <h1 className="text-center mb-2">Recupera Password</h1>
       <p className="text-center text-sm text-amber-700 mb-6">
         Inserisci la tua email e ti invieremo un link per reimpostare la password.
       </p>

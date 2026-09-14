@@ -51,7 +51,7 @@ export function ResetPasswordForm() {
     return (
       <AncientScroll variant="rolled" className="max-w-md mx-auto p-6 text-center space-y-4">
         <div className="text-4xl">✅</div>
-        <h2 className="text-amber-900">Password aggiornata!</h2>
+        <h1 className="mb-0 text-amber-900">Password aggiornata!</h1>
         <p className="text-amber-700 text-sm">
           La tua password è stata reimpostata con successo. Verrai reindirizzato alla dashboard…
         </p>
@@ -61,7 +61,7 @@ export function ResetPasswordForm() {
 
   return (
     <AncientScroll variant="rolled" className="max-w-md mx-auto p-6">
-      <h2 className="text-center mb-6">Nuova Password</h2>
+      <h1 className="text-center mb-6">Nuova Password</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1">

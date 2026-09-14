@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { AncientScroll } from '../custom/AncientScroll';
 import { Eye, EyeOff } from 'lucide-react';
 
@@ -37,26 +38,35 @@ export function LoginForm() {
   };
 
   return (
-    <AncientScroll variant="rolled" className="max-w-md mx-auto p-6">
-    
-      
-        <h2>Accedi al tuo Grimorio</h2>
-     
-   
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <Input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+    <AncientScroll variant="rolled" className="mx-auto max-w-md p-8">
+      <div className="mb-6 text-center">
+        <h1 className="mb-0 text-2xl">Accedi al tuo Grimorio</h1>
+        <p className="fantasy-subtitle mt-1">
+          Riprendi la tua avventura da dove l&apos;avevi lasciata
+        </p>
+      </div>
+
+      <form onSubmit={handleLogin} className="space-y-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="login-email">Email</Label>
+          <Input
+            id="login-email"
+            type="email"
+            autoComplete="email"
+            placeholder="nome@esempio.it"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="login-password">Password</Label>
           <div className="relative">
             <Input
+              id="login-password"
               type={showPassword ? 'text' : 'password'}
-              placeholder="Password"
+              autoComplete="current-password"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -65,34 +75,40 @@ export function LoginForm() {
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-amber-700 hover:text-amber-900 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted transition-colors hover:text-ink-strong"
               aria-label={showPassword ? 'Nascondi password' : 'Mostra password'}
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
+        </div>
           
-          {error && (
-            <p className="text-sm text-red-500 bg-red-50 border border-red-200 rounded px-3 py-2">{error}</p>
-          )}
+        {error && (
+          <p
+            role="alert"
+            className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+          >
+            {error}
+          </p>
+        )}
           
-          <Button type="submit" disabled={loading} className="w-full">
-            {loading ? 'Caricamento...' : 'Accedi'}
-          </Button>
+        <Button type="submit" disabled={loading} className="w-full">
+          {loading ? 'Caricamento...' : 'Accedi'}
+        </Button>
 
-          <div className="flex flex-col items-center gap-1 text-sm text-amber-700">
-            <Link href="/forgot-password" className="underline hover:text-amber-900">
-              Password dimenticata?
+        <div className="flex flex-col items-center gap-1 pt-1 text-sm">
+          <Link href="/forgot-password" className="font-medium">
+            Password dimenticata?
+          </Link>
+          <span className="text-ink-muted">
+            Non hai un account?{' '}
+            <Link href="/register" className="font-medium">
+              Registrati
             </Link>
-            <span>
-              Non hai un account?{' '}
-              <Link href="/register" className="underline font-medium hover:text-amber-900">
-                Registrati
-              </Link>
-            </span>
-          </div>
-        </form>
-  
-   </AncientScroll>
+          </span>
+        </div>
+      </form>
+
+    </AncientScroll>
   );
 }

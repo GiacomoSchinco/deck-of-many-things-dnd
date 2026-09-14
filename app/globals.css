@@ -19,44 +19,73 @@
   --color-antique-copper: #b87333;
   --color-antique-rust: #8b4513;
 
+  /* 🖋️ Inchiostro — testo e gerarchia */
+  --color-ink: #3a2a1d;
+  --color-ink-strong: #2a1c12;
+  --color-ink-muted: #6f5a41;
+
+  /* 🪵 Materiale — cornici in cuoio/legno */
+  --color-frame: #8b5a2b;
+  --color-frame-deep: #5a3418;
+
   /* Variabili base per componenti shadcn/ui (bg-background, text-foreground, ecc.) */
-  --color-background: hsl(40 30% 96%);
-  --color-foreground: hsl(30 40% 20%);
-  --color-border: hsl(30 30% 70%);
-  --color-ring: hsl(25 60% 35%);
+  --color-background: hsl(40 32% 96%);
+  --color-foreground: hsl(28 30% 18%);
+  --color-border: hsl(32 26% 72%);
+  --color-ring: hsl(33 70% 38%);
 
   /* Primary — oro antico */
-  --color-primary: hsl(38 80% 35%);
-  --color-primary-foreground: hsl(40 30% 96%);
+  --color-primary: hsl(35 72% 32%);
+  --color-primary-foreground: hsl(40 32% 97%);
 
   /* Secondary — pergamena scura */
-  --color-secondary: hsl(35 30% 80%);
-  --color-secondary-foreground: hsl(30 40% 20%);
+  --color-secondary: hsl(36 32% 82%);
+  --color-secondary-foreground: hsl(28 30% 18%);
 
-  /* Muted — sfondo neutro */
-  --color-muted: hsl(0 0% 100%);
-  --color-muted-foreground: hsl(30 25% 45%);
+  /* Muted — superfici recessive */
+  --color-muted: hsl(40 38% 95%);
+  --color-muted-foreground: hsl(28 24% 40%);
 
   /* Accent */
-  --color-accent: hsl(35 50% 75%);
-  --color-accent-foreground: hsl(30 40% 20%);
+  --color-accent: hsl(36 48% 78%);
+  --color-accent-foreground: hsl(28 30% 18%);
 
   /* Destructive — rosso sangue */
-  --color-destructive: hsl(0 65% 45%);
-  --color-destructive-foreground: hsl(40 30% 96%);
+  --color-destructive: hsl(0 62% 42%);
+  --color-destructive-foreground: hsl(40 32% 97%);
+
+  /* Success — verde muschio, coerente con la pergamena */
+  --color-success: hsl(140 40% 30%);
 
   /* Input e card */
-  --color-input: hsl(35 25% 78%);
-  --color-card: hsl(40 30% 94%);
-  --color-card-foreground: hsl(30 40% 20%);
-  --color-popover: hsl(40 30% 94%);
-  --color-popover-foreground: hsl(30 40% 20%);
+  --color-input: hsl(34 28% 76%);
+  --color-card: hsl(40 32% 95%);
+  --color-card-foreground: hsl(28 30% 18%);
+  --color-popover: hsl(40 32% 95%);
+  --color-popover-foreground: hsl(28 30% 18%);
 
-  /* 📝 Font */
+  /* 📝 Tipografia — ruoli distinti (display vs interfaccia vs citazione) */
+  --font-display: var(--font-cinzel, 'Cinzel', Georgia, serif);
   --font-serif: var(--font-cinzel, 'Cinzel', Georgia, serif);
-  --font-sans: var(--font-cinzel, 'Cinzel', sans-serif);
-  --font-fantasy: 'MedievalSharp', cursive;
-  --font-antique: var(--font-im-fell, 'IM Fell English', Georgia, serif);
+  --font-sans: var(--font-inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif);
+  --font-quote: var(--font-im-fell, 'IM Fell English', Georgia, serif);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace;
+
+  /* 🪄 Elevazione — ombre calde, mai nere pure */
+  --shadow-raised: 0 1px 2px rgba(74, 45, 20, 0.16), 0 10px 24px -10px rgba(74, 45, 20, 0.35);
+  --shadow-frame: 0 24px 60px -24px rgba(46, 26, 12, 0.5), 0 1px 0 rgba(255, 255, 255, 0.25) inset;
+  --shadow-carved: inset 0 2px 5px rgba(74, 45, 20, 0.18), inset 0 -1px 0 rgba(255, 255, 255, 0.45);
+  --shadow-emboss: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 1px 2px rgba(74, 45, 20, 0.25);
+
+  /* 🔲 Raggi */
+  --radius-control: 0.5rem;
+  --radius-panel: 0.75rem;
+  --radius-frame: 1rem;
+
+  /* ⏱️ Movimento */
+  --ease-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --duration-quick: 150ms;
+  --duration-base: 250ms;
 
   /* ✨ Animazioni */
   --animate-float: float 3s ease-in-out infinite;
@@ -95,22 +124,43 @@
 /* 🎭 Componenti personalizzati */
 @layer components {
 
-  /* ── Typography ─────────────────────────────────────────────── */
+  /* ── Tipografia ─────────────────────────────────────────────── */
   /** Titolo sezione: "Info Personaggio", "Caratteristiche", ... */
   .fantasy-title {
-    @apply font-serif font-bold text-amber-900;
+    @apply font-serif font-bold;
+    color: var(--color-ink-strong);
+    letter-spacing: -0.01em;
   }
-  /** Sottotitolo / label descrittiva */
+  /** Etichetta maiuscola sopra un blocco (occhiello) */
+  .eyebrow {
+    @apply text-xs font-semibold uppercase;
+    font-family: var(--font-sans);
+    letter-spacing: 0.14em;
+    color: var(--color-ink-muted);
+  }
+  /** Sottotitolo / testo descrittivo */
   .fantasy-subtitle {
-    @apply text-amber-600 text-sm;
+    font-family: var(--font-quote);
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--color-ink-muted);
   }
   /** Label inline (etichetta a sinistra nelle righe info) */
   .fantasy-label {
-    @apply text-amber-800;
+    color: var(--color-ink-muted);
   }
   /** Valore inline (valore a destra nelle righe info) */
   .fantasy-value {
-    @apply font-bold text-amber-900;
+    @apply font-bold;
+    color: var(--color-ink-strong);
+    font-variant-numeric: tabular-nums;
+  }
+  /** Numero o statistica: cifre allineate */
+  .stat-value {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    color: var(--color-ink-strong);
   }
 
   /* ── Contenitori ─────────────────────────────────────────────── */
@@ -131,72 +181,103 @@
     @apply inline-flex items-center justify-center p-3 bg-amber-100 rounded-full mb-4;
   }
 
-  .antique-card {
+  /* ── Superfici ─────────────────────────────────────────────── */
+  /** Superficie standard: carta chiara, bordo sottile, ombra calda */
+  .panel {
     position: relative;
-    border-radius: 0.5rem;
-    border-width: 2px;
-    border-color: rgb(120 53 15 / 0.3);
-    background: linear-gradient(to bottom right, var(--color-parchment-100), var(--color-parchment-200));
-    padding: 1rem;
-    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    border-radius: var(--radius-panel);
+    border: 1px solid rgba(139, 90, 43, 0.28);
+    background-image: linear-gradient(180deg, var(--color-parchment-50), var(--color-parchment-200));
+    box-shadow: var(--shadow-raised);
   }
 
-  .decorated-card {
+  /** Superficie incassata: area "scavata" nel materiale */
+  .panel-inset {
     position: relative;
+    border-radius: var(--radius-control);
+    border: 1px solid rgba(139, 90, 43, 0.22);
+    background-color: rgba(255, 253, 248, 0.65);
+    box-shadow: var(--shadow-carved);
   }
 
-  .decorated-card::before {
-    content: '';
-    position: absolute;
-    top: 0.5rem;
-    left: 0.5rem;
-    width: 1rem;
-    height: 1rem;
-    border-top-width: 2px;
-    border-left-width: 2px;
-    border-color: rgb(180 83 9 / 0.3);
+  /** Card sezione con sfondo chiaro (step wizard, sezioni scheda) */
+  .fantasy-section {
+    @apply border;
+    border-radius: var(--radius-panel);
+    border-color: rgba(139, 90, 43, 0.24);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(240, 224, 192, 0.55));
+    box-shadow: var(--shadow-emboss);
   }
 
-  .decorated-card::after {
-    content: '';
-    position: absolute;
-    bottom: 0.5rem;
-    right: 0.5rem;
-    width: 1rem;
-    height: 1rem;
-    border-bottom-width: 2px;
-    border-right-width: 2px;
-    border-color: rgb(180 83 9 / 0.3);
+  /** Riga label/valore incassata */
+  .fantasy-row {
+    @apply flex items-center justify-between gap-3 px-3 py-2;
+    border-radius: var(--radius-control);
+    border: 1px solid rgba(139, 90, 43, 0.16);
+    background-color: rgba(255, 255, 255, 0.45);
+  }
+
+  /** Intestazione di sezione con separatore ornamentale */
+  .fantasy-section-header {
+    @apply font-serif font-bold mb-4 pb-2 text-center;
+    color: var(--color-ink-strong);
+    border-bottom: 1px solid rgba(139, 90, 43, 0.3);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  /** Medaglione per un'icona decorativa */
+  .fantasy-icon-wrap {
+    @apply inline-flex items-center justify-center mb-4;
+    padding: 0.7rem;
+    border-radius: 9999px;
+    color: var(--color-frame-deep);
+    border: 1px solid rgba(139, 90, 43, 0.35);
+    background-image: linear-gradient(180deg, var(--color-parchment-200), var(--color-parchment-400));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.7),
+      inset 0 -2px 6px rgba(74, 45, 20, 0.18),
+      0 2px 6px rgba(74, 45, 20, 0.2);
+  }
+
+  /** Divisore ornamentale (sostituisce i bordi netti) */
+  .divider-ornate {
+    height: 1px;
+    border: 0;
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      rgba(139, 90, 43, 0.45),
+      transparent
+    );
   }
 
   .parchment-bg {
     background-color: var(--color-parchment-100);
-    background-image: 
+    background-image:
       linear-gradient(45deg, rgba(0,0,0,0.02) 25%, transparent 25%),
       linear-gradient(-45deg, rgba(0,0,0,0.02) 25%, transparent 25%);
     background-size: 4px 4px;
+  }
+
+  /** Grana di carta generata inline: nessuna richiesta di rete */
+  .paper-grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+  }
+
+  /** Rombo ornamentale riutilizzabile */
+  .ornament-diamond {
+    display: inline-block;
+    rotate: 45deg;
+    background-color: color-mix(in oklab, var(--color-frame) 70%, transparent);
   }
 }
 
 /* 🛠️ Utility class */
 @layer utilities {
-  .text-shadow-antique {
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.2), 0 0 10px rgba(184,134,11,0.3);
-  }
-
-  .text-shadow-emboss {
-    text-shadow: 1px 1px 0 #fff, 2px 2px 0 rgba(0,0,0,0.2);
-  }
-
-  .hover-lift {
-    transition-property: transform;
-    transition-duration: 300ms;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .hover-lift:hover {
-    transform: translateY(-0.25rem);
-    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  /** Testo inciso: rilievo appena percettibile, senza bagliore */
+  .text-engraved {
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
   }
 
   .shine-effect {
@@ -225,61 +306,110 @@
 
 /* Base styles */
 @layer base {
-  :root {
-    --background: 40 30% 96%;
-    --foreground: 30 40% 20%;
-    --border: 30 30% 70%;
-    --ring: 25 60% 35%;
-  }
-
   * {
-    border-color: hsl(var(--border));
+    border-color: var(--color-border);
   }
 
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    color: var(--color-ink);
     background-color: var(--color-parchment-100);
-    background-image: 
-      linear-gradient(45deg, rgba(0,0,0,0.02) 25%, transparent 25%),
-      linear-gradient(-45deg, rgba(0,0,0,0.02) 25%, transparent 25%);
+    background-image:
+      linear-gradient(45deg, rgba(0, 0, 0, 0.02) 25%, transparent 25%),
+      linear-gradient(-45deg, rgba(0, 0, 0, 0.02) 25%, transparent 25%);
     background-size: 4px 4px;
-    font-family: var(--font-serif);
+    /* L'interfaccia usa il sans leggibile; i titoli restano in Cinzel */
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-serif);
-    color: rgb(120 53 15);
+    font-family: var(--font-display);
+    color: var(--color-ink-strong);
     font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
   }
 
   h1 {
-    font-size: 2.25rem;
+    font-size: clamp(2rem, 1.4rem + 2.4vw, 3rem);
     font-weight: 700;
     margin-bottom: 1.5rem;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.2), 0 0 10px rgba(184,134,11,0.3);
   }
 
   h2 {
-    font-size: 1.875rem;
+    font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
     margin-bottom: 1.25rem;
   }
 
   h3 {
-    font-size: 1.5rem;
+    font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
     margin-bottom: 1rem;
   }
 
+  /* I link restano riconoscibili dal colore; sottolineatura al passaggio del mouse
+     così le CTA costruite su <Link> non risultano barrate */
   a {
-    color: rgb(146 64 14);
-    text-decoration: underline;
-    text-decoration-color: rgb(180 83 9 / 0.3);
-    text-underline-offset: 2px;
-    transition-property: color;
-    transition-duration: 300ms;
+    color: var(--color-antique-rust);
+    text-underline-offset: 3px;
+    text-decoration-color: color-mix(in oklab, var(--color-antique-gold) 45%, transparent);
+    transition: color var(--duration-quick) var(--ease-soft);
   }
-  
+
   a:hover {
-    color: rgb(217 119 6);
+    color: var(--color-antique-gold);
+    text-decoration-color: currentColor;
+  }
+
+  /* Un solo focus ring per tutta l'app (accessibilità da tastiera) */
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-control);
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--color-antique-gold) 35%, transparent);
+    color: var(--color-ink-strong);
+  }
+
+  /* Scrollbar coerente con il tema invece di quella di sistema */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-frame) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: color-mix(in oklab, var(--color-frame) 55%, transparent);
+    border: 3px solid transparent;
+    border-radius: 9999px;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-frame);
+  }
+
+  /* Rispetta chi riduce le animazioni a livello di sistema */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }

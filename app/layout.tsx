@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Cinzel, IM_Fell_English } from "next/font/google";
+import { Cinzel, IM_Fell_English, Inter } from "next/font/google";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 import Topbar from "@/components/layout/Topbar";
@@ -21,6 +21,13 @@ const imFellEnglish = IM_Fell_English({
   style: ["normal", "italic"],
 });
 
+// Font di interfaccia: leggibile a corpo piccolo, evita di usare Cinzel per il testo
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Deck of Many Things",
   description: "Il destino è nelle carte",
@@ -32,8 +39,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="it" className="scroll-smooth">
-      <body className={`${cinzel.variable} ${imFellEnglish.variable} antialiased bg-[#1a0f08]`}>
+    <html
+      lang="it"
+      /* Le variabili dei font vanno su <html>: i token di @theme vivono su :root,
+         quindi un font definito su <body> non verrebbe mai risolto. */
+      className={`scroll-smooth ${cinzel.variable} ${imFellEnglish.variable} ${inter.variable}`}
+    >
+      <body className="antialiased bg-[#1a0f08]">
         <Providers>
           <Toaster richColors position="top-right" />
 
