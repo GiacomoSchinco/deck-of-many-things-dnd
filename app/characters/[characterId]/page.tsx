@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import AncientCardContainer from '@/components/custom/AncientCardContainer'
 import StatDiamond from '@/components/custom/StatDiamond'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button-variants'
 import { Scroll, Package, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { useCharacter } from '@/hooks/queries/useCharacter'
@@ -70,28 +70,34 @@ export default function CharacterPage() {
       subtitle={`${character.races?.name ?? ''} · ${character.classes?.name ?? ''} · Livello ${character.level}`}
       action={
         <div className="flex flex-wrap justify-center gap-2">
-          <Link href={`/characters/${characterId}/edit`}>
-            <Button variant="outline" size="sm">Modifica</Button>
+          <Link
+            href={`/characters/${characterId}/edit`}
+            className={buttonVariants({ variant: 'outline', size: 'sm' })}
+          >
+            Modifica
           </Link>
-          <Link href={`/characters/${characterId}/spells`}>
-            <Button variant="outline" size="sm">
-              <Scroll className="w-4 h-4 mr-2" />Incantesimi
-            </Button>
+          <Link
+            href={`/characters/${characterId}/spells`}
+            className={buttonVariants({ variant: 'outline', size: 'sm' })}
+          >
+            <Scroll className="w-4 h-4 mr-2" />Incantesimi
           </Link>
-          <Link href={`/characters/${characterId}/inventory`}>
-            <Button variant="outline" size="sm">
-              <Package className="w-4 h-4 mr-2" />Inventario
-            </Button>
+          <Link
+            href={`/characters/${characterId}/inventory`}
+            className={buttonVariants({ variant: 'outline', size: 'sm' })}
+          >
+            <Package className="w-4 h-4 mr-2" />Inventario
           </Link>
-          <Link href={`/characters/${characterId}/level-up`}>
-            <Button variant="outline" size="sm">
-              <Zap className="w-4 h-4 mr-2" />Level Up
-            </Button>
+          <Link
+            href={`/characters/${characterId}/level-up`}
+            className={buttonVariants({ variant: 'outline', size: 'sm' })}
+          >
+            <Zap className="w-4 h-4 mr-2" />Level Up
           </Link>
         </div>
       }
     >
-    <div className="not-prose space-y-6">
+    <div className="space-y-6">
       {/* Razza e Classe */}
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <FanCardGroup size="md" spread="normal" noWrapper>
