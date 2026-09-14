@@ -216,19 +216,6 @@ export const ABILITY_LIST: { key: string; label: string; name: string }[] = [
   { key: 'charisma',     label: 'CAR', name: 'Carisma' },
 ]
 
-/**
- * Array ordinato delle 6 caratteristiche con id, nome italiano e icona emoji.
- * Usato da LevelUpASIStep, ecc.
- */
-export const ABILITY_LIST_ICONS: { id: string; label: string; icon: string }[] = [
-  { id: 'strength',     label: 'Forza',        icon: '💪' },
-  { id: 'dexterity',    label: 'Destrezza',    icon: '🏃' },
-  { id: 'constitution', label: 'Costituzione', icon: '❤️' },
-  { id: 'intelligence', label: 'Intelligenza', icon: '🧠' },
-  { id: 'wisdom',       label: 'Saggezza',     icon: '🕯️' },
-  { id: 'charisma',     label: 'Carisma',      icon: '👑' },
-]
-
 /** I 9 allineamenti D&D in italiano. */
 export const ALIGNMENTS: string[] = [
   'Legale Buono',

@@ -5,6 +5,7 @@ import { useClasses } from '@/hooks/queries/useClasses';
 import { Badge } from '@/components/ui/badge';
 import { SelectionStep } from './SelectionStep';
 import { getItalianClass, getItalianAbilityFull } from '@/lib/utils/nameMappers';
+import { Sword } from 'lucide-react';
 import type { DndClass, ClassFeature } from '@/types/class';
 
 interface ClassStepProps {
@@ -93,13 +94,13 @@ export function ClassStep({ initialClassId, onBack, onSelect }: ClassStepProps) 
       error={error}
       initialId={initialClassId}
       type="class"
-      title="⚔️ Scegli la tua Classe"
+      title="Scegli la tua Classe"
       subtitle="Sfoglia le carte con le frecce e seleziona la tua classe"
       nextLabel="Avanti: Punteggi →"
       searchPlaceholder="Cerca classe..."
       noResultsText="Nessuna classe trovata"
       emptyDataText="Nessuna classe disponibile"
-      searchEmoji="⚔️"
+      icon={Sword}
       getItalianName={getItalianClass}
       onBack={onBack}
       onSelect={onSelect}

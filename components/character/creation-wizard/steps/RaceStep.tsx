@@ -5,6 +5,7 @@ import { useRaces } from '@/hooks/queries/useRaces';
 import { Badge } from '@/components/ui/badge';
 import { SelectionStep } from './SelectionStep';
 import { getItalianRace, getAbilityShort } from '@/lib/utils/nameMappers';
+import { Users } from 'lucide-react';
 import type { Race } from '@/types/race';
 
 interface RaceStepProps {
@@ -72,13 +73,13 @@ export function RaceStep({ initialRaceId, onBack, onSelect }: RaceStepProps) {
       error={error}
       initialId={initialRaceId}
       type="race"
-      title="🧝 Scegli la tua Razza"
+      title="Scegli la tua Razza"
       subtitle="Sfoglia le carte con le frecce e seleziona la tua razza"
       nextLabel="Avanti: Scegli Classe →"
       searchPlaceholder="Cerca razza..."
       noResultsText="Nessuna razza trovata"
       emptyDataText="Nessuna razza disponibile"
-      searchEmoji="🧝"
+      icon={Users}
       getItalianName={getItalianRace}
       onBack={onBack}
       onSelect={onSelect}

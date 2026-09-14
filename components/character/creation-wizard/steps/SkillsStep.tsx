@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
-import { Info, CheckCircle2 } from 'lucide-react';
+import { BookOpen, CheckCircle2, Info } from 'lucide-react';
 import { WizardStep } from '../WizardStep';
 import { cn } from '@/lib/utils';
 import type { Skill } from '@/types/skill';
@@ -104,7 +104,8 @@ export function SkillsStep({ classId, abilityScores, onConfirm, onChange, initia
 
   return (
     <WizardStep
-      title="🎯 Competenze di Classe"
+      title="Competenze di Classe"
+      icon={BookOpen}
       subtitle={`Scegli ${maxChoices} competenze in cui essere addestrato`}
       onBack={onBack}
       onNext={handleConfirm}

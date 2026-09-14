@@ -7,6 +7,7 @@ import { PageWrapper } from '@/components/layout/PageWrapper';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useLevelUp } from './hooks/useLevelUp';
+import { WizardStepper } from '@/components/shared/WizardStepper';
 
 interface LevelUpWizardProps {
   characterId: string;
@@ -23,7 +24,6 @@ export default function LevelUpWizard({ characterId, currentLevel, onComplete }:
     steps,
     step,
     currentStep,
-    progress,
     levelUpData,
     isSaving,
     handleNext,
@@ -47,21 +47,16 @@ export default function LevelUpWizard({ characterId, currentLevel, onComplete }:
         <Button
           variant="ghost"
           onClick={() => router.back()}
-          className="text-amber-600 hover:text-amber-800"
+          className="text-ink-muted hover:text-ink-strong"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Torna al personaggio
         </Button>
       }
     >
-      <div className="not-prose max-w-2xl mx-auto space-y-6">
-        {/* Progress bar */}
-        <div className="h-2 bg-amber-200 rounded-full">
-          <div
-            className="h-full bg-amber-700 rounded-full transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
+      <div className="mx-auto max-w-3xl space-y-8">
+        {/* Avanzamento */}
+        <WizardStepper steps={steps.map((s) => s.label)} current={step} />
 
         {/* Step corrente */}
         <CurrentComponent

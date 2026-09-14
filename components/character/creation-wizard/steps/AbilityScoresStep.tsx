@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import { WizardStep } from '../WizardStep';
+import { Sparkles } from 'lucide-react';
 import { DndIcon } from '@/components/icons/DndIcon';
 import type { DndIconName } from '@/components/icons/DndIcon';
 import type { AbilityScores } from '@/types/character';
@@ -73,7 +74,8 @@ export function AbilityScoresStep({
 
   return (
     <WizardStep
-      title="🎲 Punteggi di Caratteristica"
+      title="Punteggi di Caratteristica"
+      icon={Sparkles}
       subtitle="Tira 4d6 e droppa il risultato più basso per ogni caratteristica"
       onBack={onBack}
       onNext={handleConfirm}

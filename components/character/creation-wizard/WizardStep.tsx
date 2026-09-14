@@ -7,6 +7,8 @@ import { WizardNav } from '@/components/shared/WizardNav';
 interface WizardStepProps {
   title: string;
   subtitle?: string;
+  /** Icona (componente lucide) mostrata nel medaglione sopra il titolo. */
+  icon?: React.ComponentType<{ className?: string }>;
   onBack?: () => void;
   backLabel?: string;
   onNext?: () => void;
@@ -24,6 +26,7 @@ interface WizardStepProps {
 export function WizardStep({
   title,
   subtitle,
+  icon: Icon,
   onBack,
   backLabel = '← Indietro',
   onNext,
@@ -50,12 +53,17 @@ export function WizardStep({
 
   const inner = (
     <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl fantasy-title mb-2">{title}</h2>
-        {subtitle && <p className="text-amber-700 text-sm">{subtitle}</p>}
-      </div>
-      {nav}
+      <header className="flex flex-col items-center text-center">
+        {Icon && (
+          <span className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full border border-frame/40 bg-frame-deep text-parchment-100 shadow-raised">
+            <Icon className="h-5 w-5" />
+          </span>
+        )}
+        <h2 className="fantasy-title mb-1 text-2xl">{title}</h2>
+        {subtitle && <p className="fantasy-subtitle">{subtitle}</p>}
+      </header>
       {children}
+      {nav}
     </div>
   );
 

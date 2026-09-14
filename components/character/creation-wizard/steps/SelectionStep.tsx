@@ -3,7 +3,8 @@
 
 import { useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
-import { Search, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Check, Search, X } from 'lucide-react';
 import { RaceClassCard } from '@/components/custom/RaceClassCard';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import Loading from '@/components/custom/Loading';
@@ -22,7 +23,8 @@ interface SelectionStepProps<T extends { id: number; name: string }> {
   searchPlaceholder: string;
   noResultsText: string;
   emptyDataText: string;
-  searchEmoji: string;
+  /** Icona del tipo di scelta (razza/classe): usata nel titolo e nei risultati di ricerca. */
+  icon: React.ComponentType<{ className?: string }>;
   getItalianName: (name: string) => string;
   onBack: () => void;
   onSelect: (id: number) => void;
@@ -41,7 +43,7 @@ export function SelectionStep<T extends { id: number; name: string }>({
   searchPlaceholder,
   noResultsText,
   emptyDataText,
-  searchEmoji,
+  icon: Icon,
   getItalianName,
   onBack,
   onSelect,
@@ -85,7 +87,7 @@ export function SelectionStep<T extends { id: number; name: string }>({
   if (error || !selectedItem) {
     return (
       <AncientCardContainer className="p-6 text-center">
-        <p className="text-red-500">Errore: {error?.message || emptyDataText}</p>
+        <p className="text-destructive">Errore: {error?.message || emptyDataText}</p>
         <Button onClick={() => window.location.reload()} variant="outline" className="mt-4">
           Riprova
         </Button>
@@ -97,31 +99,36 @@ export function SelectionStep<T extends { id: number; name: string }>({
     <WizardStep
       title={title}
       subtitle={subtitle}
+      icon={Icon}
       onBack={onBack}
       onNext={handleConfirm}
       nextDisabled={!selectedId}
       nextLabel={nextLabel}
     >
       {/* Ricerca per nome */}
-      <div className="relative w-full max-w-sm mx-auto">
-        <div className="relative flex items-center">
-          <Search className="absolute left-3 w-4 h-4 text-amber-700 pointer-events-none" />
-          <input
-            type="text"
-            placeholder={searchPlaceholder}
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="w-full pl-9 pr-9 py-2 rounded-md border-2 border-amber-700/50 bg-amber-50/80 text-amber-900 placeholder-amber-500 text-sm focus:outline-none focus:border-amber-700"
-          />
-          {search && (
-            <button onClick={() => setSearch('')} className="absolute right-3 text-amber-600 hover:text-amber-900">
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
+      <div className="relative mx-auto w-full max-w-sm">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" />
+        <Input
+          type="text"
+          placeholder={searchPlaceholder}
+          aria-label={searchPlaceholder}
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="pl-9 pr-9"
+        />
+        {search && (
+          <button
+            type="button"
+            onClick={() => setSearch('')}
+            aria-label="Cancella la ricerca"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted transition-colors hover:text-ink-strong"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
 
         {searchResults.length > 0 && (
-          <div className="absolute z-10 mt-1 w-full bg-amber-50 border-2 border-amber-700/40 rounded-md shadow-lg overflow-hidden">
+          <div className="panel absolute z-10 mt-1 w-full overflow-hidden">
             {searchResults.map(item => {
               const idx = (data ?? []).findIndex(d => d.id === item.id);
               return (
@@ -133,11 +140,13 @@ export function SelectionStep<T extends { id: number; name: string }>({
                     setGotoIndex(idx);
                     setSearch('');
                   }}
-                  className="w-full text-left px-4 py-2 text-sm text-amber-900 hover:bg-amber-200 border-b border-amber-200 last:border-0 flex items-center gap-2"
+                  className="flex w-full items-center gap-2 border-b border-frame/15 px-4 py-2 text-left text-sm text-ink transition-colors last:border-0 hover:bg-parchment-200/60"
                 >
-                  <span className="text-amber-600">{searchEmoji}</span>
+                  <Icon className="h-4 w-4 shrink-0 text-frame" />
                   {getItalianName(item.name)}
-                  {selectedId === item.id && <span className="ml-auto text-emerald-700 text-xs font-bold">✓</span>}
+                  {selectedId === item.id && (
+                    <Check className="ml-auto h-4 w-4 text-success" aria-hidden="true" />
+                  )}
                 </button>
               );
             })}
@@ -145,7 +154,7 @@ export function SelectionStep<T extends { id: number; name: string }>({
         )}
 
         {search.trim() && searchResults.length === 0 && (
-          <p className="absolute mt-1 w-full text-center text-sm text-amber-600 bg-amber-50 border border-amber-300 rounded-md py-2">
+          <p className="panel-inset absolute mt-1 w-full py-2 text-center text-sm text-ink-muted">
             {noResultsText}
           </p>
         )}
