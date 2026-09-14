@@ -37,7 +37,7 @@ export default function CreditsPage() {
     <PageWrapper
       withContainer={false}
       title="Crediti"
-      subtitle="Fatto con ❤️ e tanti dadi 🎲"
+      subtitle="Fatto con passione, e con molti tiri di dado"
       action={
         <Link href="/">
           <Button variant="ghost" className="text-amber-700 hover:text-amber-900">

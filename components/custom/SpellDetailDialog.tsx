@@ -157,10 +157,16 @@ export default function SpellDetailDialog({ spell, open, onClose }: SpellDetailD
         {(spell.ritual || spell.concentration) && (
           <div className="flex gap-2">
             {spell.ritual && (
-              <Badge className="bg-purple-100 text-purple-700 border-purple-300">📖 Rituale</Badge>
+              <Badge className="gap-1 border-frame/30 bg-parchment-200 text-frame-deep">
+                <BookOpen className="h-3.5 w-3.5" aria-hidden="true" />
+                Rituale
+              </Badge>
             )}
             {spell.concentration && (
-              <Badge className="bg-orange-100 text-orange-700 border-orange-300">🧠 Concentrazione</Badge>
+              <Badge className="gap-1 border-antique-gold/40 bg-antique-gold/15 text-frame-deep">
+                <Brain className="h-3.5 w-3.5" aria-hidden="true" />
+                Concentrazione
+              </Badge>
             )}
           </div>
         )}
@@ -169,11 +175,11 @@ export default function SpellDetailDialog({ spell, open, onClose }: SpellDetailD
         <div>
           <div className="relative mb-3">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-amber-300/40" />
+              <div className="divider-ornate w-full" />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-amber-50/95 px-3 text-amber-600 text-xs font-serif tracking-wider">
-                ✦ Descrizione ✦
+              <span className="eyebrow bg-parchment-50 px-3">
+                Descrizione
               </span>
             </div>
           </div>
@@ -187,11 +193,11 @@ export default function SpellDetailDialog({ spell, open, onClose }: SpellDetailD
           <div>
             <div className="relative mb-3">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-amber-300/40" />
+                <div className="divider-ornate w-full" />
               </div>
               <div className="relative flex justify-center">
-                <span className="bg-amber-50/95 px-3 text-amber-600 text-xs font-serif tracking-wider">
-                  ✦ A Livelli Superiori ✦
+                <span className="eyebrow bg-parchment-50 px-3">
+                  A Livelli Superiori
                 </span>
               </div>
             </div>

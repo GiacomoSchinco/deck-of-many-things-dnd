@@ -8,7 +8,7 @@ import { useAddPreparedSpells, useRemovePreparedSpells } from '@/hooks/mutations
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Search, Check, RefreshCw } from 'lucide-react';
+import { Search, Check, RefreshCw, Clock, Hourglass, Target } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Spell } from '@/types/spell';
 import { getItalianSchool, schoolBadgeColors } from '@/lib/utils/nameMappers';
@@ -200,9 +200,24 @@ export default function PreparedSpellsManager({
                         )}
                       </div>
                       <div className="flex gap-3 text-xs text-amber-600 mt-1">
-                        {spell.casting_time && <span>⏱ {spell.casting_time}</span>}
-                        {spell.range && <span>🎯 {spell.range}</span>}
-                        {spell.duration && <span>⏳ {spell.duration}</span>}
+                        {spell.casting_time && (
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" aria-hidden="true" />
+                            {spell.casting_time}
+                          </span>
+                        )}
+                        {spell.range && (
+                          <span className="flex items-center gap-1">
+                            <Target className="h-3 w-3" aria-hidden="true" />
+                            {spell.range}
+                          </span>
+                        )}
+                        {spell.duration && (
+                          <span className="flex items-center gap-1">
+                            <Hourglass className="h-3 w-3" aria-hidden="true" />
+                            {spell.duration}
+                          </span>
+                        )}
                       </div>
                     </div>
 

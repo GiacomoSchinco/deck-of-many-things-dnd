@@ -1,6 +1,7 @@
 "use client";
 import AncientCardStack from "@/components/custom/AncientCardStack";
 import { AntiqueButton } from "@/components/custom/AntiqueButton";
+import { Sword } from "lucide-react";
 
 export default function NotFound() {
     return (
@@ -35,9 +36,9 @@ export default function NotFound() {
                 <div className="max-w-3xl mx-auto text-center">          
                     {/* Linea decorativa */}
                     <div className="flex items-center justify-center gap-4 mb-8 mt-8">
-                        <div className="w-20 h-1 bg-gradient-to-r from-transparent via-amber-700 to-transparent" />
-                        <span className="text-3xl text-amber-700">⚔️</span>
-                        <div className="w-20 h-1 bg-gradient-to-r from-transparent via-amber-700 to-transparent" />
+                        <div className="h-px w-20 bg-frame/40" />
+                        <Sword className="h-6 w-6 text-frame" aria-hidden="true" />
+                        <div className="h-px w-20 bg-frame/40" />
                     </div>
                     {/* Descrizione */}
                     <p className="text-xl md:text-2xl text-amber-800 mb-6 font-serif italic">

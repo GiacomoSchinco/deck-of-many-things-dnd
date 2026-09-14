@@ -8,6 +8,8 @@ import AncientCardContainer from './AncientCardContainer';
 import HpBar from './HpBar';
 import CardBack from './CardBack';
 import { cn } from '@/lib/utils';
+import { buttonVariants } from '@/components/ui/button-variants';
+import { Scale, ScrollText, Sword, User } from 'lucide-react';
 import { CardSize, CARD_SIZES } from '@/lib/utils/cardSizes';
 import { getItalianClass, getItalianRace } from '@/lib/utils/nameMappers';
 import { CharacterLevelBadge } from './CharacterLevelBadge';
@@ -59,13 +61,13 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
         {/* Razza e Allineamento */}
         <div className="flex items-center justify-between gap-2 mt-1 mb-1">
           <div className="flex items-center gap-1">
-            <span className="text-xs text-amber-600">🧝</span>
+            <User className="h-3.5 w-3.5 text-frame" aria-hidden="true" />
             <span className="text-sm font-serif font-medium text-amber-800">
               {getItalianRace(race)}
             </span>
           </div>
           <div className="flex items-center gap-1">
-            <span className="text-xs text-amber-600">⚖️</span>
+            <Scale className="h-3.5 w-3.5 text-frame" aria-hidden="true" />
             <span className="text-sm font-serif text-amber-700">
               {alignment}
             </span>
@@ -98,30 +100,18 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
 
         {/* Background */}
         <div className="text-center mt-1">
-          <span className="text-xs text-amber-600">📜</span>
+          <ScrollText className="mr-1 inline h-3.5 w-3.5 text-frame" aria-hidden="true" />
           <span className="text-xs font-serif text-amber-700 ml-1">{background}</span>
         </div>
 
         {/* Pulsante Dettagli */}
         <div className="flex justify-center mt-3">
-          <Link href={`/characters/${id}`}>
-            <button className={cn(
-              "relative px-6 py-1.5",
-              "bg-amber-700 text-amber-100 text-sm font-serif tracking-wide",
-              "rounded-sm border-2 border-amber-900",
-              "shadow-md hover:shadow-lg",
-              "hover:bg-amber-800 hover:border-amber-950 hover:text-amber-50",
-              "active:translate-y-0.5 transition-all duration-200",
-              "before:content-[''] before:absolute before:inset-0",
-              "before:border before:border-amber-500/30 before:rounded-sm before:pointer-events-none",
-              "overflow-hidden"
-            )}>
-              <span className="relative z-10 flex items-center justify-center gap-2">
-                <span className="text-amber-300 text-xs">⚔️</span>
-                Dettagli
-                <span className="text-amber-300 text-xs">🛡️</span>
-              </span>
-            </button>
+          <Link
+            href={`/characters/${id}`}
+            className={cn(buttonVariants({ size: 'sm' }), 'gap-2 px-6 py-1.5 font-serif tracking-wide')}
+          >
+            <Sword className="h-4 w-4" aria-hidden="true" />
+            Dettagli
           </Link>
         </div>
       </div>

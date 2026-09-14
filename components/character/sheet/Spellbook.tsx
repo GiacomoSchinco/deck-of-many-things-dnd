@@ -11,7 +11,7 @@ import { SpellsStep } from '@/components/character/creation-wizard/steps/SpellsS
 import SpellDetailDialog from '@/components/custom/SpellDetailDialog';
 import SpellSlotsManager from '@/components/custom/SpellSlotsManager';
 import { getItalianSchool, schoolBadgeColors } from '@/lib/utils/nameMappers';
-import { BookOpen, Trash, Check, Sparkles, Star } from 'lucide-react';
+import { BookOpen, Trash, Check, Sparkles, Star, Clock, Hourglass, Target } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Spell, SpellKnown, PreparedSpell, SpellSlot } from '@/types/spell';
 
@@ -297,9 +297,24 @@ function SpellRow({
           {spell.concentration && <Badge className="text-xs bg-orange-100 text-orange-800">Concentrazione</Badge>}
         </div>
         <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-amber-700 mt-1">
-          {spell.casting_time && <span>⏱ {spell.casting_time}</span>}
-          {spell.range && <span>🎯 {spell.range}</span>}
-          {spell.duration && <span>⏳ {spell.duration}</span>}
+          {spell.casting_time && (
+            <span className="flex items-center gap-1">
+              <Clock className="h-3 w-3" aria-hidden="true" />
+              {spell.casting_time}
+            </span>
+          )}
+          {spell.range && (
+            <span className="flex items-center gap-1">
+              <Target className="h-3 w-3" aria-hidden="true" />
+              {spell.range}
+            </span>
+          )}
+          {spell.duration && (
+            <span className="flex items-center gap-1">
+              <Hourglass className="h-3 w-3" aria-hidden="true" />
+              {spell.duration}
+            </span>
+          )}
         </div>
       </div>
 

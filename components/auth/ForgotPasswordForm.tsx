@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Mail } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { AncientScroll } from '../custom/AncientScroll';
 
@@ -35,7 +36,7 @@ export function ForgotPasswordForm() {
   if (sent) {
     return (
       <AncientScroll variant="rolled" className="max-w-md mx-auto p-6 text-center space-y-4">
-        <div className="text-4xl">✉️</div>
+        <Mail className="mx-auto h-10 w-10 text-frame" aria-hidden="true" />
         <h1 className="mb-0 text-amber-900">Email inviata!</h1>
         <p className="text-amber-700 text-sm">
           Abbiamo inviato un link a <strong>{email}</strong> per reimpostare la password.

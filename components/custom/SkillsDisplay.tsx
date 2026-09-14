@@ -2,7 +2,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
-import { Info, CheckCircle2, Star, Circle } from 'lucide-react';
+import { BookOpen, Info, CheckCircle2, Star, Circle, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { calculateModifier } from '@/lib/calculations/abilityModifiers';
 import {
@@ -93,7 +93,7 @@ export function SkillsDisplay({
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-2">
         <h3 className="text-xl fantasy-title flex items-center gap-2">
-          <span>🎯</span>Abilità
+          <Target className="h-5 w-5 text-frame" aria-hidden="true" />Abilità
           {information && (
             selectedCount > 0 && (
               <Badge className="bg-amber-100 text-amber-800 border-amber-300 text-sm">
@@ -224,7 +224,7 @@ export function SkillsDisplay({
                     <DialogContent className="max-w-md bg-parchment-100 border-2 border-amber-900/30">
                       <DialogHeader>
                         <DialogTitle className="text-2xl font-serif text-amber-900 flex items-center gap-2">
-                          <span>📖</span> {skill.name_it}
+                          <BookOpen className="mr-1 inline h-3.5 w-3.5" aria-hidden="true" /> {skill.name_it}
                         </DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4 mt-2">

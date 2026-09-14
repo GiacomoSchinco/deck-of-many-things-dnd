@@ -83,9 +83,9 @@ export default function EquipmentPresetsPage() {
               <select
                 value={selectedClass}
                 onChange={(e) => setSelectedClass(e.target.value)}
-                className="px-4 py-2 bg-white border-2 border-amber-300 rounded-lg text-amber-900 font-medium focus:outline-none focus:border-amber-500 transition-colors"
+                className="rounded-lg border border-frame/30 bg-parchment-50 px-4 py-2 font-medium text-ink transition-colors focus:border-ring focus:outline-none"
               >
-                <option value="all">📋 Tutte le classi</option>
+                <option value="all">Tutte le classi</option>
                 {classes?.map((cls) => (
                   <option key={cls.id} value={cls.id}>
                     {getItalianClass(cls.name)}
