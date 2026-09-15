@@ -1,7 +1,11 @@
 "use client"
 
+import Link from "next/link";
+
 import AncientCardStack from "@/components/custom/AncientCardStack";
-import { AntiqueButton } from "@/components/custom/AntiqueButton";
+import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
+import { cn } from "@/lib/utils";
 import { Construction, Sword } from "lucide-react";
 
 export default function WorkInProgress() {
@@ -32,13 +36,13 @@ export default function WorkInProgress() {
                 I nostri mastri nani stanno ancora battendo il ferro. Presto emergerà un&apos;opera degna del martello di Moradin!
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                <AntiqueButton href="/" variant="primary" className="px-10 py-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <Link href="/" className={cn(buttonVariants({ size: "lg" }))}>
                     Torna all&apos;Avventura
-                </AntiqueButton>
-                <AntiqueButton onClick={() => window.history.back()} variant="secondary" className="px-8 py-4">
+                </Link>
+                <Button variant="outline" size="lg" onClick={() => window.history.back()}>
                     Torna al Sentiero Precedente
-                </AntiqueButton>
+                </Button>
             </div>
         </div>
     );
