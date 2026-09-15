@@ -4,9 +4,8 @@
 import Image from 'next/image';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import { cn } from '@/lib/utils';
+import { getEnglishClass, getEnglishRace } from '@/lib/utils/nameMappers';
 import { CARD_SIZES } from '@/lib/utils/cardSizes';
-
-// Mappa nomi italiani → inglese per razze
 
 interface RaceClassCardProps {
   id?: number;
@@ -30,7 +29,13 @@ export function RaceClassCard({
   disabled = false
 }: RaceClassCardProps) {
 
-  //const englishName = getEnglishName(name, type);
+  // Il nome arriva dal DB in Title Case ("Human", "Half-Elf", "Wizard") mentre i
+  // file su disco sono tutti lowercase. Su Windows `card_Human.png` si risolve
+  // comunque in `card_human.png`, su Linux (Vercel) è un 404: è per questo che le
+  // immagini non si vedevano SOLO online. `getEnglishRace` / `getEnglishClass`
+  // normalizzano qualsiasi forma in arrivo (Title Case, lowercase o italiano)
+  // nello slug inglese lowercase che corrisponde al nome del file.
+  const slug = type === 'race' ? getEnglishRace(name) : getEnglishClass(name);
   const folder = type === 'race' ? 'races' : 'classes';
   const isInteractive = !!onSelect;
 
@@ -39,7 +44,7 @@ export function RaceClassCard({
       {/* Immagine di sfondo della carta */}
       <div className="absolute inset-0">
         <Image
-          src={`/images/${folder}/card_${name}.png`}
+          src={`/images/${folder}/card_${slug}.png`}
           alt={name}
           fill
           className="object-fill"

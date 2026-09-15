@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button-variants';
 import { RefreshCw, Scale, ScrollText, Sword, User } from 'lucide-react';
 import { CARD_SIZES, type CardSize } from '@/lib/utils/cardSizes';
-import { getItalianClass, getItalianRace } from '@/lib/utils/nameMappers';
+import { getEnglishClass, getItalianClass, getItalianRace } from '@/lib/utils/nameMappers';
 import { CharacterLevelBadge } from './CharacterLevelBadge';
 
 interface CharacterCardProps {
@@ -84,7 +84,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
         <div className="flex flex-1 flex-col items-center justify-center gap-2">
           <div className="surface-well relative h-24 w-24 overflow-hidden rounded-full border border-frame/30">
             <Image
-              src={`/images/classes/token_${characterClass.toLowerCase()}.png`}
+              src={`/images/classes/token_${getEnglishClass(characterClass)}.png`}
               alt={getItalianClass(characterClass)}
               fill
               sizes="96px"
