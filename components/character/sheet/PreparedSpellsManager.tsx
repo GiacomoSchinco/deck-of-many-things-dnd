@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Search, Check, RefreshCw, Clock, Hourglass, Target } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Spell } from '@/types/spell';
-import { getItalianSchool, schoolBadgeColors } from '@/lib/utils/nameMappers';
+import { getSchoolMeta } from '@/lib/theme/schools';
 import { filterByName } from '@/lib/utils';
 
 interface PreparedSpellsManagerProps {
@@ -169,37 +169,35 @@ export default function PreparedSpellsManager({
         .sort((a, b) => a - b)
         .map((level) => (
           <div key={level} className="space-y-2">
-            <h4 className="fantasy-title font-semibold border-b border-amber-200 pb-1">
+            <h4 className="fantasy-title font-semibold border-b border-frame/20 pb-1">
               Livello {level}
             </h4>
             <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
               {byLevel[level].map((spell) => {
                 const isPrepared = preparedSpellIds.has(spell.id);
+                const school = getSchoolMeta(spell.school);
                 return (
                   <div
                     key={spell.id}
                     className={`
-                      flex items-center justify-between p-3 rounded-lg border transition-all
-                      ${isPrepared 
-                        ? 'bg-green-50 border-green-300' 
-                        : 'fantasy-section hover:bg-amber-100/50'
-                      }
+                      flex items-center justify-between surface-tile p-3
+                      ${isPrepared ? 'border-antique-gold/70 shadow-e2' : ''}
                     `}
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-medium text-amber-900">{spell.name}</span>
-                        <Badge className={`text-xs ${schoolBadgeColors[spell.school] ?? 'bg-gray-100'}`}>
-                          {getItalianSchool(spell.school)}
+                        <span className="font-medium text-ink-strong">{spell.name}</span>
+                        <Badge className={`text-xs ${school.badge}`}>
+                          {school.it}
                         </Badge>
                         {spell.ritual && (
-                          <Badge className="text-xs bg-emerald-100 text-emerald-800">Rituale</Badge>
+                          <Badge className="text-xs border-school-illusion/35 bg-school-illusion/10 text-school-illusion">Rituale</Badge>
                         )}
                         {spell.concentration && (
-                          <Badge className="text-xs bg-orange-100 text-orange-800">Concentrazione</Badge>
+                          <Badge className="text-xs border-antique-gold/40 bg-antique-gold/15 text-frame-deep">Concentrazione</Badge>
                         )}
                       </div>
-                      <div className="flex gap-3 text-xs text-amber-600 mt-1">
+                      <div className="flex gap-3 text-xs text-ink-muted mt-1">
                         {spell.casting_time && (
                           <span className="flex items-center gap-1">
                             <Clock className="h-3 w-3" aria-hidden="true" />

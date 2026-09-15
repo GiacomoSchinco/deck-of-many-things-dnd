@@ -5,17 +5,14 @@ import React from 'react';
 import AncientCardContainer from './AncientCardContainer';
 import { cn } from '@/lib/utils';
 import {
-  Sparkles,
   Clock,
   Target,
   Hourglass,
   ScrollText,
-  Crown,
-  Star,
   Info,
 } from 'lucide-react';
 import { DndIcon } from '../icons/DndIcon';
-import { getItalianSchool } from '@/lib/utils/nameMappers';
+import { getSchoolMeta, getSpellLevelMeta } from '@/lib/theme/schools';
 import type { Spell } from '@/types/spell';
 
 interface SpellCardProps {
@@ -26,38 +23,15 @@ interface SpellCardProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-// Mappa delle icone per scuola (usate anche per il badge colorato)
-const schoolConfig: Record<string, { color: string; bgLight: string }> = {
-  abjuration:    {   color: 'text-blue-600', bgLight: 'bg-blue-50' },
-  conjuration:   {     color: 'text-purple-600', bgLight: 'bg-purple-50' },
-  divination:    {      color: 'text-indigo-600', bgLight: 'bg-indigo-50' },
-  enchantment:   {     color: 'text-pink-600', bgLight: 'bg-pink-50' },
-  evocation:     {       color: 'text-orange-600', bgLight: 'bg-orange-50' },
-  illusion:      {      color: 'text-cyan-600', bgLight: 'bg-cyan-50' },
-  necromancy:    {     color: 'text-gray-600', bgLight: 'bg-gray-100' },
-  transmutation: {    color: 'text-emerald-600', bgLight: 'bg-emerald-50' },
-};
-
-// Mappa dei livelli (per icone)
-const levelConfig: Record<number, { icon: React.ElementType; label: string }> = {
-  0: { icon: Sparkles, label: 'Trucchetto' },
-  1: { icon: Star, label: '1° Livello' },
-  2: { icon: Star, label: '2° Livello' },
-  3: { icon: Star, label: '3° Livello' },
-  4: { icon: Star, label: '4° Livello' },
-  5: { icon: Star, label: '5° Livello' },
-  6: { icon: Crown, label: '6° Livello' },
-  7: { icon: Crown, label: '7° Livello' },
-  8: { icon: Crown, label: '8° Livello' },
-  9: { icon: Crown, label: '9° Livello' },
-};
+// Icona, colore e nome della scuola arrivano da `lib/theme/schools.ts`:
+// prima questo file aveva una propria mappa di colori, diversa da quella di
+// tutti gli altri punti dell'app.
 
 export default function SpellCard({ spell, showActions = false, onEdit, onDelete, size = 'md' }: SpellCardProps) {
   const [showDesc, setShowDesc] = React.useState(false);
 
-  const schoolInfo = schoolConfig[spell.school] || { color: 'text-amber-600', bgLight: 'bg-amber-50' };
-  const LevelIcon = levelConfig[spell.level]?.icon || Star;
-  const levelLabel = levelConfig[spell.level]?.label || `${spell.level}° Livello`;
+  const school = getSchoolMeta(spell.school);
+  const { icon: LevelIcon, label: levelLabel } = getSpellLevelMeta(spell.level);
 
   // Formatta i componenti
   const formatComponents = () => {
@@ -66,7 +40,7 @@ export default function SpellCard({ spell, showActions = false, onEdit, onDelete
     if (Array.isArray(comp)) {
       const text = comp.join(', ');
       if (comp.includes('M') && spell.material) {
-        return <span>{text} <span className="text-xs text-amber-500">({spell.material})</span></span>;
+        return <span>{text} <span className="text-xs text-ink-muted">({spell.material})</span></span>;
       }
       return text;
     }
@@ -78,7 +52,7 @@ export default function SpellCard({ spell, showActions = false, onEdit, onDelete
     return (
       <>
         {parts.length ? parts.join(', ') : '—'}
-        {comp.material && <span className="text-xs text-amber-500 block">({comp.material})</span>}
+        {comp.material && <span className="text-xs text-ink-muted block">({comp.material})</span>}
       </>
     );
   };
@@ -92,7 +66,7 @@ export default function SpellCard({ spell, showActions = false, onEdit, onDelete
             <button
               onClick={() => setShowDesc(true)}
               aria-label="Mostra descrizione"
-              className="inline-flex items-center justify-center w-8 h-8 text-xs font-semibold bg-white text-amber-700 border border-amber-200 rounded-full shadow-sm"
+              className="inline-flex items-center justify-center w-8 h-8 text-xs font-semibold surface-tile text-frame-deep"
             >
               <Info className="w-4 h-4" />
             </button>
@@ -101,7 +75,7 @@ export default function SpellCard({ spell, showActions = false, onEdit, onDelete
           {showDesc && (
             <div className="fixed inset-0 z-50 flex items-center justify-center">
               <div className="absolute inset-0 bg-black/40" onClick={() => setShowDesc(false)} />
-              <div className="bg-white p-4 rounded-lg max-w-lg mx-4 z-10 shadow-lg border border-amber-100">
+              <div className="surface-floating p-5 max-w-lg mx-4 z-10">
                 <div className="flex items-start justify-between gap-4">
                   <h3 className="text-sm font-semibold text-amber-900">{spell.name}</h3>
                   <button onClick={() => setShowDesc(false)} className="text-xs text-amber-600 hover:underline">Chiudi</button>
@@ -117,20 +91,20 @@ export default function SpellCard({ spell, showActions = false, onEdit, onDelete
       <div className="border-b-2 border-amber-700/30 text-center relative">
         <h2 className="text-lg font-bold text-amber-900 font-serif leading-tight">{spell.name}</h2>
         <div className="flex items-center justify-center gap-2 mt-1 flex-wrap">
-          <span className={cn('text-xs font-medium', schoolInfo.color)}>{getItalianSchool(spell.school)}</span>
+          <span className={cn('text-xs font-medium', school.text)}>{school.it}</span>
           {spell.ritual && (
-            <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">Rituale</span>
+            <span className="text-xs bg-school-illusion/12 text-school-illusion border border-school-illusion/30 px-2 py-0.5 rounded-full">Rituale</span>
           )}
           {spell.concentration && (
-            <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">Concentrazione</span>
+            <span className="text-xs bg-antique-gold/15 text-frame-deep border border-antique-gold/40 px-2 py-0.5 rounded-full">Concentrazione</span>
           )}
         </div>
       </div>
 
       {/* Icona scuola centrata + livello */}
       <div className="flex flex-col items-center justify-center mt-3 gap-1">
-        <DndIcon name={spell.school} className={schoolInfo.color} size={70} />
-        <div className="flex items-center gap-1 text-xs text-amber-600">
+        <DndIcon name={spell.school} className={school.text} size={70} />
+        <div className="flex items-center gap-1 text-xs text-ink-muted">
           <LevelIcon className="w-3 h-3" />
           <span>{levelLabel}</span>
         </div>
@@ -138,20 +112,20 @@ export default function SpellCard({ spell, showActions = false, onEdit, onDelete
 
       {/* Statistiche: tempo di lancio, gittata, durata, componenti */}
       <div className="grid grid-cols-2 gap-2 mt-3 text-xs">
-        <div className="bg-amber-50/50 p-1.5 rounded text-center flex flex-col items-center gap-0.5">
-          <Clock className="w-3 h-3 text-amber-500" />
+        <div className="surface-well p-1.5 text-center flex flex-col items-center gap-0.5">
+          <Clock className="w-3 h-3 text-frame" />
           <span className="text-amber-800">{spell.casting_time || '—'}</span>
         </div>
-        <div className="bg-amber-50/50 p-1.5 rounded text-center flex flex-col items-center gap-0.5">
-          <Target className="w-3 h-3 text-amber-500" />
+        <div className="surface-well p-1.5 text-center flex flex-col items-center gap-0.5">
+          <Target className="w-3 h-3 text-frame" />
           <span className="text-amber-800">{spell.range || '—'}</span>
         </div>
-        <div className="bg-amber-50/50 p-1.5 rounded text-center flex flex-col items-center gap-0.5">
-          <Hourglass className="w-3 h-3 text-amber-500" />
+        <div className="surface-well p-1.5 text-center flex flex-col items-center gap-0.5">
+          <Hourglass className="w-3 h-3 text-frame" />
           <span className="text-amber-800">{spell.duration || '—'}</span>
         </div>
-        <div className="bg-amber-50/50 p-1.5 rounded text-center flex flex-col items-center gap-0.5">
-          <ScrollText className="w-3 h-3 text-amber-500" />
+        <div className="surface-well p-1.5 text-center flex flex-col items-center gap-0.5">
+          <ScrollText className="w-3 h-3 text-frame" />
           <span className="text-amber-800">{formatComponents()}</span>
         </div>
       </div>
@@ -162,7 +136,7 @@ export default function SpellCard({ spell, showActions = false, onEdit, onDelete
           {onEdit && (
             <button
               onClick={onEdit}
-              className="px-3 py-1 text-xs bg-amber-700 text-amber-100 rounded hover:bg-amber-800 transition-colors"
+              className="px-3 py-1 text-xs metal-primary border border-primary/50 text-primary-foreground rounded-control shadow-e1 hover:shadow-e2 hover:-translate-y-0.5 active:translate-y-0 active:shadow-press transition-[transform,box-shadow] duration-200"
             >
               Modifica
             </button>
@@ -170,7 +144,7 @@ export default function SpellCard({ spell, showActions = false, onEdit, onDelete
           {onDelete && (
             <button
               onClick={onDelete}
-              className="px-3 py-1 text-xs bg-red-700 text-white rounded hover:bg-red-800 transition-colors"
+              className="px-3 py-1 text-xs metal-danger border border-destructive/50 text-destructive-foreground rounded-control shadow-e1 hover:shadow-e2 hover:-translate-y-0.5 active:translate-y-0 active:shadow-press transition-[transform,box-shadow] duration-200"
             >
               Elimina
             </button>
@@ -179,7 +153,7 @@ export default function SpellCard({ spell, showActions = false, onEdit, onDelete
       )}
 
       {/* Effetto hover decorativo */}
-      <div className="absolute inset-0 pointer-events-none border-2 border-transparent group-hover:border-amber-400/30 rounded-xl transition-all duration-300" />
+      <div className="absolute inset-0 pointer-events-none border-2 border-transparent group-hover:border-antique-gold/30 rounded-panel transition-colors duration-300" />
     </AncientCardContainer>
   );
 }

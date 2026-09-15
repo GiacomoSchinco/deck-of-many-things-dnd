@@ -4,12 +4,14 @@
 import { useMyCharacters } from '@/hooks/queries/useCharacter';
 import Loading from '@/components/custom/Loading';
 import DataTable from '@/components/custom/DataTable';
-import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button-variants';
+import { EmptyState } from '@/components/ui/empty-state';
 import Link from 'next/link';
 import { PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { getItalianClass, getItalianRace } from '@/lib/utils/nameMappers';
 import { PageWrapper } from '@/components/layout/PageWrapper';
+import { cn } from '@/lib/utils';
 
 // Utility per estrarre il nome da strutture nested
 function extractName(value: unknown): string {
@@ -36,11 +38,12 @@ export default function CharactersPage() {
 
   if (error) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          Errore: {error.message}
-        </div>
-      </div>
+      <PageWrapper withContainer={false} title="I Miei Personaggi" maxWidth="xl">
+        <EmptyState
+          title="Impossibile caricare i personaggi"
+          description={error.message}
+        />
+      </PageWrapper>
     );
   }
 
@@ -60,11 +63,12 @@ export default function CharactersPage() {
       title="I Miei Personaggi"
       subtitle="Gestisci tutti i tuoi eroi e compagni"
       action={
-        <Link href="/create-character">
-          <Button className="bg-amber-700 hover:bg-amber-800">
-            <PlusCircle className="w-4 h-4 mr-2" />
-            Nuovo Personaggio
-          </Button>
+        <Link
+          href="/create-character"
+          className={cn(buttonVariants())}
+        >
+          <PlusCircle className="w-4 h-4" />
+          Nuovo Personaggio
         </Link>
       }
     >

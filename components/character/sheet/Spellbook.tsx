@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { SpellsStep } from '@/components/character/creation-wizard/steps/SpellsStep';
 import SpellDetailDialog from '@/components/custom/SpellDetailDialog';
 import SpellSlotsManager from '@/components/custom/SpellSlotsManager';
-import { getItalianSchool, schoolBadgeColors } from '@/lib/utils/nameMappers';
+import { getSchoolMeta } from '@/lib/theme/schools';
 import { BookOpen, Trash, Check, Sparkles, Star, Clock, Hourglass, Target } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Spell, SpellKnown, PreparedSpell, SpellSlot } from '@/types/spell';
@@ -172,7 +172,7 @@ export default function Spellbook({
           {/* Cantrips */}
           {cantrips.length > 0 && (
             <section>
-              <h4 className="text-md fantasy-title mb-2 pb-1 border-b border-amber-200 flex items-center gap-1">
+              <h4 className="text-md fantasy-title mb-2 pb-1 border-b border-frame/20 flex items-center gap-1">
                 <Sparkles className="w-4 h-4" />
                 Trucchetti
               </h4>
@@ -198,7 +198,7 @@ export default function Spellbook({
             .sort((a, b) => a - b)
             .map((lvl) => (
               <section key={lvl}>
-                <div className="flex justify-between items-baseline mb-2 pb-1 border-b border-amber-200">
+                <div className="flex justify-between items-baseline mb-2 pb-1 border-b border-frame/20">
                   <h4 className="text-md fantasy-title">
                     Livello {lvl}
                   </h4>
@@ -274,8 +274,7 @@ function SpellRow({
   onTogglePrepare: () => void;
 }) {
   const [deleting, setDeleting] = useState(false);
-  const schoolKey = spell.school;
-  const schoolColor = schoolBadgeColors[schoolKey] ?? 'bg-gray-100 text-gray-800';
+  const school = getSchoolMeta(spell.school);
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -286,17 +285,25 @@ function SpellRow({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={() => onView(spell)}
-      className="w-full p-3 bg-amber-50 rounded-lg border border-amber-100 hover:bg-amber-100 hover:border-amber-300 transition-colors cursor-pointer flex items-start justify-between"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onView(spell);
+        }
+      }}
+      className="w-full surface-flat interactive-quiet p-3 cursor-pointer flex items-start justify-between focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none"
     >
       <div className="flex-1">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="font-semibold text-amber-900">{spell.name}</span>
-          <Badge className={`text-xs ${schoolColor}`}>{getItalianSchool(spell.school)}</Badge>
-          {spell.ritual && <Badge className="text-xs bg-emerald-100 text-emerald-800">Rituale</Badge>}
-          {spell.concentration && <Badge className="text-xs bg-orange-100 text-orange-800">Concentrazione</Badge>}
+          <span className="font-semibold text-ink-strong">{spell.name}</span>
+          <Badge className={`text-xs ${school.badge}`}>{school.it}</Badge>
+          {spell.ritual && <Badge className="text-xs border-school-illusion/35 bg-school-illusion/10 text-school-illusion">Rituale</Badge>}
+          {spell.concentration && <Badge className="text-xs border-antique-gold/40 bg-antique-gold/15 text-frame-deep">Concentrazione</Badge>}
         </div>
-        <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-amber-700 mt-1">
+        <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-ink-muted mt-1">
           {spell.casting_time && (
             <span className="flex items-center gap-1">
               <Clock className="h-3 w-3" aria-hidden="true" />

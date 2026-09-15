@@ -205,15 +205,15 @@ export default function CharacterPage() {
       </section>
 
       {/* Razza e Classe */}
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <FanCardGroup size="md" spread="normal" noWrapper>
           <RaceClassCard type='class' name={character?.classes?.name ?? '...'} size='md' isSelected={false} />
           <RaceClassCard type='race' name={character?.races?.name ?? '...'} size='md' isSelected={false} />
         </FanCardGroup>
         <AncientScroll variant='rolled'>
-          <div >
+          <div>
             <SectionTitle size="lg">Caratteristiche</SectionTitle>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
               {STATS.map(({ label, key }) => (
                 <StatDiamond
                   key={key}
@@ -224,13 +224,9 @@ export default function CharacterPage() {
                 />
               ))}
             </div>
-
           </div>
         </AncientScroll>
       </div>
-              
-      {/* Competenze principali (riepilogo) */}
-
 
       {/* Griglia a 2 colonne */}
       <div className="grid grid-cols-1 items-start lg:grid-cols-2 gap-6">
@@ -273,7 +269,7 @@ export default function CharacterPage() {
 
       {/* Tabs */}
       <Tabs defaultValue="skills" className="w-full">
-        <TabsList className="mb-4 grid w-full grid-cols-1 border-b border-frame/25 md:grid-cols-3">
+        <TabsList className="mb-6 grid w-full grid-cols-3">
           <TabsTrigger className="w-full text-center" value="skills">Abilità</TabsTrigger>
           <TabsTrigger className="w-full text-center" value="spells">Incantesimi</TabsTrigger>
           <TabsTrigger className="w-full text-center" value="inventory">Inventario</TabsTrigger>
@@ -311,7 +307,6 @@ export default function CharacterPage() {
             </h3>
             <InventoryGrouped items={inventory?.items} />
           </AncientCardContainer>
-
         </TabsContent>
       </Tabs>
     </div>

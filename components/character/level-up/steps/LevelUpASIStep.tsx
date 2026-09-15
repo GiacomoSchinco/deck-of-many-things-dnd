@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { WizardNav } from '@/components/shared/WizardNav';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { RadioCard } from '@/components/ui/selectable-card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Brain, Crown, Dumbbell, Flame, Footprints, Heart, TrendingUp, Sparkles } from 'lucide-react';
 import { getItalianAbilityFull } from '@/lib/utils/nameMappers';
@@ -121,28 +122,22 @@ export default function LevelUpASIStep({
           onValueChange={(v) => setAsiType(v as 'increase' | 'feat')}
           className="space-y-3"
         >
-          <div className="flex items-start gap-3 p-3 rounded-lg border border-amber-200 bg-amber-50/30">
-            <RadioGroupItem value="increase" id="increase" className="mt-1" />
-            <Label htmlFor="increase" className="flex-1 cursor-pointer">
-              <div className="font-medium text-amber-900">Aumenta caratteristiche</div>
-              <div className="text-sm text-amber-600">
-                Aumenta una caratteristica di 2 o due caratteristiche di 1
-              </div>
-            </Label>
-          </div>
+          <RadioCard
+            value="increase"
+            title="Aumenta caratteristiche"
+            description="Aumenta una caratteristica di 2 o due caratteristiche di 1"
+          />
 
-          <div className="flex items-start gap-3 p-3 rounded-lg border border-amber-200 bg-amber-50/30">
-            <RadioGroupItem value="feat" id="feat" className="mt-1" />
-            <Label htmlFor="feat" className="flex-1 cursor-pointer">
-              <div className="font-medium text-amber-900 flex items-center gap-1">
-                <Sparkles className="w-4 h-4" />
+          <RadioCard
+            value="feat"
+            title={
+              <span className="flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4" aria-hidden="true" />
                 Scegli un talento
-              </div>
-              <div className="text-sm text-amber-600">
-                Sostituisci l&apos;ASI con un talento speciale
-              </div>
-            </Label>
-          </div>
+              </span>
+            }
+            description="Sostituisci l'ASI con un talento speciale"
+          />
         </RadioGroup>
       )}
 

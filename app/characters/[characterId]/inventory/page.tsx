@@ -3,10 +3,14 @@
 import React from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import { ArrowLeft, PackageOpen } from 'lucide-react'
 import Loading from '@/components/custom/Loading'
-import { Button } from '@/components/ui/button'
+import { PageWrapper } from '@/components/layout/PageWrapper'
+import { buttonVariants } from '@/components/ui/button-variants'
+import { EmptyState } from '@/components/ui/empty-state'
 import { useInventory } from '@/hooks/queries/useInventory'
 import ItemCard from '@/components/custom/ItemCard'
+import { cn } from '@/lib/utils'
 import type { Item } from '@/types/item'
 
 export default function InventoryPage() {
@@ -16,21 +20,37 @@ export default function InventoryPage() {
   const { data, isLoading, error } = useInventory(characterId)
 
   if (isLoading) return <Loading />
-  if (error) return <div className="container mx-auto p-4">Errore caricamento inventario</div>
+
   const items = data?.items ?? []
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-serif font-bold">Inventario</h1>
-        <div className="flex gap-2">
-          <Link href={`/characters/${characterId}`}>
-            <Button variant="outline" size="sm">Indietro</Button>
-          </Link>
-        </div>
-      </div>
-      {items.length === 0 ? (
-        <p className="text-center text-amber-700">Inventario vuoto</p>
+    <PageWrapper
+      title="Inventario"
+      subtitle="Ogni oggetto che l'eroe porta con sé"
+      icon={<PackageOpen className="w-6 h-6" />}
+      maxWidth="xl"
+      action={
+        <Link
+          href={`/characters/${characterId}`}
+          className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Indietro
+        </Link>
+      }
+    >
+      {error ? (
+        <EmptyState
+          icon={PackageOpen}
+          title="Impossibile caricare l'inventario"
+          description="Riprova tra qualche istante o torna alla scheda del personaggio."
+        />
+      ) : items.length === 0 ? (
+        <EmptyState
+          icon={PackageOpen}
+          title="Inventario vuoto"
+          description="Le borse dell'eroe sono ancora leggere: aggiungi equipaggiamento dalla scheda."
+        />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {items.map((it) => (
@@ -38,7 +58,6 @@ export default function InventoryPage() {
           ))}
         </div>
       )}
-    </div>
-    
+    </PageWrapper>
   )
 }

@@ -53,7 +53,7 @@ export function PageWrapper({
     minimal: {
       wrapper: 'bg-parchment-50 text-ink',
       border: 'border border-frame/25',
-      shadow: 'shadow-sm',
+      shadow: 'shadow-e2',
     },
   };
 

@@ -4,8 +4,8 @@
 import { useState } from 'react';
 import { AntiqueButton } from '@/components/custom/AntiqueButton';
 import { WizardNav } from '@/components/shared/WizardNav';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { RadioGroup } from '@/components/ui/radio-group';
+import { RadioCard } from '@/components/ui/selectable-card';
 import { Dice6, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -103,38 +103,33 @@ export default function LevelUpHPStep({
         onValueChange={(v) => setMethod(v as 'average' | 'roll')}
         className="space-y-3"
       >
-        <div className={cn(
-          "flex items-start gap-3 p-3 rounded-lg border transition-all",
-          method === 'average' ? "border-amber-500 bg-amber-50" : "border-amber-200"
-        )}>
-          <RadioGroupItem value="average" id="average" className="mt-1" />
-          <Label htmlFor="average" className="flex-1 cursor-pointer">
-            <div className="font-medium text-amber-900">Valore medio</div>
-            <div className="text-sm text-amber-600">
-              {hitDiceMax} + {conMod} = <strong className="text-amber-800">+{averageGain} PF</strong>
-            </div>
-            <div className="text-xs text-amber-500 mt-1">
-              Consigliato per una crescita stabile
-            </div>
-          </Label>
-        </div>
+        <RadioCard
+          value="average"
+          title="Valore medio"
+          description={
+            <>
+              {hitDiceMax} + {conMod} = <strong className="text-ink-strong">+{averageGain} PF</strong>
+            </>
+          }
+        >
+          <span className="mt-1 block text-xs text-ink-muted">
+            Consigliato per una crescita stabile
+          </span>
+        </RadioCard>
 
-        <div className={cn(
-          "flex items-start gap-3 p-3 rounded-lg border transition-all",
-          method === 'roll' ? "border-amber-500 bg-amber-50" : "border-amber-200"
-        )}>
-          <RadioGroupItem value="roll" id="roll" className="mt-1" />
-          <Label htmlFor="roll" className="flex-1 cursor-pointer">
-            <div className="font-medium text-amber-900">Tiro del dado</div>
-            <div className="text-sm text-amber-600">
-              {rolledValue ? (
-                <span>
-                  {rolledValue} + {conMod} = <strong className="text-amber-800">+{rolledValue + conMod} PF</strong>
-                </span>
-              ) : (
-                <span>Non ancora tirato</span>
-              )}
-            </div>
+        <RadioCard
+          value="roll"
+          title="Tiro del dado"
+          description={
+            rolledValue ? (
+              <>
+                {rolledValue} + {conMod} = <strong className="text-ink-strong">+{rolledValue + conMod} PF</strong>
+              </>
+            ) : (
+              'Non ancora tirato'
+            )
+          }
+        >
             <AntiqueButton
               type="button"
               variant="outline"
@@ -145,8 +140,7 @@ export default function LevelUpHPStep({
             >
               {isRolling ? 'Tirando...' : 'Tira il dado'}
             </AntiqueButton>
-          </Label>
-        </div>
+        </RadioCard>
       </RadioGroup>
 
       <WizardNav

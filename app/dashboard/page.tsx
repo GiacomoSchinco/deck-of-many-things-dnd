@@ -141,7 +141,7 @@ export default function DashboardPage() {
               <div className="flex flex-col h-full">
                 <div className="flex-1 overflow-y-auto pr-2 space-y-3">
                 {characters?.map((character: DashboardCharacter) => (
-                  <div key={character?.id} className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-parchment-200/50">
+                  <div key={character?.id} className="surface-tile interactive-quiet flex items-center gap-3 p-2">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-frame/40 bg-parchment-200 text-frame-deep shadow-emboss">
                       <User className="h-5 w-5" />
                     </div>

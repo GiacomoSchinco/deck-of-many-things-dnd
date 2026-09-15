@@ -1,12 +1,15 @@
 "use client";
-import { Button } from '@/components/ui/button';
 import { useCampaigns } from '@/hooks/queries/useCampaigns';
 import type { Campaign } from '@/types';
 import Loading from '@/components/custom/Loading';
 import DataTable from '@/components/custom/DataTable';
+import { Badge } from '@/components/ui/badge';
+import { buttonVariants } from '@/components/ui/button-variants';
+import { EmptyState } from '@/components/ui/empty-state';
 import Link from 'next/link';
 import { PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
 import { PageWrapper } from '@/components/layout/PageWrapper';
 export default function CampaignsPage() {
     const { data: campaigns, isLoading, isError } = useCampaigns();
@@ -30,7 +33,14 @@ export default function CampaignsPage() {
         return <Loading />;
     }
     if (isError) {
-        return <div className="text-center text-red-600 p-8">Errore nel caricamento delle campagne.</div>;
+        return (
+          <PageWrapper withContainer={false} title="Le Mie Campagne" maxWidth="xl">
+            <EmptyState
+              title="Impossibile caricare le campagne"
+              description="Riprova tra qualche istante."
+            />
+          </PageWrapper>
+        );
     }
 
     return (
@@ -39,11 +49,12 @@ export default function CampaignsPage() {
         title="Le Mie Campagne"
         subtitle="Gestisci tutte le tue campagne e avventure"
         action={
-          <Link href="/campaigns/create">
-            <Button className="bg-amber-700 hover:bg-amber-800">
-              <PlusCircle className="w-4 h-4 mr-2" />
-              Nuova Campagna
-            </Button>
+          <Link
+            href="/campaigns/create"
+            className={cn(buttonVariants())}
+          >
+            <PlusCircle className="w-4 h-4" />
+            Nuova Campagna
           </Link>
         }
       >
@@ -55,7 +66,15 @@ export default function CampaignsPage() {
                     name: "Nome",
                     charactersCount: "Personaggi",
                 }}
+                customRenderers={{
+                    charactersCount: (value: unknown) => (
+                        <Badge variant="outline" className="surface-tile text-ink-strong">
+                            {Number(value) || 0}
+                        </Badge>
+                    ),
+                }}
                 onRowClick={handleRowClick}
+                pagination
             />
         </div>
       </PageWrapper>
