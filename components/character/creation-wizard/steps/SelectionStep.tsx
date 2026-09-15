@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
+import dynamic from 'next/dynamic';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Check, Search, X } from 'lucide-react';
@@ -9,7 +10,25 @@ import { RaceClassCard } from '@/components/custom/RaceClassCard';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import Loading from '@/components/custom/Loading';
 import { WizardStep } from '../WizardStep';
-import CardSwiper, { type CardSwiperEntry } from '@/components/custom/CardSwiper';
+import type { CardSwiperEntry } from '@/components/custom/CardSwiper';
+import { CARD_SIZES } from '@/lib/utils/cardSizes';
+
+/**
+ * `CardSwiper` importa `swiper/css` a livello di modulo. Finché l'import era
+ * statico, quel foglio di stile entrava nel grafo dei moduli di OGNI pagina che
+ * raggiunge questa cartella — compresa la scheda personaggio, che ci arriva via
+ * `Spellbook` → `SpellsStep`. Il CSS di Swiper veniva quindi scaricato su pagine
+ * dove non esiste nessuno swiper, e il browser avvisava in console
+ * "preloaded but not used". Caricandolo su richiesta, il CSS parte solo quando
+ * il carosello viene effettivamente montato.
+ *
+ * Il placeholder di `loading` ha la stessa dimensione della card così il layout
+ * non salta durante il caricamento.
+ */
+const CardSwiper = dynamic(() => import('@/components/custom/CardSwiper'), {
+  ssr: false,
+  loading: () => <div className={CARD_SIZES.md} aria-hidden="true" />,
+});
 
 interface SelectionStepProps<T extends { id: number; name: string }> {
   data: T[] | undefined;
