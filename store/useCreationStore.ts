@@ -1,12 +1,13 @@
 // store/useCreationStore.ts
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
 import type { CreationData, CreationStep } from '@/types/creation';
 
 interface CreationState {
   currentStep: CreationStep;
   data: Partial<CreationData>;
-  _hasHydrated: boolean;
+  hasHydrated: boolean;
 
   setStep: (step: CreationStep) => void;
   updateData: (newData: Partial<CreationData>) => void;
@@ -29,20 +30,23 @@ const initialData: Partial<CreationData> = {
 
 export const useCreationStore = create<CreationState>()(
   persist(
-    (set) => ({
+    immer((set) => ({
       currentStep: 'basic-info',
       data: initialData,
-      _hasHydrated: false,
+      hasHydrated: false,
 
-      setStep: (step) => set({ currentStep: step }),
+      setStep: (step) => set((state) => { state.currentStep = step; }),
 
       updateData: (newData) =>
-        set((state) => ({ data: { ...state.data, ...newData } })),
+        set((state) => { Object.assign(state.data, newData); }),
 
-      reset: () => set({ currentStep: 'basic-info', data: initialData }),
+      reset: () => set((state) => {
+        state.currentStep = 'basic-info';
+        state.data = initialData;
+      }),
 
-      setHasHydrated: (val) => set({ _hasHydrated: val }),
-    }),
+      setHasHydrated: (val) => set((state) => { state.hasHydrated = val; }),
+    })),
     {
       name: 'dnd-character-creation-draft',
       onRehydrateStorage: () => (state) => {

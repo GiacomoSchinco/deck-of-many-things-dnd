@@ -3,7 +3,7 @@
 export interface EquipmentItem {
   item_id: number;
   quantity: number;
-  name?: string;        // Opzionale, per visualizzazione
+  name: string;        // Nome per visualizzazione (ora obbligatorio)
 }
 
 export interface EquipmentChoice {

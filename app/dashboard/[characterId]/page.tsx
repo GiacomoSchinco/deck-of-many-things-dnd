@@ -11,6 +11,7 @@ import { Scroll, Package, Zap, Heart, Shield, Footprints, Zap as InitiativeIcon 
 import Link from 'next/link'
 import { useCharacter } from '@/hooks/queries/useCharacter'
 import Loading from '@/components/custom/Loading'
+import { PageWrapper } from '@/components/layout/PageWrapper'
 
 export default function CharacterPage() {
   const params = useParams()
@@ -39,40 +40,31 @@ export default function CharacterPage() {
   const initiative = character.combat_stats?.initiative_bonus ?? 0
 
   return (
-    <div className="container mx-auto p-4 md:p-6 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-4xl font-serif font-bold text-amber-900">
-            {character.name}
-          </h1>
-          <p className="text-amber-700">
-            {character.races?.name} · {character.classes?.name} · Livello {character.level}
-          </p>
-        </div>
-        
+    <PageWrapper
+      withContainer={false}
+      title={character.name}
+      subtitle={`${character.races?.name ?? ''} · ${character.classes?.name ?? ''} · Livello ${character.level}`}
+      action={
         <div className="flex gap-2">
           <Link href={`/characters/${characterId}/spells`}>
             <Button variant="outline" size="sm">
-              <Scroll className="w-4 h-4 mr-2" />
-              Incantesimi
+              <Scroll className="w-4 h-4 mr-2" />Incantesimi
             </Button>
           </Link>
           <Link href={`/characters/${characterId}/inventory`}>
             <Button variant="outline" size="sm">
-              <Package className="w-4 h-4 mr-2" />
-              Inventario
+              <Package className="w-4 h-4 mr-2" />Inventario
             </Button>
           </Link>
           <Link href={`/characters/${characterId}/level-up`}>
             <Button variant="outline" size="sm">
-              <Zap className="w-4 h-4 mr-2" />
-              Level Up
+              <Zap className="w-4 h-4 mr-2" />Level Up
             </Button>
           </Link>
         </div>
-      </div>
-
+      }
+    >
+    <div className="not-prose space-y-6">
       {/* Combat Stats in alto */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <AncientCardContainer className="p-4 text-center" size='sm'>
@@ -112,7 +104,7 @@ export default function CharacterPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Colonna sinistra - Caratteristiche */}
         <AncientCardContainer className="p-6">
-          <h2 className="text-2xl font-serif font-bold text-amber-900 mb-4 text-center border-b border-amber-200 pb-2">
+          <h2 className="text-2xl fantasy-section-header">
             Caratteristiche
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -130,25 +122,25 @@ export default function CharacterPage() {
 
         {/* Colonna destra - Info rapide */}
         <AncientCardContainer className="p-6">
-          <h2 className="text-2xl font-serif font-bold text-amber-900 mb-4 text-center border-b border-amber-200 pb-2">
+          <h2 className="text-2xl fantasy-section-header">
             Info Personaggio
           </h2>
           <div className="space-y-4">
-            <div className="flex justify-between items-center p-2 bg-amber-50 rounded">
-              <span className="text-amber-800">Background</span>
-              <span className="font-bold text-amber-900">{character.background || 'Nessuno'}</span>
+            <div className="fantasy-row">
+              <span className="fantasy-label">Background</span>
+              <span className="fantasy-value">{character.background || 'Nessuno'}</span>
             </div>
-            <div className="flex justify-between items-center p-2 bg-amber-50 rounded">
-              <span className="text-amber-800">Allineamento</span>
-              <span className="font-bold text-amber-900">{character.alignment || 'Neutrale'}</span>
+            <div className="fantasy-row">
+              <span className="fantasy-label">Allineamento</span>
+              <span className="fantasy-value">{character.alignment || 'Neutrale'}</span>
             </div>
-            <div className="flex justify-between items-center p-2 bg-amber-50 rounded">
-              <span className="text-amber-800">Bonus Competenza</span>
-              <span className="font-bold text-amber-900 text-xl">+{proficiencyBonus}</span>
+            <div className="fantasy-row">
+              <span className="fantasy-label">Bonus Competenza</span>
+              <span className="fantasy-value">+{proficiencyBonus}</span>
             </div>
-            <div className="flex justify-between items-center p-2 bg-amber-50 rounded">
-              <span className="text-amber-800">Tiri Salvezza</span>
-              <span className="font-bold text-amber-900">
+            <div className="fantasy-row">
+              <span className="fantasy-label">Tiri Salvezza</span>
+              <span className="fantasy-value">
                 {character.classes?.saving_throws?.map((s: string) => s.slice(0,3).toUpperCase()).join(' · ')}
               </span>
             </div>
@@ -166,7 +158,7 @@ export default function CharacterPage() {
 
         <TabsContent value="skills">
           <AncientCardContainer className="p-6">
-            <h3 className="text-xl font-serif font-bold text-amber-900 mb-4">
+            <h3 className="text-xl fantasy-title mb-4">
               Abilità
             </h3>
             <p className="text-amber-700 text-center py-8">Prossimamente...</p>
@@ -175,7 +167,7 @@ export default function CharacterPage() {
 
         <TabsContent value="spells">
           <AncientCardContainer className="p-6">
-            <h3 className="text-xl font-serif font-bold text-amber-900 mb-4">
+            <h3 className="text-xl fantasy-title mb-4">
               Incantesimi
             </h3>
             <div className="flex justify-center">
@@ -189,7 +181,7 @@ export default function CharacterPage() {
 
         <TabsContent value="inventory">
           <AncientCardContainer className="p-6">
-            <h3 className="text-xl font-serif font-bold text-amber-900 mb-4">
+            <h3 className="text-xl fantasy-title mb-4">
               Inventario
             </h3>
             <div className="flex justify-center">
@@ -202,5 +194,6 @@ export default function CharacterPage() {
         </TabsContent>
       </Tabs>
     </div>
+    </PageWrapper>
   )
 }

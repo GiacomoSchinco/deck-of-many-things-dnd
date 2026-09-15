@@ -1,7 +1,7 @@
 // components/item/ItemForm.tsx (versione con danno selezionabile)
 'use client';
 
-import { useState, useEffect, type ComponentType } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useCreateItem, useUpdateItem, useDeleteItem } from '@/hooks/mutations/useItemMutations';
@@ -17,7 +17,6 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Checkbox } from '@/components/ui/checkbox';
 import { 
   Save, 
   X, 
@@ -34,6 +33,23 @@ import {
   Dice6
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import AncientContainer from '@/components/custom/AncientContainer';
+import { AntiqueButton } from '@/components/custom/AntiqueButton';
+import {
+  CheckboxField,
+  DamageTypeSelect,
+  DiceSelect,
+  ItemPropertyHeader,
+  MagicBonusField,
+  NumberField,
+} from '@/components/items/ItemFormFields';
+import {
+  CURRENCY_OPTIONS,
+  ITEM_TYPE_OPTIONS,
+  RARITY_OPTIONS,
+  VERSATILE_DICE_OPTIONS,
+  WEAPON_PROPERTY_OPTIONS,
+} from '@/components/items/itemOptions';
 import type { 
   CreateItemDTO, 
   ItemType, 
@@ -45,12 +61,12 @@ import type {
   ConsumableProperties,
   AmmunitionProperties,
   ToolProperties,
-  GearProperties,
-  DamageType
+  GearProperties
 } from '@/types/item';
+import { Separator } from '@base-ui/react';
 
 type ItemFormProps = {
-  mode?: 'create' | 'edit';
+  mode?: 'create' | 'edit' | 'view';
   itemId?: number;
   initialData?: Partial<CreateItemDTO>;
   onSubmit?: (data: CreateItemDTO) => Promise<void>;
@@ -59,86 +75,6 @@ type ItemFormProps = {
   title?: string;
   subtitle?: string;
 };
-
-const itemTypes: { value: ItemType; label: string; icon: ComponentType<Record<string, unknown>> }[] = [
-  { value: 'weapon', label: 'Arma', icon: Sword },
-  { value: 'armor', label: 'Armatura', icon: Shield },
-  { value: 'gear', label: 'Equipaggiamento', icon: Package },
-  { value: 'consumable', label: 'Consumabile', icon: FlaskConical },
-  { value: 'ammunition', label: 'Munizione', icon: ArrowUpDown },
-  { value: 'tool', label: 'Attrezzo', icon: Wrench },
-  { value: 'currency', label: 'Moneta', icon: Coins },
-];
-
-const rarities: { value: Rarity; label: string; color: string }[] = [
-  { value: 'common', label: 'Comune', color: 'text-gray-500' },
-  { value: 'uncommon', label: 'Non Comune', color: 'text-green-600' },
-  { value: 'rare', label: 'Raro', color: 'text-blue-600' },
-  { value: 'very rare', label: 'Molto Raro', color: 'text-purple-600' },
-  { value: 'legendary', label: 'Leggendario', color: 'text-orange-600' },
-  { value: 'artifact', label: 'Artefatto', color: 'text-red-600' },
-];
-
-const currencies: { value: CurrencyType; label: string; symbol: string }[] = [
-  { value: 'po', label: 'Moneta d\'Oro', symbol: '🪙' },
-  { value: 'pa', label: 'Moneta di Platino', symbol: '💎' },
-  { value: 'pr', label: 'Moneta d\'Elettro', symbol: '✨' },
-  { value: 'pe', label: 'Moneta d\'Argento', symbol: '🥈' },
-  { value: 'mo', label: 'Moneta di Rame', symbol: '🥉' },
-];
-
-// ===========================================
-// DATI PER IL DANNO
-// ===========================================
-
-const damageTypes: { value: DamageType; label: string; icon: string }[] = [
-  { value: 'tagliente', label: 'Tagliente', icon: '⚔️' },
-  { value: 'perforante', label: 'Perforante', icon: '🏹' },
-  { value: 'contundente', label: 'Contundente', icon: '🔨' },
-  { value: 'acido', label: 'Acido', icon: '🧪' },
-  { value: 'freddo', label: 'Freddo', icon: '❄️' },
-  { value: 'fuoco', label: 'Fuoco', icon: '🔥' },
-  { value: 'fulmine', label: 'Fulmine', icon: '⚡' },
-  { value: 'necrotico', label: 'Necrotico', icon: '💀' },
-  { value: 'psichico', label: 'Psichico', icon: '🧠' },
-  { value: 'radioso', label: 'Radioso', icon: '✨' },
-  { value: 'veleno', label: 'Veleno', icon: '☠️' },
-  { value: 'tuono', label: 'Tuono', icon: '🌩️' },
-  { value: 'forza', label: 'Forza', icon: '💪' },
-];
-
-// Dadi predefiniti
-const diceOptions = [
-  { value: '1d4', label: '1d4', icon: '🎲' },
-  { value: '1d6', label: '1d6', icon: '🎲' },
-  { value: '1d8', label: '1d8', icon: '🎲' },
-  { value: '1d10', label: '1d10', icon: '🎲' },
-  { value: '1d12', label: '1d12', icon: '🎲' },
-  { value: '2d4', label: '2d4', icon: '🎲' },
-  { value: '2d6', label: '2d6', icon: '🎲' },
-  { value: '2d8', label: '2d8', icon: '🎲' },
-  { value: '3d6', label: '3d6', icon: '🎲' },
-  { value: '4d6', label: '4d6', icon: '🎲' },
-];
-
-const versatileDiceOptions = [
-  { value: '1d8', label: '1d8', icon: '🎲' },
-  { value: '1d10', label: '1d10', icon: '🎲' },
-  { value: '1d12', label: '1d12', icon: '🎲' },
-  { value: '2d6', label: '2d6', icon: '🎲' },
-];
-
-const weaponPropertiesList = [
-  { value: 'accurata', label: 'Accurata', description: '+1 al tiro per colpire' },
-  { value: 'leggera', label: 'Leggera', description: 'Può essere impugnata con due armi' },
-  { value: 'lancio', label: 'Lancio', description: 'Può essere lanciata' },
-  { value: 'versatile', label: 'Versatile', description: 'Può essere usata a due mani per danno maggiore' },
-  { value: 'pesante', label: 'Pesante', description: 'Richiede Forza 13 o superiore' },
-  { value: 'a due mani', label: 'A due mani', description: 'Richiede entrambe le mani' },
-  { value: 'portata', label: 'Portata', description: 'Colpisce a 3 metri di distanza' },
-  { value: 'carica', label: 'Carica', description: 'Richiede tempo per ricaricare' },
-  { value: 'munizioni', label: 'Munizioni', description: 'Richiede munizioni' },
-];
 
 export default function ItemForm({
   mode = 'create',
@@ -172,8 +108,8 @@ export default function ItemForm({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const isView = mode === 'view';
 
-  // Aggiorna il tipo quando cambia
   useEffect(() => {
     setFormData(prev => ({ ...prev, type: selectedType }));
   }, [selectedType]);
@@ -258,308 +194,195 @@ export default function ItemForm({
 
   const renderWeaponProperties = () => {
     const props = formData.properties as WeaponProperties || { itemType: 'weapon' };
+    const extraDamage = props.extraDamage ?? [];
     const isVersatile = props.properties?.includes('versatile');
+
+    const setExtraDamage = (next: WeaponProperties['extraDamage']) =>
+      updateProperties({ extraDamage: next });
     
     return (
-      <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <h3 className="font-medium text-gray-700 flex items-center gap-2">
-          <Sword className="w-4 h-4" />
-          Proprietà dell&apos;Arma
-        </h3>
-        
-        <div className="grid grid-cols-2 gap-4">
-          {/* Dado Danno */}
+        <>
+        <ItemPropertyHeader icon={Sword} title="Proprietà dell'Arma" />
+        <div className="pt-4">
+          <div className="grid grid-cols-2 gap-4">
+            {/* Dado Danno */}
+            <div>
+              <Label className="flex items-center gap-2">
+                <Dice6 className="w-4 h-4" />
+                Dado Danno
+              </Label>
+              <DiceSelect
+                className="mt-1"
+                value={props.damage}
+                onChange={(damage) => updateProperties({ damage })}
+              />
+            </div>
+
+            {/* Tipo Danno */}
+            <div>
+              <Label>Tipo Danno</Label>
+              <DamageTypeSelect
+                className="mt-1"
+                value={props.damageType}
+                onChange={(damageType) => updateProperties({ damageType })}
+              />
+            </div>
+          </div>
+
+          {/* Statistica per il Danno */}
           <div>
             <Label className="flex items-center gap-2">
-              <Dice6 className="w-4 h-4" />
-              Dado Danno
+              Statistica per il Danno
+              <span className="text-xs font-normal text-gray-400">(opzionale)</span>
             </Label>
             <Select
-              value={props.damage ?? ''}
-              onValueChange={(value) => updateProperties({ damage: value ?? '' })}
+              value={props.damageAbility ?? ''}
+              onValueChange={(value) => updateProperties({ damageAbility: value ? (value as 'strength' | 'dexterity') : null })}
             >
-              <SelectTrigger className="mt-1">
-                <SelectValue placeholder="Seleziona dado">
-                  {props.damage || 'Seleziona dado'}
+              <SelectTrigger className="mt-1 w-full">
+                <SelectValue placeholder="Nessuna (usa bonus proficiency)">
+                  {props.damageAbility === 'strength' ? 'Forza (FOR)' :
+                   props.damageAbility === 'dexterity' ? 'Destrezza (DES)' :
+                   'Nessuna (usa bonus proficiency)'}
                 </SelectValue>
               </SelectTrigger>
               <SelectContent>
-                {diceOptions.map(dice => (
-                  <SelectItem key={dice.value} value={dice.value} label={dice.value}>
-                    <div className="flex items-center gap-2">
-                      <span>{dice.icon}</span>
-                      <span className="font-mono">{dice.value}</span>
-                    </div>
-                  </SelectItem>
-                ))}
+                <SelectItem value="" label="Nessuna">
+                  <span className="text-gray-500">Nessuna (usa bonus proficiency)</span>
+                </SelectItem>
+                <SelectItem value="strength" label="Forza (FOR)">
+                  Forza (FOR)
+                </SelectItem>
+                <SelectItem value="dexterity" label="Destrezza (DES)">
+                  Destrezza (DES)
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
-          
-          {/* Tipo Danno */}
+
+          {/* Danni Aggiuntivi */}
           <div>
-            <Label>Tipo Danno</Label>
-            <Select
-              value={props.damageType ?? ''}
-              onValueChange={(value) => updateProperties({ damageType: value as DamageType })}
-            >
-              <SelectTrigger className="mt-1">
-                <SelectValue placeholder="Seleziona tipo">
-                  {damageTypes.find(t => t.value === props.damageType)?.label || 'Seleziona tipo'}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                {damageTypes.map(type => (
-                  <SelectItem key={type.value} value={type.value} label={type.label}>
-                    <div className="flex items-center gap-2">
-                      <span>{type.icon}</span>
-                      <span>{type.label}</span>
-                    </div>
-                  </SelectItem>
+            <div className="flex items-center justify-between mb-2">
+              <Label className="flex items-center gap-2">
+                Danni Aggiuntivi
+                <span className="text-xs font-normal text-gray-400">(es. +1d6 fuoco magico)</span>
+              </Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1 text-xs"
+                onClick={() => {
+                  const current = props.extraDamage || [];
+                  setExtraDamage([...current, { dice: '1d6', type: 'fuoco' }]);
+                }}
+              >
+                <Plus className="w-3 h-3" />
+                Aggiungi
+              </Button>
+            </div>
+            {extraDamage.length === 0 ? (
+              <p className="text-xs text-gray-400 py-1">Nessun danno aggiuntivo</p>
+            ) : (
+              <div className="space-y-2">
+                {extraDamage.map((entry, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <DiceSelect
+                      className="flex-1"
+                      value={entry.dice}
+                      placeholder="Dado"
+                      onChange={(dice) =>
+                        setExtraDamage(extraDamage.map((e, i) => (i === idx ? { ...e, dice } : e)))
+                      }
+                    />
+                    <DamageTypeSelect
+                      className="flex-1"
+                      value={entry.type}
+                      placeholder="Tipo"
+                      onChange={(type) =>
+                        setExtraDamage(extraDamage.map((e, i) => (i === idx ? { ...e, type } : e)))
+                      }
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="text-red-400 hover:text-red-600 hover:bg-red-50 flex-shrink-0"
+                      onClick={() => setExtraDamage(extraDamage.filter((_, i) => i !== idx))}
+                    >
+                      <Trash className="w-4 h-4" />
+                    </Button>
+                  </div>
                 ))}
-              </SelectContent>
-            </Select>
+              </div>
+            )}
           </div>
-        </div>
 
-        {/* Statistica per il Danno */}
-        <div>
-          <Label className="flex items-center gap-2">
-            Statistica per il Danno
-            <span className="text-xs font-normal text-gray-400">(opzionale)</span>
-          </Label>
-          <Select
-            value={props.damageAbility ?? ''}
-            onValueChange={(value) => updateProperties({ damageAbility: value ? (value as 'strength' | 'dexterity') : null })}
-          >
-            <SelectTrigger className="mt-1 w-full">
-              <SelectValue placeholder="Nessuna (usa bonus proficiency)">
-                {props.damageAbility === 'strength' ? '💪 Forza (FOR)' :
-                 props.damageAbility === 'dexterity' ? '🤸 Destrezza (DES)' :
-                 'Nessuna (usa bonus proficiency)'}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="" label="Nessuna">
-                <span className="text-gray-500">Nessuna (usa bonus proficiency)</span>
-              </SelectItem>
-              <SelectItem value="strength" label="Forza (FOR)">
-                <div className="flex items-center gap-2">
-                  <span>💪</span>
-                  <span>Forza (FOR)</span>
-                </div>
-              </SelectItem>
-              <SelectItem value="dexterity" label="Destrezza (DES)">
-                <div className="flex items-center gap-2">
-                  <span>🤸</span>
-                  <span>Destrezza (DES)</span>
-                </div>
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Danni Aggiuntivi */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <Label className="flex items-center gap-2">
-              Danni Aggiuntivi
-              <span className="text-xs font-normal text-gray-400">(es. +1d6 fuoco magico)</span>
-            </Label>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-1 text-xs"
-              onClick={() => {
-                const current = props.extraDamage || [];
-                updateProperties({ extraDamage: [...current, { dice: '1d6', type: 'fuoco' as DamageType }] });
-              }}
-            >
-              <Plus className="w-3 h-3" />
-              Aggiungi
-            </Button>
-          </div>
-          {(props.extraDamage || []).length === 0 ? (
-            <p className="text-xs text-gray-400 py-1">Nessun danno aggiuntivo</p>
-          ) : (
-            <div className="space-y-2">
-              {(props.extraDamage || []).map((entry, idx) => (
-                <div key={idx} className="flex items-center gap-2">
-                  <Select
-                    value={entry.dice ?? ''}
-                    onValueChange={(value) => {
-                          const updated = (props.extraDamage || []).map((e, i) =>
-                            i === idx ? { ...e, dice: value ?? '1d6' } : e
-                          );
-                          updateProperties({ extraDamage: updated });
-                        }}
-                  >
-                    <SelectTrigger className="flex-1">
-                      <SelectValue>
-                        {entry.dice || 'Dado'}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {diceOptions.map(dice => (
-                        <SelectItem key={dice.value} value={dice.value} label={dice.value}>
-                          <div className="flex items-center gap-2">
-                            <span>{dice.icon}</span>
-                            <span className="font-mono">{dice.value}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Select
-                    value={entry.type ?? ''}
-                    onValueChange={(value) => {
-                      const updated = (props.extraDamage || []).map((e, i) =>
-                        i === idx ? { ...e, type: value as DamageType } : e
-                      );
-                      updateProperties({ extraDamage: updated });
-                    }}
-                  >
-                    <SelectTrigger className="flex-1">
-                      <SelectValue>
-                        {damageTypes.find(t => t.value === entry.type)?.label || 'Tipo'}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {damageTypes.map(type => (
-                        <SelectItem key={type.value} value={type.value} label={type.label}>
-                          <div className="flex items-center gap-2">
-                            <span>{type.icon}</span>
-                            <span>{type.label}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="text-red-400 hover:text-red-600 hover:bg-red-50 flex-shrink-0"
-                    onClick={() => {
-                      const updated = (props.extraDamage || []).filter((_, i) => i !== idx);
-                      updateProperties({ extraDamage: updated });
-                    }}
-                  >
-                    <Trash className="w-4 h-4" />
-                  </Button>
-                </div>
-              ))}
+          {/* Danno Versatile (condizionale) */}
+          {isVersatile && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Danno Versatile</Label>
+                <DiceSelect
+                  className="mt-1"
+                  options={VERSATILE_DICE_OPTIONS}
+                  value={props.versatileDamage}
+                  onChange={(versatileDamage) => updateProperties({ versatileDamage })}
+                />
+              </div>
+              <div className="text-xs text-gray-500 flex items-end pb-2">
+                Quando usata a due mani
+              </div>
             </div>
           )}
-        </div>
 
-        {/* Danno Versatile (condizionale) */}
-        {isVersatile && (
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>Danno Versatile</Label>
-              <Select
-                value={props.versatileDamage ?? ''}
-                onValueChange={(value) => updateProperties({ versatileDamage: value ?? '' })}
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="Seleziona dado" />
-                </SelectTrigger>
-                <SelectContent>
-                  {versatileDiceOptions.map(dice => (
-                    <SelectItem key={dice.value} value={dice.value}>
-                      <div className="flex items-center gap-2">
-                        <span>{dice.icon}</span>
-                        <span className="font-mono">{dice.value}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="text-xs text-gray-500 flex items-end pb-2">
-              Quando usata a due mani
-            </div>
-          </div>
-        )}
-
-        {/* Proprietà arma (checkboxes con descrizione) */}
-        <div>
-          <Label>Proprietà</Label>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mt-1">
-            {weaponPropertiesList.map(prop => (
-              <label key={prop.value} className="flex items-start gap-2 text-sm p-2 hover:bg-gray-100 rounded cursor-pointer">
-                <Checkbox
+          {/* Proprietà arma (checkboxes con descrizione) */}
+          <div>
+            <Label>Proprietà</Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mt-1">
+              {WEAPON_PROPERTY_OPTIONS.map(prop => (
+                <CheckboxField
+                  key={prop.value}
+                  label={prop.label}
+                  description={prop.description}
                   checked={props.properties?.includes(prop.value) ?? false}
                   onCheckedChange={(checked) => {
                     const current = props.properties || [];
-                    const updated = checked 
-                      ? [...current, prop.value]
-                      : current.filter(p => p !== prop.value);
-                    updateProperties({ properties: updated });
+                    updateProperties({
+                      properties: checked
+                        ? [...current, prop.value]
+                        : current.filter(p => p !== prop.value),
+                    });
                   }}
-                  className="mt-0.5"
                 />
-                <div>
-                  <div className="font-medium">{prop.label}</div>
-                  <div className="text-xs text-gray-500">{prop.description}</div>
-                </div>
-              </label>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Gittata */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label>Gittata Normale (m)</Label>
-            <Input
-              type="number"
-              value={props.range?.normal || ''}
-              onChange={(e) => updateProperties({ 
-                range: { normal: parseInt(e.target.value) || (props.range?.normal ?? 0), long: props.range?.long }
-              })}
-              className="mt-1"
+          {/* Gittata */}
+          <div className="grid grid-cols-2 gap-4">
+            <NumberField
+              label="Gittata Normale (m)"
+              value={props.range?.normal}
+              emptyValue={props.range?.normal ?? 0}
+              onChange={(normal) => updateProperties({ range: { normal, long: props.range?.long } })}
               placeholder="es. 6"
             />
-          </div>
-          <div>
-            <Label>Gittata Lunga (m)</Label>
-            <Input
-              type="number"
-              value={props.range?.long ?? ''}
-              onChange={(e) => updateProperties({ 
-                range: { normal: props.range?.normal ?? 0, long: parseInt(e.target.value) || 0 }
-              })}
-              className="mt-1"
+            <NumberField
+              label="Gittata Lunga (m)"
+              value={props.range?.long}
+              onChange={(long) => updateProperties({ range: { normal: props.range?.normal ?? 0, long } })}
               placeholder="es. 18"
             />
           </div>
-        </div>
 
-        {/* Bonus magico */}
-        <div>
-          <Label>Bonus Magico</Label>
-          <div className="flex gap-2 mt-1">
-            {[0, 1, 2, 3].map(bonus => (
-              <Button
-                key={bonus}
-                type="button"
-                variant={props.magicBonus === bonus ? "default" : "outline"}
-                size="sm"
-                onClick={() => updateProperties({ magicBonus: bonus })}
-                className={props.magicBonus === bonus 
-                  ? "bg-blue-600 hover:bg-blue-700" 
-                  : "border-gray-300"
-                }
-              >
-                {bonus === 0 ? 'Normale' : `+${bonus}`}
-              </Button>
-            ))}
-          </div>
+          {/* Bonus magico */}
+          <MagicBonusField
+            value={props.magicBonus}
+            onChange={(magicBonus) => updateProperties({ magicBonus })}
+          />
         </div>
-      </div>
+      </>
     );
   };
 
@@ -567,107 +390,82 @@ export default function ItemForm({
     const props = formData.properties as ArmorProperties || { itemType: 'armor' };
     
     return (
-      <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <h3 className="font-medium text-gray-700 flex items-center gap-2">
-          <Shield className="w-4 h-4" />
-          Proprietà dell&apos;Armatura
-        </h3>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label>Classe Armatura (CA)</Label>
-            <Input
-              type="number"
-              value={props.armorClass || ''}
-              onChange={(e) => updateProperties({ armorClass: parseInt(e.target.value) || 0 })}
-              className="mt-1"
-            />
-          </div>
-          <div>
-            <Label>Tipo Armatura</Label>
-            <Select
-              value={props.armorType ?? ''}
-              onValueChange={(value) => updateProperties({ armorType: value as ArmorProperties['armorType'] })}
-            >
-              <SelectTrigger className="mt-1">
-                <SelectValue placeholder="Seleziona tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="light" label="Leggera">Leggera</SelectItem>
-                <SelectItem value="medium" label="Media">Media</SelectItem>
-                <SelectItem value="heavy" label="Pesante">Pesante</SelectItem>
-                <SelectItem value="shield" label="Scudo">Scudo</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+      <>
+        <ItemPropertyHeader icon={Shield} title="Proprietà dell'Armatura" />
+        <div className="pt-4">
 
-        <div className="flex flex-wrap gap-4">
-          <label className="flex items-center gap-2">
-            <Checkbox
+          <div className="grid grid-cols-2 gap-4">
+            <NumberField
+              label="Classe Armatura (CA)"
+              value={props.armorClass}
+              onChange={(armorClass) => updateProperties({ armorClass })}
+            />
+            <div>
+              <Label>Tipo Armatura</Label>
+              <Select
+                value={props.armorType ?? ''}
+                onValueChange={(value) => updateProperties({ armorType: value as ArmorProperties['armorType'] })}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Seleziona tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="light" label="Leggera">Leggera</SelectItem>
+                  <SelectItem value="medium" label="Media">Media</SelectItem>
+                  <SelectItem value="heavy" label="Pesante">Pesante</SelectItem>
+                  <SelectItem value="shield" label="Scudo">Scudo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-4">
+            <CheckboxField
+              label="Aggiunge modificatore Destrezza"
               checked={props.addsDexModifier || false}
-              onCheckedChange={(checked) => updateProperties({ addsDexModifier: checked })}
+              onCheckedChange={(addsDexModifier) => updateProperties({ addsDexModifier })}
             />
-            <span>Aggiunge modificatore Destrezza</span>
-          </label>
 
-          {props.armorType === 'medium' && (
+            {props.armorType === 'medium' && (
+              <div className="flex items-center gap-2">
+                <Label>Max Bonus Destrezza</Label>
+                <Input
+                  type="number"
+                  value={props.maxDexBonus || ''}
+                  onChange={(e) => updateProperties({ maxDexBonus: parseInt(e.target.value) || 0 })}
+                  className="w-20"
+                  placeholder="2"
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-wrap gap-4">
+            <CheckboxField
+              label="Svantaggio su Furtività"
+              checked={props.stealthDisadvantage || false}
+              onCheckedChange={(stealthDisadvantage) => updateProperties({ stealthDisadvantage })}
+            />
+
             <div className="flex items-center gap-2">
-              <Label>Max Bonus Destrezza</Label>
+              <Label>Richiede Forza</Label>
               <Input
                 type="number"
-                value={props.maxDexBonus || ''}
-                onChange={(e) => updateProperties({ maxDexBonus: parseInt(e.target.value) || 0 })}
+                value={props.strengthRequirement || ''}
+                onChange={(e) => updateProperties({ strengthRequirement: parseInt(e.target.value) || 0 })}
                 className="w-20"
-                placeholder="2"
+                placeholder="13"
               />
             </div>
-          )}
-        </div>
-
-        <div className="flex flex-wrap gap-4">
-          <label className="flex items-center gap-2">
-            <Checkbox
-              checked={props.stealthDisadvantage || false}
-              onCheckedChange={(checked) => updateProperties({ stealthDisadvantage: checked })}
-            />
-            <span>Svantaggio su Furtività</span>
-          </label>
-
-          <div className="flex items-center gap-2">
-            <Label>Richiede Forza</Label>
-            <Input
-              type="number"
-              value={props.strengthRequirement || ''}
-              onChange={(e) => updateProperties({ strengthRequirement: parseInt(e.target.value) || 0 })}
-              className="w-20"
-              placeholder="13"
-            />
           </div>
-        </div>
 
-        {/* Bonus magico */}
-        <div>
-          <Label>Bonus Magico</Label>
-          <div className="flex gap-2 mt-1">
-            {[0, 1, 2, 3].map(bonus => (
-              <Button
-                key={bonus}
-                type="button"
-                variant={props.magicBonus === bonus ? "default" : "outline"}
-                size="sm"
-                onClick={() => updateProperties({ magicBonus: bonus })}
-                className={props.magicBonus === bonus 
-                  ? "bg-blue-600 hover:bg-blue-700" 
-                  : "border-gray-300"
-                }
-              >
-                {bonus === 0 ? 'Normale' : `+${bonus}`}
-              </Button>
-            ))}
-          </div>
+          {/* Bonus magico */}
+          <MagicBonusField
+            value={props.magicBonus}
+            onChange={(magicBonus) => updateProperties({ magicBonus })}
+          />
         </div>
-      </div>
+      </>
     );
   };
 
@@ -675,64 +473,59 @@ export default function ItemForm({
     const props = formData.properties as ConsumableProperties || { itemType: 'consumable' };
     
     return (
-      <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <h3 className="font-medium text-gray-700 flex items-center gap-2">
-          <FlaskConical className="w-4 h-4" />
-          Proprietà del Consumabile
-        </h3>
-        
-        <div>
-          <Label>Effetto</Label>
-          <Textarea
-            value={props.effect || ''}
-            onChange={(e) => updateProperties({ effect: e.target.value })}
-            placeholder="es. Recupera 2d4+2 PF, Invisibilità per 1 ora, +2 Forza per 1 ora"
-            className="mt-1"
-            rows={3}
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
+      <>
+        <ItemPropertyHeader icon={FlaskConical} title="Proprietà del Consumabile" />
+        <div className="pt-4">
           <div>
-            <Label>Durata</Label>
-            <Input
-              value={props.duration || ''}
-              onChange={(e) => updateProperties({ duration: e.target.value })}
-              placeholder="es. Istantaneo, 1 ora, 24 ore"
+            <Label>Effetto</Label>
+            <Textarea
+              value={props.effect || ''}
+              onChange={(e) => updateProperties({ effect: e.target.value })}
+              placeholder="es. Recupera 2d4+2 PF, Invisibilità per 1 ora, +2 Forza per 1 ora"
               className="mt-1"
+              rows={3}
             />
           </div>
-          <div>
-            <Label>Ricarica</Label>
-            <Select
-              value={props.recharge ?? ''}
-              onValueChange={(value) => updateProperties({ recharge: value as string })}
-            >
-              <SelectTrigger className="mt-1">
-                <SelectValue placeholder="Nessuna" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="short">Riposo Breve</SelectItem>
-                <SelectItem value="long">Riposo Lungo</SelectItem>
-                <SelectItem value="dawn">Alba</SelectItem>
-                <SelectItem value="dusk">Crepuscolo</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
 
-        <div>
-          <Label>Utilizzi Massimi</Label>
-          <Input
-            type="number"
-            value={props.usesMax ?? ''}
-            onChange={(e) => updateProperties({ usesMax: parseInt(e.target.value) || 0 })}
-            className="mt-1 w-32"
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Durata</Label>
+              <Input
+                value={props.duration || ''}
+                onChange={(e) => updateProperties({ duration: e.target.value })}
+                placeholder="es. Istantaneo, 1 ora, 24 ore"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label>Ricarica</Label>
+              <Select
+                value={props.recharge ?? ''}
+                onValueChange={(value) => updateProperties({ recharge: value as string })}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Nessuna" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="short">Riposo Breve</SelectItem>
+                  <SelectItem value="long">Riposo Lungo</SelectItem>
+                  <SelectItem value="dawn">Alba</SelectItem>
+                  <SelectItem value="dusk">Crepuscolo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <NumberField
+            label="Utilizzi Massimi"
+            value={props.usesMax}
+            onChange={(usesMax) => updateProperties({ usesMax })}
+            inputClassName="w-32"
             placeholder="1, 3, 10"
+            hint="Lascia vuoto per utilizzo singolo"
           />
-          <p className="text-xs text-gray-500 mt-1">Lascia vuoto per utilizzo singolo</p>
         </div>
-      </div>
+      </>
     );
   };
 
@@ -740,74 +533,54 @@ export default function ItemForm({
     const props = formData.properties as AmmunitionProperties || { itemType: 'ammunition' };
     
     return (
-      <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <h3 className="font-medium text-gray-700 flex items-center gap-2">
-          <ArrowUpDown className="w-4 h-4" />
-          Proprietà delle Munizioni
-        </h3>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label>Tipo</Label>
-            <Select
-              value={props.ammunitionType ?? ''}
-              onValueChange={(value) => updateProperties({ ammunitionType: value as AmmunitionProperties['ammunitionType'] })}
-            >
-              <SelectTrigger className="mt-1">
-                <SelectValue placeholder="Seleziona tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="arrow" label="Freccia">Freccia</SelectItem>
-                <SelectItem value="bolt" label="Quadrello">Quadrello</SelectItem>
-                <SelectItem value="bullet" label="Proiettile">Proiettile</SelectItem>
-                <SelectItem value="needle" label="Spillo">Spillo</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>Quantità per confezione</Label>
-            <Input
-              type="number"
-              value={props.quantity || ''}
-              onChange={(e) => updateProperties({ quantity: parseInt(e.target.value) || 1 })}
-              className="mt-1"
+      <>
+        <ItemPropertyHeader icon={ArrowUpDown} title="Proprietà delle Munizioni" />
+        <div className="pt-4">
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Tipo</Label>
+              <Select
+                value={props.ammunitionType ?? ''}
+                onValueChange={(value) => updateProperties({ ammunitionType: value as AmmunitionProperties['ammunitionType'] })}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Seleziona tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="arrow" label="Freccia">Freccia</SelectItem>
+                  <SelectItem value="bolt" label="Quadrello">Quadrello</SelectItem>
+                  <SelectItem value="bullet" label="Proiettile">Proiettile</SelectItem>
+                  <SelectItem value="needle" label="Spillo">Spillo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <NumberField
+              label="Quantità per confezione"
+              value={props.quantity}
+              emptyValue={1}
+              onChange={(quantity) => updateProperties({ quantity })}
               placeholder="20"
             />
           </div>
-        </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label>Bonus Danno</Label>
-            <Input
-              value={props.damageBonus || ''}
-              onChange={(e) => updateProperties({ damageBonus: e.target.value })}
-              placeholder="es. 1d4 fuoco, +1 danno"
-              className="mt-1"
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Bonus Danno</Label>
+              <Input
+                value={props.damageBonus || ''}
+                onChange={(e) => updateProperties({ damageBonus: e.target.value })}
+                placeholder="es. 1d4 fuoco, +1 danno"
+                className="mt-1"
+              />
+            </div>
+            <MagicBonusField
+              value={props.magicBonus}
+              onChange={(magicBonus) => updateProperties({ magicBonus })}
             />
           </div>
-          <div>
-            <Label>Bonus Magico</Label>
-            <div className="flex gap-2 mt-1">
-              {[0, 1, 2, 3].map(bonus => (
-                <Button
-                  key={bonus}
-                  type="button"
-                  variant={props.magicBonus === bonus ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => updateProperties({ magicBonus: bonus })}
-                  className={props.magicBonus === bonus 
-                    ? "bg-blue-600 hover:bg-blue-700" 
-                    : "border-gray-300"
-                  }
-                >
-                  {bonus === 0 ? 'Normale' : `+${bonus}`}
-                </Button>
-              ))}
-            </div>
-          </div>
         </div>
-      </div>
+      </>
     );
   };
 
@@ -815,81 +588,72 @@ export default function ItemForm({
     const props = formData.properties as ToolProperties || { itemType: 'tool' };
     
     return (
-      <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <h3 className="font-medium text-gray-700 flex items-center gap-2">
-          <Wrench className="w-4 h-4" />
-          Proprietà dell&apos;Attrezzo
-        </h3>
-        
-        <div>
-          <Label>Tipo Attrezzo</Label>
-          <Input
-            value={props.toolType || ''}
-            onChange={(e) => updateProperties({ toolType: e.target.value })}
-            placeholder="es. Attrezzi da fabbro, Attrezzi da scasso, Kit da alchimista"
-            className="mt-1"
-          />
-        </div>
-        
-        <div>
-          <Label>Abilità Associata</Label>
-          <Input
-            value={props.skill || ''}
-            onChange={(e) => updateProperties({ skill: e.target.value })}
-            placeholder="es. Artigianato, Scassinare, Alchimia"
-            className="mt-1"
-          />
-        </div>
-        
-        <label className="flex items-center gap-2">
-          <Checkbox
+      <>
+        <ItemPropertyHeader icon={Wrench} title="Proprietà dell'Attrezzo" />
+        <div className="pt-4">
+          <div>
+            <Label>Tipo Attrezzo</Label>
+            <Input
+              value={props.toolType || ''}
+              onChange={(e) => updateProperties({ toolType: e.target.value })}
+              placeholder="es. Attrezzi da fabbro, Attrezzi da scasso, Kit da alchimista"
+              className="mt-1"
+            />
+          </div>
+          
+          <div>
+            <Label>Abilità Associata</Label>
+            <Input
+              value={props.skill || ''}
+              onChange={(e) => updateProperties({ skill: e.target.value })}
+              placeholder="es. Artigianato, Scassinare, Alchimia"
+              className="mt-1"
+            />
+          </div>
+          
+          <CheckboxField
+            label="Richiede competenza"
             checked={!!props.proficiency}
-            onCheckedChange={(checked) => updateProperties({ proficiency: !!checked })}
+            onCheckedChange={(proficiency) => updateProperties({ proficiency })}
           />
-          <span>Richiede competenza</span>
-        </label>
-      </div>
+        </div>
+      </>
     );
   };
 
   const renderGearProperties = () => {
     const props = formData.properties as GearProperties || { itemType: 'gear' };
-    
+
     return (
-      <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <h3 className="font-medium text-gray-700 flex items-center gap-2">
-          <Package className="w-4 h-4" />
-          Proprietà dell&apos;Equipaggiamento
-        </h3>
-        
-        <div>
-          <Label>Capacità (kg)</Label>
-          <Input
-            type="number"
+      <>
+        <ItemPropertyHeader icon={Package} title="Proprietà dell'Equipaggiamento" />
+        <div className="pt-4">
+          <NumberField
+            className="mt-3"
+            label="Capacità (kg)"
+            value={props.capacity}
+            parse="float"
             step="0.5"
-            value={props.capacity || ''}
-            onChange={(e) => updateProperties({ capacity: parseFloat(e.target.value) || 0 })}
+            onChange={(capacity) => updateProperties({ capacity })}
             placeholder="Per contenitori (es. zaino, baule)"
-            className="mt-1"
+            hint="Lascia vuoto se non è un contenitore"
           />
-          <p className="text-xs text-gray-500 mt-1">Lascia vuoto se non è un contenitore</p>
         </div>
-      </div>
+      </>
     );
   };
 
   const renderCurrencyProperties = () => {
     return (
-      <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <h3 className="font-medium text-gray-700 flex items-center gap-2">
-          <Coins className="w-4 h-4" />
-          Moneta
-        </h3>
-        <p className="text-sm text-gray-500">
-          Le monete sono gestite automaticamente nel sistema di valuta.
-          Il valore viene calcolato in base alla moneta selezionata.
-        </p>
-      </div>
+      <>
+        <ItemPropertyHeader icon={Coins} title="Moneta" />
+        <div className="pt-4">
+          <p className="text-sm text-gray-500">
+            Le monete sono gestite automaticamente nel sistema di valuta.
+            Il valore viene calcolato in base alla moneta selezionata.
+          </p>
+        </div>
+      </>
     );
   };
 
@@ -915,34 +679,31 @@ export default function ItemForm({
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-      {/* Header */}
-      <div className="bg-gray-50 border-b border-gray-200 px-6 py-4">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
-            {subtitle && <p className="text-gray-500 text-sm mt-1">{subtitle}</p>}
-          </div>
-          <div className="flex gap-2">
-            {(onDelete || (mode === 'edit' && itemId)) && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleDelete}
-                disabled={isLoading}
-                className="border-red-300 text-red-600 hover:bg-red-50"
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Elimina
-              </Button>
-            )}
-            <Button type="button" variant="outline" onClick={() => router.back()}>
-              <X className="w-4 h-4 mr-2" />
-              Annulla
+    <AncientContainer
+      title={title}
+      subtitle={subtitle}
+      action={(
+        <div className="flex gap-2">
+          {(onDelete || (mode === 'edit' && itemId)) && !isView && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleDelete}
+              disabled={isLoading}
+              className="border-red-300 text-red-600 hover:bg-red-50"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Elimina
             </Button>
-          </div>
+          )}
+          <Button type="button" variant="outline" onClick={() => router.back()}>
+            <X className="w-4 h-4 mr-2" />
+            {isView ? 'Chiudi' : 'Annulla'}
+          </Button>
         </div>
-      </div>
+      )}
+      contentClassName="p-0"
+    >
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="p-6 space-y-6">
@@ -970,14 +731,14 @@ export default function ItemForm({
             <Select value={selectedType} onValueChange={(value) => setSelectedType(value as ItemType)}>
               <SelectTrigger className="mt-1">
                 {(() => {
-                  const found = itemTypes.find(t => t.value === selectedType);
+                  const found = ITEM_TYPE_OPTIONS.find(t => t.value === selectedType);
                   if (!found) return <SelectValue placeholder="Seleziona tipo" />;
                   const Icon = found.icon;
                   return <span className="flex items-center gap-2"><Icon className="w-4 h-4" /><span>{found.label}</span></span>;
                 })()}
               </SelectTrigger>
               <SelectContent>
-                {itemTypes.map((type) => {
+                {ITEM_TYPE_OPTIONS.map((type) => {
                   const Icon = type.icon;
                   return (
                     <SelectItem key={type.value} value={type.value} label={type.label}>
@@ -1003,14 +764,14 @@ export default function ItemForm({
             >
               <SelectTrigger className="mt-1">
                 {(() => {
-                  const found = rarities.find(r => r.value === formData.rarity);
+                  const found = RARITY_OPTIONS.find(r => r.value === formData.rarity);
                   return found
                     ? <span className={found.color}>{found.label}</span>
                     : <SelectValue placeholder="Seleziona rarità" />;
                 })()}
               </SelectTrigger>
               <SelectContent>
-                {rarities.map((rarity) => (
+                {RARITY_OPTIONS.map((rarity) => (
                   <SelectItem key={rarity.value} value={rarity.value}>
                     <span className={rarity.color}>{rarity.label}</span>
                   </SelectItem>
@@ -1056,9 +817,9 @@ export default function ItemForm({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {currencies.map((curr) => (
-                    <SelectItem key={curr.value} value={curr.value}>
-                      {curr.symbol} {curr.value.toUpperCase()}
+                  {CURRENCY_OPTIONS.map((curr) => (
+                    <SelectItem key={curr.value} value={curr.value} label={curr.label}>
+                      {curr.value.toUpperCase()}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -1108,31 +869,24 @@ export default function ItemForm({
             />
           </div>
         </div>
-
+        <Separator className="h-[2px] bg-amber-400" />
         {/* Proprietà specifiche per tipo */}
         {renderPropertiesByType()}
 
         {/* Pulsante submit */}
-        <div className="flex justify-end pt-4 border-t border-gray-200">
-          <Button
+        <div className="flex justify-end pt-4 border-t border-amber-200">
+          <AntiqueButton
             type="submit"
+            variant="parchment"
+            size="md"
+            icon={<Save className="w-4 h-4" />}
+            loading={isLoading}
             disabled={isLoading}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
           >
-            {isLoading ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                Salvataggio...
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4 mr-2" />
-                {mode === 'edit' ? 'Salva Modifiche' : 'Crea Oggetto'}
-              </>
-            )}
-          </Button>
+            {mode === 'edit' ? 'Salva Modifiche' : 'Crea Oggetto'}
+          </AntiqueButton>
         </div>
       </form>
-    </div>
+    </AncientContainer>
   );
 }

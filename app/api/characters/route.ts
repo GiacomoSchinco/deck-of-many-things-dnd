@@ -1,10 +1,17 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { createServerSupabase } from '@/lib/supabase/server'
-//GET /api/characters -> lista personaggi dell'utente loggato
+import { createServerSupabase, requireAuth, requireAdmin } from '@/lib/supabase/server'
+import type { Database } from '@/lib/supabase/types'
+
+type Tables = Database['public']['Tables']
+
+//GET /api/characters -> lista tutti i personaggi (solo admin)
 export async function GET() {
   const cookieStore = await cookies()
   const supabase = createServerSupabase(cookieStore)
+
+  const { error: adminError } = await requireAdmin(supabase)
+  if (adminError) return adminError
 
   // TUTTI i personaggi (admin)
   const { data: characters, error } = await supabase
@@ -38,11 +45,8 @@ export async function POST(request: Request) {
 
   const supabase = createServerSupabase(cookieStore)
 
-  // 2. Utente non autenticato
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
-  }
+  const { user, error: authError } = await requireAuth(supabase)
+  if (authError) return authError
 
   // 3. Validazione campi obbligatori
   const name = typeof body.name === 'string' ? body.name.trim() : ''
@@ -74,8 +78,8 @@ export async function POST(request: Request) {
 
     // 5. Verifica che raceId e classId esistano
     const [{ error: raceErr }, { error: classErr }] = await Promise.all([
-      supabase.from('races').select('id').eq('id', body.raceId).single(),
-      supabase.from('classes').select('id').eq('id', body.classId).single(),
+      supabase.from('races').select('id').eq('id', body.raceId as number).single(),
+      supabase.from('classes').select('id').eq('id', body.classId as number).single(),
     ])
     if (raceErr) {
       return NextResponse.json({ error: 'Razza non valida' }, { status: 400 })
@@ -98,7 +102,7 @@ export async function POST(request: Request) {
         experience: body.experience || 0,
         background: body.background || null,
         alignment: body.alignment || null,
-      })
+      } as Tables['characters']['Insert'])
       .select()
       .single()
 
@@ -139,7 +143,7 @@ export async function POST(request: Request) {
           initiative_bonus: cs.initiative_bonus ?? 0,
           speed:            cs.speed            ?? 30,
           inspiration:      cs.inspiration      ?? false,
-        })
+        } as Tables['combat_stats']['Insert'])
 
       if (combatError) throw combatError
     }

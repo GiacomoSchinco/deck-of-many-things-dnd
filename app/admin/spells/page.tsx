@@ -8,52 +8,43 @@ import { Button } from "@/components/ui/button";
 import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { useSpells } from "@/hooks/queries/useSpells";
-import type { Spell } from '@/types/spell';
-import { getItalianSchool, getItalianClass } from "@/lib/utils/nameMappers";
-import { Plus, BookOpen, Wand2, ScrollText, Sparkles, Crown, Flame, Shield, Eye, Heart, Moon, Zap, Skull, Brain, Star } from "lucide-react";
+import { SPELL_LEVEL_ORDER, SPELL_SCHOOL_ORDER, SPELL_SCHOOLS, getSchoolMeta, getSpellLevelMeta } from "@/lib/theme/schools";
+import { Axe, BookOpen, Cross, Crosshair, Flame, Hand, Leaf, Music, Plus, ScrollText, Shield, Sparkles, Sword, Swords, Loader2 } from "lucide-react";
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
 // Opzioni per i livelli degli incantesimi
-const levelOptions = [
-  { value: '0', label: 'Trucchetto', icon: Sparkles },
-  { value: '1', label: '1° Livello', icon: Star },
-  { value: '2', label: '2° Livello', icon: Star },
-  { value: '3', label: '3° Livello', icon: Star },
-  { value: '4', label: '4° Livello', icon: Star },
-  { value: '5', label: '5° Livello', icon: Star },
-  { value: '6', label: '6° Livello', icon: Crown },
-  { value: '7', label: '7° Livello', icon: Crown },
-  { value: '8', label: '8° Livello', icon: Crown },
-  { value: '9', label: '9° Livello', icon: Crown },
-];
+const levelOptions = SPELL_LEVEL_ORDER.map((level) => {
+  const meta = getSpellLevelMeta(level);
+  return { value: String(level), label: meta.label, icon: meta.icon };
+});
 
-// Opzioni per le scuole di magia
-const schoolOptions = [
-  { value: 'abjuration', label: 'Abiurazione', icon: Shield, color: 'text-blue-500' },
-  { value: 'conjuration', label: 'Evocazione', icon: Wand2, color: 'text-purple-500' },
-  { value: 'divination', label: 'Divinazione', icon: Eye, color: 'text-indigo-500' },
-  { value: 'enchantment', label: 'Ammaliamento', icon: Heart, color: 'text-pink-500' },
-  { value: 'evocation', label: 'Invocazione', icon: Zap, color: 'text-orange-500' },
-  { value: 'illusion', label: 'Illusione', icon: Moon, color: 'text-cyan-500' },
-  { value: 'necromancy', label: 'Necromanzia', icon: Skull, color: 'text-gray-500' },
-  { value: 'transmutation', label: 'Trasmutazione', icon: Brain, color: 'text-emerald-500' },
-];
+// Opzioni per le scuole di magia — nome, icona e colore da `lib/theme/schools`.
+// Prima questo file aveva una propria mappa di colori, diversa da quella di
+// SpellCard e SpellDetailDialog: la stessa scuola cambiava colore da pagina a
+// pagina.
+const schoolOptions = SPELL_SCHOOL_ORDER.map((value) => ({
+  value,
+  label: SPELL_SCHOOLS[value].it,
+  icon: SPELL_SCHOOLS[value].icon,
+  color: SPELL_SCHOOLS[value].text,
+}));
 
-// Opzioni per le classi
+// Opzioni per le classi. Le emoji sono state sostituite da icone: erano
+// l'ultimo residuo nel progetto e non ereditano colore né dimensione.
 const classOptions = [
-  { value: 'barbarian', label: 'Barbaro', icon: '💪' },
-  { value: 'bard', label: 'Bardo', icon: '🎵' },
-  { value: 'cleric', label: 'Chierico', icon: '✝️' },
-  { value: 'druid', label: 'Druido', icon: '🌿' },
-  { value: 'fighter', label: 'Guerriero', icon: '⚔️' },
-  { value: 'monk', label: 'Monaco', icon: '🥋' },
-  { value: 'paladin', label: 'Paladino', icon: '🛡️' },
-  { value: 'ranger', label: 'Ranger', icon: '🏹' },
-  { value: 'rogue', label: 'Ladro', icon: '🗡️' },
-  { value: 'sorcerer', label: 'Stregone', icon: '✨' },
-  { value: 'warlock', label: 'Warlock', icon: '🔮' },
-  { value: 'wizard', label: 'Mago', icon: '📚' },
+  { value: 'barbarian', label: 'Barbaro', icon: Axe },
+  { value: 'bard', label: 'Bardo', icon: Music },
+  { value: 'cleric', label: 'Chierico', icon: Cross },
+  { value: 'druid', label: 'Druido', icon: Leaf },
+  { value: 'fighter', label: 'Guerriero', icon: Sword },
+  { value: 'monk', label: 'Monaco', icon: Hand },
+  { value: 'paladin', label: 'Paladino', icon: Shield },
+  { value: 'ranger', label: 'Ranger', icon: Crosshair },
+  { value: 'rogue', label: 'Ladro', icon: Swords },
+  { value: 'sorcerer', label: 'Stregone', icon: Sparkles },
+  { value: 'warlock', label: 'Warlock', icon: Flame },
+  { value: 'wizard', label: 'Mago', icon: BookOpen },
 ];
 
 export default function SpellsPage() {
@@ -71,19 +62,25 @@ export default function SpellsPage() {
 
   useEffect(() => {
     const t = setTimeout(() => {
-      setDebouncedFilters({
-        search: query?.trim() ? query.trim() : undefined,
-        level: levelQuery?.trim() ? levelQuery.trim() : undefined,
-        school: schoolQuery?.trim() ? schoolQuery.trim() : undefined,
-        class: classQuery?.trim() ? classQuery.trim() : undefined,
-      });
-    }, 300);
+      // Costruisce l'oggetto senza proprietà undefined per mantenere
+      // la query key stabile e non generare fetch inutili
+      const filters: { search?: string; level?: string; school?: string; class?: string } = {};
+      if (query.trim())   filters.search = query.trim();
+      if (levelQuery)     filters.level  = levelQuery;
+      if (schoolQuery)    filters.school = schoolQuery;
+      if (classQuery)     filters.class  = classQuery;
+      setDebouncedFilters(filters);
+    }, 500);
     return () => clearTimeout(t);
   }, [query, levelQuery, schoolQuery, classQuery]);
 
-  const { data: spells, isLoading } = useSpells(debouncedFilters);
+  const { data: spells, isLoading, isFetching, isError } = useSpells(
+    debouncedFilters,
+    { keepPrevious: true }
+  );
   
   if (isLoading) return <Loading />;
+  if (isError) return <div className="text-center text-red-600 p-8">Errore nel caricamento degli incantesimi.</div>;
 
   return (
     <AncientContainer 
@@ -179,27 +176,32 @@ export default function SpellsPage() {
                   {(() => {
                     const sel = classOptions.find(t => t.value === classQuery);
                     if (!sel) return (<><ScrollText className="w-4 h-4" /><span>Classe</span></>);
-                    return (<><span>{sel.icon}</span><span>{sel.label}</span></>);
+                    const ClsIcon = sel.icon;
+                    return (<><ClsIcon className="w-4 h-4 text-frame" /><span>{sel.label}</span></>);
                   })()}
                 </div>
               </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="" label="Tutte le classi">Tutte le classi</SelectItem>
-              {classOptions.map(opt => (
-                <SelectItem key={opt.value} value={opt.value} label={opt.label}>
-                  <div className="flex items-center gap-2">
-                    <span>{opt.icon}</span>
-                    <span>{opt.label}</span>
-                  </div>
-                </SelectItem>
-              ))}
+              {classOptions.map(opt => {
+                const ClsIcon = opt.icon;
+                return (
+                  <SelectItem key={opt.value} value={opt.value} label={opt.label}>
+                    <div className="flex items-center gap-2">
+                      <ClsIcon className="w-4 h-4 text-frame" />
+                      <span>{opt.label}</span>
+                    </div>
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
         </div>
 
-        {/* Contatore risultati */}
-        <div className="text-sm text-amber-600">
+        {/* Contatore risultati + indicatore di ricerca in corso */}
+        <div className="flex items-center gap-2 text-sm text-ink-muted">
+          {isFetching && <Loader2 className="w-3 h-3 animate-spin" />}
           {spells?.length || 0} incantesimi trovati
         </div>
       </div>
@@ -217,23 +219,21 @@ export default function SpellsPage() {
         }}
         customRenderers={{
           level: (v) => {
-            const level = Number(v);
-            if (level === 0) return <span className="flex items-center gap-1"><Sparkles className="w-3 h-3" /> Trucchetto</span>;
-            return <span>{level}° Livello</span>;
+            const { icon: LvlIcon, label } = getSpellLevelMeta(Number(v));
+            return <span className="flex items-center gap-1"><LvlIcon className="w-3 h-3" /> {label}</span>;
           },
           school: (v) => {
-            const school = String(v || '');
-            const schoolInfo = schoolOptions.find(s => s.value === school);
-            const Icon = schoolInfo?.icon || BookOpen;
+            const school = getSchoolMeta(String(v || ''));
+            const Icon = school.icon;
             return (
-              <span className={`flex items-center gap-1 ${schoolInfo?.color || ''}`}>
+              <span className={`flex items-center gap-1 ${school.text}`}>
                 <Icon className="w-3 h-3" />
-                {getItalianSchool(school)}
+                {school.it}
               </span>
             );
           },
-          ritual: (v) => v ? <span className="text-purple-600">✓ Rituale</span> : null,
-          concentration: (v) => v ? <span className="text-orange-600">✓ Concentrazione</span> : null,
+          ritual: (v) => v ? <span className="text-school-illusion">Rituale</span> : null,
+          concentration: (v) => v ? <span className="text-antique-gold">Concentrazione</span> : null,
         }}
         onRowClick={(id) => router.push(`/admin/spells/${id}`)}
         pagination

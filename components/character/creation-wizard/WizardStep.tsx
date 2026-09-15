@@ -2,21 +2,22 @@
 'use client';
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { WizardNav } from '@/components/shared/WizardNav';
 
 interface WizardStepProps {
   title: string;
   subtitle?: string;
+  /** Icona (componente lucide) mostrata nel medaglione sopra il titolo. */
+  icon?: React.ComponentType<{ className?: string }>;
   onBack?: () => void;
   backLabel?: string;
   onNext?: () => void;
   nextLabel?: string;
   nextDisabled?: boolean;
   nextLoading?: boolean;
-  /** Slot for extra buttons between Back and Next (e.g. "Skip"). */
+  /** Slot per pulsanti extra tra Indietro e Avanti (es. "Salta"). */
   extraActions?: React.ReactNode;
-  /** Wrap children in a <form>; Next button becomes type="submit". */
+  /** Wrappa il contenuto in un <form>; il pulsante Avanti diventa type="submit". */
   asForm?: boolean;
   onFormSubmit?: (e: React.FormEvent) => void;
   children: React.ReactNode;
@@ -25,6 +26,7 @@ interface WizardStepProps {
 export function WizardStep({
   title,
   subtitle,
+  icon: Icon,
   onBack,
   backLabel = '← Indietro',
   onNext,
@@ -37,40 +39,31 @@ export function WizardStep({
   children,
 }: WizardStepProps) {
   const nav = (
-    <div className={`flex pt-4 ${onBack ? 'justify-between' : 'justify-end'}`}>
-      {onBack && (
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onBack}
-          className="border-amber-700 text-amber-700"
-        >
-          {backLabel}
-        </Button>
-      )}
-      <div className="flex gap-2 items-center">
-        {extraActions}
-        <Button
-          type={asForm ? 'submit' : 'button'}
-          onClick={!asForm ? onNext : undefined}
-          disabled={nextDisabled || nextLoading}
-          className="bg-amber-700 hover:bg-amber-800 text-amber-50 disabled:opacity-50"
-        >
-          {nextLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-          {nextLabel}
-        </Button>
-      </div>
-    </div>
+    <WizardNav
+      onBack={onBack}
+      backLabel={backLabel}
+      onNext={onNext}
+      nextLabel={nextLabel}
+      nextDisabled={nextDisabled}
+      nextLoading={nextLoading}
+      extraActions={extraActions}
+      asForm={asForm}
+    />
   );
 
   const inner = (
     <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-serif font-bold text-amber-900 mb-2">{title}</h2>
-        {subtitle && <p className="text-amber-700 text-sm">{subtitle}</p>}
-      </div>
-      {nav}
+      <header className="flex flex-col items-center text-center">
+        {Icon && (
+          <span className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full border border-frame/40 bg-frame-deep text-parchment-100 shadow-raised">
+            <Icon className="h-5 w-5" />
+          </span>
+        )}
+        <h2 className="fantasy-title mb-1 text-2xl">{title}</h2>
+        {subtitle && <p className="fantasy-subtitle">{subtitle}</p>}
+      </header>
       {children}
+      {nav}
     </div>
   );
 

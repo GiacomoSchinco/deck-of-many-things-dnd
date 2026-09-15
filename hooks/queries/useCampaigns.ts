@@ -27,3 +27,29 @@ export function useCampaign(id: string | null) {
     staleTime: 1000 * 60 * 5,
   });
 }
+
+// Campagne dove sei Master
+export function useMasterCampaigns() {
+  return useQuery({
+    queryKey: ['campaigns', 'me', 'master'],
+    queryFn: async () => {
+      const res = await fetch('/api/campaigns/me/master');
+      if (!res.ok) throw new Error('Errore caricamento campagne master');
+      return res.json();
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+// Campagne dove hai personaggi (giocatore)
+export function usePlayerCampaigns() {
+  return useQuery({
+    queryKey: ['campaigns', 'me', 'player'],
+    queryFn: async () => {
+      const res = await fetch('/api/campaigns/me/player');
+      if (!res.ok) throw new Error('Errore caricamento campagne giocatore');
+      return res.json();
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+}

@@ -73,11 +73,13 @@ const AncientCardContainer: React.FC<AncientCardContainerProps> = ({
         <div className="absolute top-1/4 right-1/4 w-8 h-8 bg-amber-800/10 rounded-full blur-sm" />
         <div className="absolute bottom-1/3 left-1/3 w-12 h-12 bg-amber-800/10 rounded-full blur-md" />
 
-        {/* Semi decorativi */}
-        <div className="absolute top-4 left-4 text-3xl text-amber-800/20 pointer-events-none select-none">♠</div>
-        <div className="absolute top-4 right-4 text-3xl text-amber-800/20 pointer-events-none select-none">♣</div>
-        <div className="absolute bottom-4 left-4 text-3xl text-amber-800/20 pointer-events-none select-none">♥</div>
-        <div className="absolute bottom-4 right-4 text-3xl text-amber-800/20 pointer-events-none select-none">♦</div>
+        {/* Semi decorativi agli angoli (forme CSS, invisibili agli screen reader) */}
+        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+          <span className="ornament-diamond absolute top-4 left-4 h-2 w-2 bg-frame/25" />
+          <span className="ornament-diamond absolute top-4 right-4 h-2 w-2 bg-frame/25" />
+          <span className="ornament-diamond absolute bottom-4 left-4 h-2 w-2 bg-frame/25" />
+          <span className="ornament-diamond absolute bottom-4 right-4 h-2 w-2 bg-frame/25" />
+        </div>
 
         {/* Contenuto principale con padding condizionale */}
         <div className={cn(

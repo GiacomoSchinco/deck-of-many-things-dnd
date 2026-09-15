@@ -33,7 +33,7 @@ export function useUpdateCombatStats(characterId: string) {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['combatStats', characterId] });
+      queryClient.invalidateQueries({ queryKey: ['combat-stats', characterId] });
       queryClient.invalidateQueries({ queryKey: ['character', characterId] });
     },
   });

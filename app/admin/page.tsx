@@ -9,6 +9,7 @@ export default function AdminIndexPage() {
 		{ href: '/admin/import-spells', title: 'Import Spells', description: 'Importa incantesimi dal json di riferimento' },
 		{ href: '/admin/items', title: 'Catalogo Oggetti', description: 'Visualizza, modifica e gestisci il catalogo oggetti' },
 		{ href: '/admin/spells', title: 'Catalogo Incantesimi', description: 'Visualizza, modifica e gestisci il catalogo incantesimi' },
+		{ href: '/admin/characters', title: 'Gestione Personaggi', description: 'Visualizza, modifica e gestisci tutti i personaggi' },
 	]
 
 	return (

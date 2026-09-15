@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { ItemPicker } from '@/components/custom/ItemPicker'
+import type { Item } from '@/types/item'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Trash } from 'lucide-react'
@@ -12,7 +13,7 @@ interface ItemRowProps {
   value: number
   name?: string
   quantity: number
-  onSelect: (item: { id: number; name: string }) => void
+  onSelect: (item: Pick<Item, 'id' | 'name'>) => void
   onQuantityChange: (q: number) => void
   onRemove: () => void
   placeholder?: string

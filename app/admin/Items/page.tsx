@@ -8,7 +8,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { useItems } from "@/hooks/queries/useItems";
 import type { Item } from '@/types/item';
 import { getItalianItemType, getItalianCurrency } from "@/lib/utils/nameMappers";
-import { Plus, Sword, Shield, Package, FlaskConical, ArrowUpDown, Wrench, Coins } from "lucide-react";
+import { Plus, Sword, Shield, Package, FlaskConical, ArrowUpDown, Wrench, Coins, Loader2 } from "lucide-react";
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
@@ -29,69 +29,73 @@ export default function ItemsPage() {
 
     useEffect(() => {
         const t = setTimeout(() => {
-            setDebouncedFilters({
-                search: query?.trim() ? query.trim() : undefined,
-                type: typeQuery?.trim() ? typeQuery.trim() : undefined,
-            })
-        }, 300)
+            const filters: { search?: string; type?: string } = {};
+            if (query.trim())  filters.search = query.trim();
+            if (typeQuery)     filters.type   = typeQuery;
+            setDebouncedFilters(filters);
+        }, 500)
         return () => clearTimeout(t)
     }, [query, typeQuery])
 
-    const { data: items, isLoading } = useItems(debouncedFilters);
+    const { data: items, isLoading, isFetching, isError } = useItems(debouncedFilters, { keepPrevious: true });
     if (isLoading) return <Loading />;
+    if (isError) return <div className="text-center text-red-600 p-8">Errore nel caricamento degli oggetti.</div>;
     return (
-        <AncientContainer 
-            title="Catalogo Oggetti" 
-            subtitle="Esplora il vasto catalogo di oggetti magici e non, pronti per essere aggiunti al tuo inventario o utilizzati nelle tue avventure!" 
-            action={<Button 
-              onClick={() => router.push('/admin/items/create')}
-              className="bg-amber-700 hover:bg-amber-800 text-white shadow-md hover:shadow-lg transition-all"
+        <AncientContainer
+            title="Catalogo Oggetti"
+            subtitle="Esplora il vasto catalogo di oggetti magici e non, pronti per essere aggiunti al tuo inventario o utilizzati nelle tue avventure!"
+            action={<Button
+                onClick={() => router.push('/admin/items/create')}
+                className="bg-amber-700 hover:bg-amber-800 text-white shadow-md hover:shadow-lg transition-all"
             >
-              <Plus className="w-4 h-4 mr-2" />
-              Nuovo Oggetto
+                <Plus className="w-4 h-4 mr-2" />
+                Nuovo Oggetto
             </Button>}
             showDecorations={false}>
-                        
-                        <div className="mb-4">
-                            <div className="flex gap-2">
-                                <Input placeholder="Cerca (nome/desc)" value={query} onChange={(e) => setQuery(e.target.value)} />
-                                <Select value={typeQuery ?? ''} onValueChange={(v) => setTypeQuery(v || '')}>
-                                    <SelectTrigger className="w-56">
-                                        <SelectValue placeholder="Tipo (seleziona)">
-                                            <div className="flex items-center gap-2">
-                                                {(() => {
-                                                    const sel = itemTypeOptions.find(t => t.value === typeQuery);
-                                                    if (!sel) return 'Tipo (seleziona)';
-                                                    const Icon = sel.icon;
-                                                    return (
-                                                        <>
-                                                            <Icon className="w-4 h-4" />
-                                                            <span>{sel.label}</span>
-                                                        </>
-                                                    )
-                                                })()}
-                                            </div>
-                                        </SelectValue>
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="" label="Tutti">Tutti</SelectItem>
-                                        {itemTypeOptions.map(opt => {
-                                            const Icon = opt.icon;
-                                            return (
-                                                <SelectItem key={opt.value} value={opt.value} label={opt.label}>
-                                                    <div className="flex items-center gap-2">
-                                                        <Icon className="w-4 h-4" />
-                                                        <span>{opt.label}</span>
-                                                    </div>
-                                                </SelectItem>
-                                            )
-                                        })}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
 
-                        <DataTable
+            <div className="mb-4">
+                <div className="flex gap-2 mb-2">                    <Input placeholder="Cerca (nome/desc)" value={query} onChange={(e) => setQuery(e.target.value)} />
+                    <Select value={typeQuery ?? ''} onValueChange={(v) => setTypeQuery(v || '')}>
+                        <SelectTrigger className="w-56">
+                            <SelectValue placeholder="Tipo (seleziona)">
+                                <div className="flex items-center gap-2">
+                                    {(() => {
+                                        const sel = itemTypeOptions.find(t => t.value === typeQuery);
+                                        if (!sel) return 'Tipo (seleziona)';
+                                        const Icon = sel.icon;
+                                        return (
+                                            <>
+                                                <Icon className="w-4 h-4" />
+                                                <span>{sel.label}</span>
+                                            </>
+                                        )
+                                    })()}
+                                </div>
+                            </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="" label="Tutti">Tutti</SelectItem>
+                            {itemTypeOptions.map(opt => {
+                                const Icon = opt.icon;
+                                return (
+                                    <SelectItem key={opt.value} value={opt.value} label={opt.label}>
+                                        <div className="flex items-center gap-2">
+                                            <Icon className="w-4 h-4" />
+                                            <span>{opt.label}</span>
+                                        </div>
+                                    </SelectItem>
+                                )
+                            })}
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-amber-600">
+                    {isFetching && <Loader2 className="w-3 h-3 animate-spin" />}
+                    {items?.length || 0} oggetti trovati
+                </div>
+            </div>
+
+            <DataTable
                 initialData={(items ?? []) as unknown as Record<string, unknown>[]}
                 visibleColumns={['id', 'name', 'type', 'weight', 'value']}
                 labels={{ id: 'ID', name: 'Nome', type: 'Tipo', weight: 'Peso', value: 'Valore' }}

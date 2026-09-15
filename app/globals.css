@@ -1,4 +1,18 @@
 @import "tailwindcss";
+/* Fornisce animate-in/out, fade-*, zoom-*: senza questo import le classi di
+   animazione dei primitivi (dialog, drawer, dropdown, tooltip) non hanno effetto
+   e i popup restano in stato "ending" invece di sparire. */
+@import "tw-animate-css";
+
+/* Il progetto ha UN SOLO tema (pergamena chiara), ma i componenti di base si
+   portano dietro classi `dark:` di serie. In Tailwind v4 `dark:` si attiva con
+   la preferenza di sistema: su un computer impostato su scuro, una parte
+   dell'interfaccia usava i colori del tema scuro sopra il fondo pergamena —
+   testo slavato e contrasto insufficiente (tab inattive a 3.83:1 invece di
+   5.4:1). Legando la variante alla classe `.dark`, che qui non viene mai
+   impostata, quelle classi diventano inerti e l'aspetto non dipende più dal
+   sistema operativo dell'utente. */
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   /* 🎨 Colori personalizzati */
@@ -19,44 +33,160 @@
   --color-antique-copper: #b87333;
   --color-antique-rust: #8b4513;
 
+  /* 🖋️ Inchiostro — testo e gerarchia */
+  --color-ink: #3a2a1d;
+  --color-ink-strong: #2a1c12;
+  --color-ink-muted: #6f5a41;
+
+  /* 🪵 Materiale — cornici in cuoio/legno */
+  --color-frame: #8b5a2b;
+  --color-frame-deep: #5a3418;
+
   /* Variabili base per componenti shadcn/ui (bg-background, text-foreground, ecc.) */
-  --color-background: hsl(40 30% 96%);
-  --color-foreground: hsl(30 40% 20%);
-  --color-border: hsl(30 30% 70%);
-  --color-ring: hsl(25 60% 35%);
+  --color-background: hsl(40 32% 96%);
+  --color-foreground: hsl(28 30% 18%);
+  --color-border: hsl(32 26% 72%);
+  --color-ring: hsl(33 70% 38%);
 
   /* Primary — oro antico */
-  --color-primary: hsl(38 80% 35%);
-  --color-primary-foreground: hsl(40 30% 96%);
+  --color-primary: hsl(35 72% 32%);
+  --color-primary-foreground: hsl(40 32% 97%);
 
   /* Secondary — pergamena scura */
-  --color-secondary: hsl(35 30% 80%);
-  --color-secondary-foreground: hsl(30 40% 20%);
+  --color-secondary: hsl(36 32% 82%);
+  --color-secondary-foreground: hsl(28 30% 18%);
 
-  /* Muted — sfondo neutro */
-  --color-muted: hsl(0 0% 100%);
-  --color-muted-foreground: hsl(30 25% 45%);
+  /* Muted — superfici recessive */
+  --color-muted: hsl(40 38% 95%);
+  /* Testo secondario dei componenti di base: deve restare leggibile sul fondo
+     pergamena (prima era al 40% di luminosità → 3.83:1, sotto la soglia 4.5) */
+  --color-muted-foreground: hsl(28 24% 33%);
 
   /* Accent */
-  --color-accent: hsl(35 50% 75%);
-  --color-accent-foreground: hsl(30 40% 20%);
+  --color-accent: hsl(36 48% 78%);
+  --color-accent-foreground: hsl(28 30% 18%);
 
   /* Destructive — rosso sangue */
-  --color-destructive: hsl(0 65% 45%);
-  --color-destructive-foreground: hsl(40 30% 96%);
+  --color-destructive: hsl(0 62% 42%);
+  --color-destructive-foreground: hsl(40 32% 97%);
+
+  /* Success — verde muschio, coerente con la pergamena */
+  --color-success: hsl(140 40% 30%);
+
+  /* 🎨 Scuole di magia — pigmenti da manoscritto miniato, non i colori
+     saturi di default. Stessa luminosità e croma contenuta: formano una
+     famiglia coerente e nessuna "urla" sul fondo pergamena.
+     Vincolo: sono usati anche come COLORE DEL TESTO di badge a 12px, quindi
+     la luminosità è tarata per stare sopra 4.5:1 sul fondo pergamena
+     (misurato: prima 4 su 8 erano sotto la soglia, es. trasmutazione 4.24). */
+  --color-school-abjuration: #2a5c8a;
+  --color-school-conjuration: #356a45;
+  --color-school-divination: #286b78;
+  --color-school-enchantment: #8f3f65;
+  --color-school-evocation: #9e4413;
+  --color-school-illusion: #5f4889;
+  --color-school-necromancy: #403840;
+  --color-school-transmutation: #6f5a0e;
+
+  /* Rarità degli oggetti — scala metallica (bronzo → argento → oro → piena) */
+  --color-rarity-common: #6f5a41;
+  --color-rarity-uncommon: #3f7a52;
+  --color-rarity-rare: #2f6ba0;
+  --color-rarity-very-rare: #6f569e;
+  --color-rarity-legendary: #9a6f16;
+  --color-rarity-artifact: #a03a2a;
 
   /* Input e card */
-  --color-input: hsl(35 25% 78%);
-  --color-card: hsl(40 30% 94%);
-  --color-card-foreground: hsl(30 40% 20%);
-  --color-popover: hsl(40 30% 94%);
-  --color-popover-foreground: hsl(30 40% 20%);
+  --color-input: hsl(34 28% 76%);
+  --color-card: hsl(40 32% 95%);
+  --color-card-foreground: hsl(28 30% 18%);
+  --color-popover: hsl(40 32% 95%);
+  --color-popover-foreground: hsl(28 30% 18%);
 
-  /* 📝 Font */
-  --font-serif: 'Cinzel', Georgia, serif;
-  --font-sans: 'Cinzel', sans-serif;
-  --font-fantasy: 'MedievalSharp', cursive;
-  --font-antique: 'IM Fell English', serif;
+  /* 📝 Tipografia — ruoli distinti (display vs interfaccia vs citazione) */
+  --font-display: var(--font-cinzel, 'Cinzel', Georgia, serif);
+  --font-serif: var(--font-cinzel, 'Cinzel', Georgia, serif);
+  --font-sans: var(--font-inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif);
+  --font-quote: var(--font-im-fell, 'IM Fell English', Georgia, serif);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace;
+
+  /* 💡 Luce — mai bianco puro, mai nero puro: la luce è calda, l'ombra è calda */
+  --color-light: #fffdf8;
+  --color-shade: #2e1a0c;
+  --color-hairline: rgba(139, 90, 43, 0.24);
+
+  /* 🪄 Elevazione — scala unica, luce coerente (dall'alto, appena a sinistra).
+     La profondità non nasce da una ombra sola ma dalla stratificazione:
+     ombra di contatto (netta, 1-2px) + ombra ambiente (morbida, diffusa) +
+     luce di bordo superiore (il materiale che "prende" la luce).
+     e0 = a filo · e1 = appoggiata · e2 = pannello · e3 = sollevata ·
+     e4 = sospesa (menu/dialog) · e5 = cerimonia (carte, copertine) */
+  --shadow-e0: 0 1px 0 rgba(255, 255, 255, 0.45), 0 0 0 1px rgba(139, 90, 43, 0.16);
+  --shadow-e1:
+    0 1px 1px rgba(46, 26, 12, 0.1),
+    0 3px 6px -2px rgba(46, 26, 12, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  --shadow-e2:
+    0 1px 1px rgba(46, 26, 12, 0.1),
+    0 6px 14px -4px rgba(46, 26, 12, 0.2),
+    0 16px 32px -18px rgba(46, 26, 12, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  --shadow-e3:
+    0 2px 4px rgba(46, 26, 12, 0.12),
+    0 12px 26px -8px rgba(46, 26, 12, 0.26),
+    0 28px 56px -28px rgba(46, 26, 12, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  --shadow-e4:
+    0 4px 8px rgba(46, 26, 12, 0.14),
+    0 22px 44px -12px rgba(46, 26, 12, 0.32),
+    0 44px 88px -36px rgba(46, 26, 12, 0.46),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  --shadow-e5:
+    0 6px 12px rgba(46, 26, 12, 0.16),
+    0 32px 64px -16px rgba(46, 26, 12, 0.38),
+    0 64px 120px -48px rgba(46, 26, 12, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+
+  /* Superfici "scavate" nel materiale (campi, pozzetti) e stato premuto */
+  --shadow-inset-1:
+    inset 0 1px 2px rgba(46, 26, 12, 0.18),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.5);
+  --shadow-inset-2:
+    inset 0 2px 4px rgba(46, 26, 12, 0.24),
+    inset 0 1px 1px rgba(46, 26, 12, 0.12),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.45);
+  --shadow-press: inset 0 2px 5px rgba(46, 26, 12, 0.32), inset 0 -1px 0 rgba(255, 255, 255, 0.35);
+
+  /* Alias storici rimappati sulla scala: ogni uso già presente nel codice
+     guadagna profondità senza dover toccare i file che li citano. */
+  --shadow-raised: var(--shadow-e2);
+  --shadow-frame: var(--shadow-e4);
+  --shadow-carved: var(--shadow-inset-1);
+  --shadow-emboss: var(--shadow-e1);
+
+  /* 🧱 Materiali — un piano senza gradiente non ha direzione di luce.
+     Contrasto volutamente basso: il rilievo lo fa l'ombra, non il colore. */
+  --material-parchment: linear-gradient(178deg, #fffbf3 0%, #f7ecd6 55%, #f0e0c0 100%);
+  --material-parchment-deep: linear-gradient(178deg, #f7ead0 0%, #eddbb6 60%, #e3cca3 100%);
+  --material-inset: linear-gradient(178deg, rgba(231, 213, 182, 0.5) 0%, rgba(255, 253, 247, 0.8) 100%);
+  --material-leather: linear-gradient(178deg, #8b5a2b 0%, #6d431f 55%, #4a2c14 100%);
+  --material-gold: linear-gradient(178deg, #e6bd5a 0%, #c2942a 52%, #9a6f16 100%);
+
+  /* 🔲 Raggi */
+  --radius-control: 0.5rem;
+  --radius-panel: 0.75rem;
+  --radius-frame: 1rem;
+
+  /* ⏱️ Movimento — quattro velocità, ognuna con un ruolo preciso:
+     quick = feedback (hover/press) · base = cambio di stato ·
+     slow = entrata in scena · ceremony = carte, dialog, momenti "fisici" */
+  --ease-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --duration-quick: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+  --duration-ceremony: 620ms;
 
   /* ✨ Animazioni */
   --animate-float: float 3s ease-in-out infinite;
@@ -92,74 +222,586 @@
   }
 }
 
-/* 🎭 Componenti personalizzati */
+/* � Palette armonizzata — sovrascrive le rampe di default di Tailwind.
+ *
+ * Perché qui e non file per file: nel progetto c'erano 237 classi colore fuori
+ * tema (`text-gray-*`, `bg-blue-600`, `border-slate-*`, ...) sparse in ~45
+ * file, con i grigi freddi di default e i colori saturi di default. Ridefinire
+ * le rampe significa che OGNI utility già scritta — comprese varianti
+ * `hover:`, gradienti `from-/to-` e modificatori di opacità come `bg-blue-600/20`
+ * — risolve su un colore caldo e coerente, senza toccare i file.
+ *
+ * Le rampe sono generate su una scala di luminosità percettiva unica (OKLCH):
+ * la stessa L per ogni famiglia, con la sola tinta che cambia. È questo che fa
+ * sembrare i colori "una famiglia sola" invece di otto palette diverse.
+ *
+ * - Neutri (gray/slate/zinc/neutral/stone) → grigio caldo, tinta 70°, croma
+ *   bassissima: non esistono più grigi freddi nel progetto.
+ * - Cromatici → pigmenti da manoscritto miniato: stessa saturazione contenuta
+ *   per tutti, così restano leggibili sul fondo pergamena e non "urlano".
+ *   Le tinte restano semantiche (rosso = errore/pericolo, verde = successo,
+ *   blu = abilità, viola = rituale, arancio = concentrazione).
+ *
+ * `amber`, `parchment`, `antique`, `ink`, `frame` NON vengono toccati: sono
+ * già i colori del tema.
+ */
+@theme {
+  /* ── Neutri caldi: legno, cenere, cuoio ──────────────────────── */
+  --color-gray-50: oklch(0.975 0.004 70);
+  --color-gray-100: oklch(0.945 0.007 70);
+  --color-gray-200: oklch(0.89 0.011 70);
+  --color-gray-300: oklch(0.82 0.015 70);
+  --color-gray-400: oklch(0.72 0.018 70);
+  --color-gray-500: oklch(0.62 0.021 70);
+  --color-gray-600: oklch(0.53 0.022 70);
+  --color-gray-700: oklch(0.45 0.02 70);
+  --color-gray-800: oklch(0.38 0.017 70);
+  --color-gray-900: oklch(0.31 0.014 70);
+  --color-gray-950: oklch(0.24 0.01 70);
+
+  --color-slate-50: oklch(0.975 0.004 70);
+  --color-slate-100: oklch(0.945 0.007 70);
+  --color-slate-200: oklch(0.89 0.011 70);
+  --color-slate-300: oklch(0.82 0.015 70);
+  --color-slate-400: oklch(0.72 0.018 70);
+  --color-slate-500: oklch(0.62 0.021 70);
+  --color-slate-600: oklch(0.53 0.022 70);
+  --color-slate-700: oklch(0.45 0.02 70);
+  --color-slate-800: oklch(0.38 0.017 70);
+  --color-slate-900: oklch(0.31 0.014 70);
+  --color-slate-950: oklch(0.24 0.01 70);
+
+  --color-zinc-50: oklch(0.975 0.004 70);
+  --color-zinc-100: oklch(0.945 0.007 70);
+  --color-zinc-200: oklch(0.89 0.011 70);
+  --color-zinc-300: oklch(0.82 0.015 70);
+  --color-zinc-400: oklch(0.72 0.018 70);
+  --color-zinc-500: oklch(0.62 0.021 70);
+  --color-zinc-600: oklch(0.53 0.022 70);
+  --color-zinc-700: oklch(0.45 0.02 70);
+  --color-zinc-800: oklch(0.38 0.017 70);
+  --color-zinc-900: oklch(0.31 0.014 70);
+  --color-zinc-950: oklch(0.24 0.01 70);
+
+  --color-neutral-50: oklch(0.975 0.004 70);
+  --color-neutral-100: oklch(0.945 0.007 70);
+  --color-neutral-200: oklch(0.89 0.011 70);
+  --color-neutral-300: oklch(0.82 0.015 70);
+  --color-neutral-400: oklch(0.72 0.018 70);
+  --color-neutral-500: oklch(0.62 0.021 70);
+  --color-neutral-600: oklch(0.53 0.022 70);
+  --color-neutral-700: oklch(0.45 0.02 70);
+  --color-neutral-800: oklch(0.38 0.017 70);
+  --color-neutral-900: oklch(0.31 0.014 70);
+  --color-neutral-950: oklch(0.24 0.01 70);
+
+  --color-stone-50: oklch(0.975 0.004 70);
+  --color-stone-100: oklch(0.945 0.007 70);
+  --color-stone-200: oklch(0.89 0.011 70);
+  --color-stone-300: oklch(0.82 0.015 70);
+  --color-stone-400: oklch(0.72 0.018 70);
+  --color-stone-500: oklch(0.62 0.021 70);
+  --color-stone-600: oklch(0.53 0.022 70);
+  --color-stone-700: oklch(0.45 0.02 70);
+  --color-stone-800: oklch(0.38 0.017 70);
+  --color-stone-900: oklch(0.31 0.014 70);
+  --color-stone-950: oklch(0.24 0.01 70);
+
+  /* ── Pigmenti: rosso vermiglio → ossidiana per gli stati ─────── */
+  --color-red-50: oklch(0.975 0.018 25);
+  --color-red-100: oklch(0.945 0.03 25);
+  --color-red-200: oklch(0.89 0.05 25);
+  --color-red-300: oklch(0.82 0.068 25);
+  --color-red-400: oklch(0.72 0.083 25);
+  --color-red-500: oklch(0.62 0.095 25);
+  --color-red-600: oklch(0.53 0.1 25);
+  --color-red-700: oklch(0.45 0.092 25);
+  --color-red-800: oklch(0.38 0.078 25);
+  --color-red-900: oklch(0.31 0.064 25);
+  --color-red-950: oklch(0.24 0.045 25);
+
+  --color-rose-50: oklch(0.975 0.018 15);
+  --color-rose-100: oklch(0.945 0.03 15);
+  --color-rose-200: oklch(0.89 0.05 15);
+  --color-rose-300: oklch(0.82 0.068 15);
+  --color-rose-400: oklch(0.72 0.083 15);
+  --color-rose-500: oklch(0.62 0.095 15);
+  --color-rose-600: oklch(0.53 0.1 15);
+  --color-rose-700: oklch(0.45 0.092 15);
+  --color-rose-800: oklch(0.38 0.078 15);
+  --color-rose-900: oklch(0.31 0.064 15);
+
+  /* ── Arancio: concentrazione, avvisi caldi ───────────────────── */
+  --color-orange-50: oklch(0.975 0.018 55);
+  --color-orange-100: oklch(0.945 0.03 55);
+  --color-orange-200: oklch(0.89 0.05 55);
+  --color-orange-300: oklch(0.82 0.068 55);
+  --color-orange-400: oklch(0.72 0.083 55);
+  --color-orange-500: oklch(0.62 0.095 55);
+  --color-orange-600: oklch(0.53 0.1 55);
+  --color-orange-700: oklch(0.45 0.092 55);
+  --color-orange-800: oklch(0.38 0.078 55);
+  --color-orange-900: oklch(0.31 0.064 55);
+
+  --color-yellow-50: oklch(0.975 0.016 95);
+  --color-yellow-100: oklch(0.945 0.027 95);
+  --color-yellow-200: oklch(0.89 0.045 95);
+  --color-yellow-300: oklch(0.82 0.061 95);
+  --color-yellow-400: oklch(0.72 0.075 95);
+  --color-yellow-500: oklch(0.62 0.086 95);
+  --color-yellow-600: oklch(0.53 0.09 95);
+  --color-yellow-700: oklch(0.45 0.083 95);
+  --color-yellow-800: oklch(0.38 0.07 95);
+  --color-yellow-900: oklch(0.31 0.058 95);
+
+  /* ── Verdi: successo, conferme, natura ───────────────────────── */
+  --color-green-50: oklch(0.975 0.018 145);
+  --color-green-100: oklch(0.945 0.03 145);
+  --color-green-200: oklch(0.89 0.05 145);
+  --color-green-300: oklch(0.82 0.068 145);
+  --color-green-400: oklch(0.72 0.083 145);
+  --color-green-500: oklch(0.62 0.095 145);
+  --color-green-600: oklch(0.53 0.1 145);
+  --color-green-700: oklch(0.45 0.092 145);
+  --color-green-800: oklch(0.38 0.078 145);
+  --color-green-900: oklch(0.31 0.064 145);
+
+  --color-emerald-50: oklch(0.975 0.018 155);
+  --color-emerald-100: oklch(0.945 0.03 155);
+  --color-emerald-200: oklch(0.89 0.05 155);
+  --color-emerald-300: oklch(0.82 0.068 155);
+  --color-emerald-400: oklch(0.72 0.083 155);
+  --color-emerald-500: oklch(0.62 0.095 155);
+  --color-emerald-600: oklch(0.53 0.1 155);
+  --color-emerald-700: oklch(0.45 0.092 155);
+  --color-emerald-800: oklch(0.38 0.078 155);
+  --color-emerald-900: oklch(0.31 0.064 155);
+
+  --color-lime-50: oklch(0.975 0.016 125);
+  --color-lime-100: oklch(0.945 0.027 125);
+  --color-lime-200: oklch(0.89 0.045 125);
+  --color-lime-300: oklch(0.82 0.061 125);
+  --color-lime-400: oklch(0.72 0.075 125);
+  --color-lime-500: oklch(0.62 0.086 125);
+  --color-lime-600: oklch(0.53 0.09 125);
+  --color-lime-700: oklch(0.45 0.083 125);
+  --color-lime-800: oklch(0.38 0.07 125);
+  --color-lime-900: oklch(0.31 0.058 125);
+
+  /* ── Blu e verde rame: abilità, scuole, informazioni ─────────── */
+  --color-blue-50: oklch(0.975 0.018 250);
+  --color-blue-100: oklch(0.945 0.03 250);
+  --color-blue-200: oklch(0.89 0.05 250);
+  --color-blue-300: oklch(0.82 0.068 250);
+  --color-blue-400: oklch(0.72 0.083 250);
+  --color-blue-500: oklch(0.62 0.095 250);
+  --color-blue-600: oklch(0.53 0.1 250);
+  --color-blue-700: oklch(0.45 0.092 250);
+  --color-blue-800: oklch(0.38 0.078 250);
+  --color-blue-900: oklch(0.31 0.064 250);
+
+  --color-sky-50: oklch(0.975 0.016 230);
+  --color-sky-100: oklch(0.945 0.027 230);
+  --color-sky-200: oklch(0.89 0.045 230);
+  --color-sky-300: oklch(0.82 0.061 230);
+  --color-sky-400: oklch(0.72 0.075 230);
+  --color-sky-500: oklch(0.62 0.086 230);
+  --color-sky-600: oklch(0.53 0.09 230);
+  --color-sky-700: oklch(0.45 0.083 230);
+  --color-sky-800: oklch(0.38 0.07 230);
+  --color-sky-900: oklch(0.31 0.058 230);
+
+  --color-teal-50: oklch(0.975 0.016 195);
+  --color-teal-100: oklch(0.945 0.027 195);
+  --color-teal-200: oklch(0.89 0.045 195);
+  --color-teal-300: oklch(0.82 0.061 195);
+  --color-teal-400: oklch(0.72 0.075 195);
+  --color-teal-500: oklch(0.62 0.086 195);
+  --color-teal-600: oklch(0.53 0.09 195);
+  --color-teal-700: oklch(0.45 0.083 195);
+  --color-teal-800: oklch(0.38 0.07 195);
+  --color-teal-900: oklch(0.31 0.058 195);
+
+  --color-cyan-50: oklch(0.975 0.016 205);
+  --color-cyan-100: oklch(0.945 0.027 205);
+  --color-cyan-200: oklch(0.89 0.045 205);
+  --color-cyan-300: oklch(0.82 0.061 205);
+  --color-cyan-400: oklch(0.72 0.075 205);
+  --color-cyan-500: oklch(0.62 0.086 205);
+  --color-cyan-600: oklch(0.53 0.09 205);
+  --color-cyan-700: oklch(0.45 0.083 205);
+  --color-cyan-800: oklch(0.38 0.07 205);
+  --color-cyan-900: oklch(0.31 0.058 205);
+
+  /* ── Viola e rosa: rituale, ammaliamento, rarità ─────────────── */
+  --color-indigo-50: oklch(0.975 0.018 275);
+  --color-indigo-100: oklch(0.945 0.03 275);
+  --color-indigo-200: oklch(0.89 0.05 275);
+  --color-indigo-300: oklch(0.82 0.068 275);
+  --color-indigo-400: oklch(0.72 0.083 275);
+  --color-indigo-500: oklch(0.62 0.095 275);
+  --color-indigo-600: oklch(0.53 0.1 275);
+  --color-indigo-700: oklch(0.45 0.092 275);
+  --color-indigo-800: oklch(0.38 0.078 275);
+  --color-indigo-900: oklch(0.31 0.064 275);
+
+  --color-violet-50: oklch(0.975 0.019 300);
+  --color-violet-100: oklch(0.945 0.032 300);
+  --color-violet-200: oklch(0.89 0.053 300);
+  --color-violet-300: oklch(0.82 0.072 300);
+  --color-violet-400: oklch(0.72 0.088 300);
+  --color-violet-500: oklch(0.62 0.1 300);
+  --color-violet-600: oklch(0.53 0.106 300);
+  --color-violet-700: oklch(0.45 0.097 300);
+  --color-violet-800: oklch(0.38 0.082 300);
+  --color-violet-900: oklch(0.31 0.067 300);
+
+  --color-purple-50: oklch(0.975 0.019 305);
+  --color-purple-100: oklch(0.945 0.032 305);
+  --color-purple-200: oklch(0.89 0.053 305);
+  --color-purple-300: oklch(0.82 0.072 305);
+  --color-purple-400: oklch(0.72 0.088 305);
+  --color-purple-500: oklch(0.62 0.1 305);
+  --color-purple-600: oklch(0.53 0.106 305);
+  --color-purple-700: oklch(0.45 0.097 305);
+  --color-purple-800: oklch(0.38 0.082 305);
+  --color-purple-900: oklch(0.31 0.067 305);
+
+  --color-pink-50: oklch(0.975 0.018 350);
+  --color-pink-100: oklch(0.945 0.03 350);
+  --color-pink-200: oklch(0.89 0.05 350);
+  --color-pink-300: oklch(0.82 0.068 350);
+  --color-pink-400: oklch(0.72 0.083 350);
+  --color-pink-500: oklch(0.62 0.095 350);
+  --color-pink-600: oklch(0.53 0.1 350);
+  --color-pink-700: oklch(0.45 0.092 350);
+  --color-pink-800: oklch(0.38 0.078 350);
+  --color-pink-900: oklch(0.31 0.064 350);
+
+  --color-fuchsia-50: oklch(0.975 0.018 330);
+  --color-fuchsia-100: oklch(0.945 0.03 330);
+  --color-fuchsia-200: oklch(0.89 0.05 330);
+  --color-fuchsia-300: oklch(0.82 0.068 330);
+  --color-fuchsia-400: oklch(0.72 0.083 330);
+  --color-fuchsia-500: oklch(0.62 0.095 330);
+  --color-fuchsia-600: oklch(0.53 0.1 330);
+  --color-fuchsia-700: oklch(0.45 0.092 330);
+  --color-fuchsia-800: oklch(0.38 0.078 330);
+  --color-fuchsia-900: oklch(0.31 0.064 330);
+}
+
+/* �🎭 Componenti personalizzati */
 @layer components {
-  .antique-card {
-    position: relative;
-    border-radius: 0.5rem;
-    border-width: 2px;
-    border-color: rgb(120 53 15 / 0.3);
-    background: linear-gradient(to bottom right, var(--color-parchment-100), var(--color-parchment-200));
-    padding: 1rem;
-    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  /* ── Tipografia ─────────────────────────────────────────────── */
+  /** Titolo sezione: "Info Personaggio", "Caratteristiche", ... */
+  .fantasy-title {
+    @apply font-serif font-bold;
+    color: var(--color-ink-strong);
+    letter-spacing: -0.01em;
+  }
+  /** Etichetta maiuscola sopra un blocco (occhiello) */
+  .eyebrow {
+    @apply text-xs font-semibold uppercase;
+    font-family: var(--font-sans);
+    letter-spacing: 0.14em;
+    color: var(--color-ink-muted);
+  }
+  /** Sottotitolo / testo descrittivo */
+  .fantasy-subtitle {
+    font-family: var(--font-quote);
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--color-ink-muted);
+  }
+  /** Label inline (etichetta a sinistra nelle righe info) */
+  .fantasy-label {
+    color: var(--color-ink-muted);
+  }
+  /** Valore inline (valore a destra nelle righe info) */
+  .fantasy-value {
+    @apply font-bold;
+    color: var(--color-ink-strong);
+    font-variant-numeric: tabular-nums;
+  }
+  /** Numero o statistica: cifre allineate */
+  .stat-value {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    color: var(--color-ink-strong);
   }
 
-  .decorated-card {
+  /* ── Superfici ─────────────────────────────────────────────── */
+  /** Superficie standard: carta chiara, bordo sottile, ombra calda */
+  .panel {
     position: relative;
+    border-radius: var(--radius-panel);
+    border: 1px solid rgba(139, 90, 43, 0.28);
+    background-image: var(--material-parchment);
+    box-shadow: var(--shadow-e2);
   }
 
-  .decorated-card::before {
+  /** Superficie incassata: area "scavata" nel materiale */
+  .panel-inset {
+    position: relative;
+    border-radius: var(--radius-control);
+    border: 1px solid rgba(139, 90, 43, 0.22);
+    background-image: var(--material-inset);
+    box-shadow: var(--shadow-inset-1);
+  }
+
+  /* ── Scala di profondità ────────────────────────────────────────
+     Un solo vocabolario per ogni contenitore dell'app. Regola: nessun
+     blocco colorato a mano, ogni superficie sceglie un gradino.
+     Le classi qui sotto sono usabili direttamente o via <Surface level={n}>. */
+
+  /** Livello 0 — a filo: separatori, chip neutri */
+  .surface-flat {
+    border-radius: var(--radius-control);
+    border: 1px solid rgba(139, 90, 43, 0.14);
+    background-image: var(--material-parchment);
+    box-shadow: var(--shadow-e0);
+  }
+
+  /** Livello 1 — appoggiata: tessere, righe di elenco, badge grandi */
+  .surface-tile {
+    border-radius: var(--radius-control);
+    border: 1px solid rgba(139, 90, 43, 0.18);
+    background-image: var(--material-parchment);
+    box-shadow: var(--shadow-e1);
+  }
+
+  /** Livello 2 — pannello di sezione (equivalente di .panel) */
+  .surface {
+    border-radius: var(--radius-panel);
+    border: 1px solid rgba(139, 90, 43, 0.22);
+    background-image: var(--material-parchment);
+    box-shadow: var(--shadow-e2);
+  }
+
+  /** Livello 3 — sollevata: toolbar, header, blocchi in evidenza */
+  .surface-raised {
+    border-radius: var(--radius-panel);
+    border: 1px solid rgba(139, 90, 43, 0.26);
+    background-image: var(--material-parchment-deep);
+    box-shadow: var(--shadow-e3);
+  }
+
+  /** Livello 4 — sospesa: dialog, menu, drawer, tooltip */
+  .surface-floating {
+    border-radius: var(--radius-panel);
+    border: 1px solid rgba(139, 90, 43, 0.3);
+    background-image: var(--material-parchment);
+    box-shadow: var(--shadow-e4);
+  }
+
+  /** Incasso profondo: pozzetti, tavole, aree in cui "entra" il contenuto */
+  .surface-well {
+    border-radius: var(--radius-control);
+    border: 1px solid rgba(139, 90, 43, 0.2);
+    background-image: var(--material-inset);
+    box-shadow: var(--shadow-inset-2);
+  }
+
+  /** Cuoio/oro: superfici "nobili" per header e CTA */
+  .surface-leather {
+    border-radius: var(--radius-panel);
+    border: 1px solid rgba(46, 26, 12, 0.55);
+    background-image: var(--material-leather);
+    box-shadow: var(--shadow-e3);
+    color: var(--color-parchment-100);
+  }
+
+  /* ── Metalli ────────────────────────────────────────────────────
+     Un bottone solido deve avere una faccia illuminata e una in ombra,
+     altrimenti resta un rettangolo colorato. Il gradiente a 178° fa
+     questo; l'ombra stratificata lo stacca dal piano. */
+  .metal-primary {
+    background-image: linear-gradient(
+      178deg,
+      color-mix(in oklab, var(--color-primary) 84%, white) 0%,
+      var(--color-primary) 48%,
+      color-mix(in oklab, var(--color-primary) 82%, black) 100%
+    );
+    border-color: color-mix(in oklab, var(--color-primary) 68%, black);
+  }
+
+  .metal-danger {
+    background-image: linear-gradient(
+      178deg,
+      color-mix(in oklab, var(--color-destructive) 84%, white) 0%,
+      var(--color-destructive) 48%,
+      color-mix(in oklab, var(--color-destructive) 80%, black) 100%
+    );
+    border-color: color-mix(in oklab, var(--color-destructive) 68%, black);
+  }
+
+  .metal-gold {
+    background-image: var(--material-gold);
+    border-color: color-mix(in oklab, var(--color-antique-gold) 62%, black);
+    color: #3a2a0d;
+  }
+
+  .metal-parchment {
+    background-image: var(--material-parchment-deep);
+    border-color: rgba(139, 90, 43, 0.32);
+  }
+
+  /* ── Reazioni fisiche ─────────────────────────────────────────── */
+
+  /** Ogni elemento cliccabile si comporta come un oggetto: si solleva e
+     si abbassa. Il movimento è parte del feedback, non decorazione. */
+  .interactive {
+    transition:
+      transform var(--duration-base) var(--ease-soft),
+      box-shadow var(--duration-base) var(--ease-soft),
+      border-color var(--duration-quick) var(--ease-soft),
+      background-color var(--duration-quick) var(--ease-soft);
+  }
+
+  .interactive:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-e3);
+    border-color: rgba(139, 90, 43, 0.34);
+  }
+
+  .interactive:active {
+    transform: translateY(0) scale(0.995);
+    box-shadow: var(--shadow-e1);
+    transition-duration: var(--duration-quick);
+  }
+
+  /** Variante senza sollevamento: solo l'ombra cambia (righe, liste) */
+  .interactive-quiet {
+    transition:
+      box-shadow var(--duration-base) var(--ease-soft),
+      background-color var(--duration-quick) var(--ease-soft);
+  }
+
+  .interactive-quiet:hover {
+    box-shadow: var(--shadow-e2);
+  }
+
+  /** Riflesso diagonale che attraversa la superficie al passaggio del mouse */
+  .sheen {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sheen::after {
     content: '';
     position: absolute;
-    top: 0.5rem;
-    left: 0.5rem;
-    width: 1rem;
-    height: 1rem;
-    border-top-width: 2px;
-    border-left-width: 2px;
-    border-color: rgb(180 83 9 / 0.3);
+    inset: -60% -20%;
+    background: linear-gradient(
+      100deg,
+      transparent 38%,
+      rgba(255, 255, 255, 0.5) 50%,
+      transparent 62%
+    );
+    transform: translateX(-120%);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      transform var(--duration-ceremony) var(--ease-out-expo),
+      opacity var(--duration-base) var(--ease-soft);
   }
 
-  .decorated-card::after {
-    content: '';
-    position: absolute;
-    bottom: 0.5rem;
-    right: 0.5rem;
-    width: 1rem;
-    height: 1rem;
-    border-bottom-width: 2px;
-    border-right-width: 2px;
-    border-color: rgb(180 83 9 / 0.3);
+  .sheen:hover::after {
+    transform: translateX(120%);
+    opacity: 1;
+  }
+
+  /** Titolo in oro battuto: gradiente metallico + incisione.
+     L'oro chiaro su pergamena non si legge (era il caso del nome dell'eroe):
+     la scala qui resta scura, dall'oro brunito al bronzo, così il metallo
+     si vede ma le lettere restano leggibili. */
+  .text-foil {
+    background-image: linear-gradient(180deg, #94700f 0%, #6b4f0a 52%, #3f2d05 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.45));
+  }
+
+  /** Card sezione con sfondo chiaro (step wizard, sezioni scheda) */
+  .fantasy-section {
+    @apply border;
+    border-radius: var(--radius-panel);
+    border-color: rgba(139, 90, 43, 0.24);
+    background-image: var(--material-parchment);
+    box-shadow: var(--shadow-e1);
+  }
+
+  /** Riga label/valore incassata */
+  .fantasy-row {
+    @apply flex items-center justify-between gap-3 px-3 py-2;
+    border-radius: var(--radius-control);
+    border: 1px solid rgba(139, 90, 43, 0.16);
+    background-image: var(--material-inset);
+    box-shadow: var(--shadow-inset-1);
+  }
+
+  /** Intestazione di sezione con separatore ornamentale */
+  .fantasy-section-header {
+    @apply font-serif font-bold mb-4 pb-2 text-center;
+    color: var(--color-ink-strong);
+    border-bottom: 1px solid rgba(139, 90, 43, 0.3);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  /** Medaglione per un'icona decorativa */
+  .fantasy-icon-wrap {
+    @apply inline-flex items-center justify-center mb-4;
+    padding: 0.7rem;
+    border-radius: 9999px;
+    color: var(--color-frame-deep);
+    border: 1px solid rgba(139, 90, 43, 0.35);
+    background-image: linear-gradient(180deg, var(--color-parchment-200), var(--color-parchment-400));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.7),
+      inset 0 -2px 6px rgba(74, 45, 20, 0.18),
+      0 2px 6px rgba(74, 45, 20, 0.2);
+  }
+
+  /** Divisore ornamentale (sostituisce i bordi netti) */
+  .divider-ornate {
+    height: 1px;
+    border: 0;
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      rgba(139, 90, 43, 0.45),
+      transparent
+    );
   }
 
   .parchment-bg {
     background-color: var(--color-parchment-100);
-    background-image: 
+    background-image:
       linear-gradient(45deg, rgba(0,0,0,0.02) 25%, transparent 25%),
       linear-gradient(-45deg, rgba(0,0,0,0.02) 25%, transparent 25%);
     background-size: 4px 4px;
+  }
+
+  /** Grana di carta generata inline: nessuna richiesta di rete */
+  .paper-grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+  }
+
+  /** Rombo ornamentale riutilizzabile */
+  .ornament-diamond {
+    display: inline-block;
+    rotate: 45deg;
+    background-color: color-mix(in oklab, var(--color-frame) 70%, transparent);
   }
 }
 
 /* 🛠️ Utility class */
 @layer utilities {
-  .text-shadow-antique {
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.2), 0 0 10px rgba(184,134,11,0.3);
-  }
-
-  .text-shadow-emboss {
-    text-shadow: 1px 1px 0 #fff, 2px 2px 0 rgba(0,0,0,0.2);
-  }
-
-  .hover-lift {
-    transition-property: transform;
-    transition-duration: 300ms;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .hover-lift:hover {
-    transform: translateY(-0.25rem);
-    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  /** Testo inciso: rilievo appena percettibile, senza bagliore */
+  .text-engraved {
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
   }
 
   .shine-effect {
@@ -188,61 +830,120 @@
 
 /* Base styles */
 @layer base {
-  :root {
-    --background: 40 30% 96%;
-    --foreground: 30 40% 20%;
-    --border: 30 30% 70%;
-    --ring: 25 60% 35%;
-  }
-
   * {
-    border-color: hsl(var(--border));
+    border-color: var(--color-border);
   }
 
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    color: var(--color-ink);
     background-color: var(--color-parchment-100);
-    background-image: 
-      linear-gradient(45deg, rgba(0,0,0,0.02) 25%, transparent 25%),
-      linear-gradient(-45deg, rgba(0,0,0,0.02) 25%, transparent 25%);
+    background-image:
+      linear-gradient(45deg, rgba(0, 0, 0, 0.02) 25%, transparent 25%),
+      linear-gradient(-45deg, rgba(0, 0, 0, 0.02) 25%, transparent 25%);
     background-size: 4px 4px;
-    font-family: var(--font-serif);
+    /* L'interfaccia usa il sans leggibile; i titoli restano in Cinzel */
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-serif);
-    color: rgb(120 53 15);
+    font-family: var(--font-display);
+    color: var(--color-ink-strong);
     font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
   }
 
   h1 {
-    font-size: 2.25rem;
+    font-size: clamp(2rem, 1.4rem + 2.4vw, 3rem);
     font-weight: 700;
     margin-bottom: 1.5rem;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.2), 0 0 10px rgba(184,134,11,0.3);
   }
 
   h2 {
-    font-size: 1.875rem;
+    font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
     margin-bottom: 1.25rem;
   }
 
   h3 {
-    font-size: 1.5rem;
+    font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
     margin-bottom: 1rem;
   }
 
+  /* I link restano riconoscibili dal colore; sottolineatura al passaggio del mouse
+     così le CTA costruite su <Link> non risultano barrate */
   a {
-    color: rgb(146 64 14);
-    text-decoration: underline;
-    text-decoration-color: rgb(180 83 9 / 0.3);
-    text-underline-offset: 2px;
-    transition-property: color;
-    transition-duration: 300ms;
+    color: var(--color-antique-rust);
+    text-underline-offset: 3px;
+    text-decoration-color: color-mix(in oklab, var(--color-antique-gold) 45%, transparent);
+    transition: color var(--duration-quick) var(--ease-soft);
   }
-  
+
   a:hover {
-    color: rgb(217 119 6);
+    color: var(--color-antique-gold);
+    text-decoration-color: currentColor;
+  }
+
+  /* Un solo focus ring per tutta l'app (accessibilità da tastiera) */
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-control);
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--color-antique-gold) 35%, transparent);
+    color: var(--color-ink-strong);
+  }
+
+  /* Scrollbar coerente con il tema invece di quella di sistema */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-frame) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: color-mix(in oklab, var(--color-frame) 55%, transparent);
+    border: 3px solid transparent;
+    border-radius: 9999px;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-frame);
+  }
+
+  /* base-ui lascia montati i popup in fase di chiusura: senza disattivare i
+     pointer events, l'overlay invisibile intercetta i click e la pagina resta
+     bloccata dopo la chiusura di un dialog. */
+  [data-slot$="-overlay"][data-closed],
+  [data-slot$="-overlay"][data-ending-style],
+  [data-slot$="-content"][data-closed],
+  [data-slot$="-content"][data-ending-style] {
+    pointer-events: none;
+  }
+
+  /* Rispetta chi riduce le animazioni a livello di sistema */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }

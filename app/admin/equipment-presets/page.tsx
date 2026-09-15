@@ -7,10 +7,11 @@ import { useEquipmentPresets } from '@/hooks/queries/useEquipmentPresets'
 import { useClasses } from '@/hooks/queries/useClasses'
 import DataTable from '@/components/custom/DataTable'
 import type { DataTableProps } from '@/components/custom/DataTable'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Filter, Package, Calendar, Star } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Circle, Filter, Package, Calendar, Star, Plus, X } from 'lucide-react'
 import Loading from '@/components/custom/Loading'
+import { PageWrapper } from '@/components/layout/PageWrapper'
 import { getItalianClass } from '@/lib/utils/nameMappers'
 
 export default function EquipmentPresetsPage() {
@@ -20,7 +21,7 @@ export default function EquipmentPresetsPage() {
   const [selectedClass, setSelectedClass] = useState<string>('all')
 
   if (isLoading || classesLoading) return <Loading />
-  if (error) return <div className="text-center text-red-500 p-8">Errore: {error.message}</div>
+  if (error) return <div className="text-center text-destructive p-8">Errore: {error.message}</div>
 
   // Filtra per classe se selezionata
   const filteredPresets = selectedClass === 'all' 
@@ -48,71 +49,59 @@ export default function EquipmentPresetsPage() {
   }
 
   return (
-    <div className="container mx-auto p-4 md:p-6 max-w-7xl">
-      <div className="bg-gradient-to-br from-parchment-100 to-parchment-200 rounded-xl border-2 border-amber-900/30 shadow-xl overflow-hidden">
-        {/* Header decorativo */}
-        <div className="bg-amber-900/10 border-b border-amber-900/20 px-6 py-5">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-              <h1 className="text-3xl font-serif font-bold text-amber-900 flex items-center gap-2">
-                <Package className="w-7 h-7 text-amber-700" />
-                Gestione Preset Equipaggiamento
-              </h1>
-              <p className="text-amber-600 text-sm mt-1">
-                Crea e modifica i pacchetti di equipaggiamento iniziale per le classi
-              </p>
-            </div>
-            <Button 
-              onClick={() => router.push('/admin/equipment-presets/create')}
-              className="bg-amber-700 hover:bg-amber-800 text-white shadow-md hover:shadow-lg transition-all"
+    <PageWrapper
+      title="Gestione Preset Equipaggiamento"
+      subtitle="Crea e modifica i pacchetti di equipaggiamento iniziale per le classi"
+      icon={<Package className="w-6 h-6" />}
+      maxWidth="xl"
+      action={
+        <Button onClick={() => router.push('/admin/equipment-presets/create')}>
+          <Plus className="w-4 h-4" />
+          Nuovo Preset
+        </Button>
+      }
+      contentClassName="space-y-6"
+    >
+      {/* Filtro per classe */}
+      <div className="fantasy-section p-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4 text-frame" />
+            <span className="fantasy-label font-serif font-medium">Filtra per classe:</span>
+          </div>
+          <select
+            value={selectedClass}
+            onChange={(e) => setSelectedClass(e.target.value)}
+            className="surface-well px-4 py-2 font-medium text-ink outline-none"
+          >
+            <option value="all">Tutte le classi</option>
+            {classes?.map((cls) => (
+              <option key={cls.id} value={cls.id}>
+                {getItalianClass(cls.name)}
+              </option>
+            ))}
+          </select>
+          {selectedClass !== 'all' && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelectedClass('all')}
             >
-              <Plus className="w-4 h-4 mr-2" />
-              Nuovo Preset
+              <X className="w-4 h-4" />
+              Rimuovi filtro
             </Button>
+          )}
+          <div className="ml-auto text-sm text-ink-muted">
+            <span className="font-semibold text-ink-strong">{filteredPresets?.length || 0}</span> preset trovati
           </div>
         </div>
-
-        <div className="p-6 space-y-6">
-          {/* Filtro per classe - migliorato */}
-          <div className="bg-amber-50/50 rounded-lg border border-amber-200 p-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4 text-amber-600" />
-                <span className="text-amber-800 font-serif font-medium">Filtra per classe:</span>
-              </div>
-              <select
-                value={selectedClass}
-                onChange={(e) => setSelectedClass(e.target.value)}
-                className="px-4 py-2 bg-white border-2 border-amber-300 rounded-lg text-amber-900 font-medium focus:outline-none focus:border-amber-500 transition-colors"
-              >
-                <option value="all">📋 Tutte le classi</option>
-                {classes?.map((cls) => (
-                  <option key={cls.id} value={cls.id}>
-                    {getItalianClass(cls.name)}
-                  </option>
-                ))}
-              </select>
-              {selectedClass !== 'all' && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSelectedClass('all')}
-                  className="text-amber-600 hover:text-amber-800"
-                >
-                  ✖️ Rimuovi filtro
-                </Button>
-              )}
-              <div className="ml-auto text-sm text-amber-500">
-                <span className="font-semibold text-amber-700">{filteredPresets?.length || 0}</span> preset trovati
-              </div>
-            </div>
-          </div>
+      </div>
 
           {/* Statistiche rapide */}
 
           {/* Tabella preset - con stile migliorato */}
           {
-            // Build props as `any` to avoid excess-property issues while DataTable supports customRenderers
+            // Costruisce le props come `any` per evitare errori di proprietà in eccesso mentre DataTable supporta customRenderers
           }
           {(() => {
             type Row = {
@@ -142,26 +131,26 @@ export default function EquipmentPresetsPage() {
               customRenderers: {
                 is_default: (value: unknown) => (
                   (value as boolean)
-                    ? <Star className="w-4 h-4 text-amber-500 fill-amber-500" aria-label="Predefinito" />
-                    : <span className="text-amber-300">○</span>
+                    ? <Star className="w-4 h-4 text-antique-gold fill-antique-gold" aria-label="Predefinito" />
+                    : <Circle className="w-4 h-4 text-ink-muted/40" aria-hidden="true" />
                 ),
                 items_count: (value: unknown) => (
-                  <Badge variant="outline" className="bg-amber-100 text-amber-700 border-amber-300">
+                  <Badge variant="outline" className="surface-tile text-ink-strong">
                     {value as number}
                   </Badge>
                 ),
                 choices_count: (value: unknown) => (
-                  <Badge variant="outline" className="bg-amber-100 text-amber-700 border-amber-300">
+                  <Badge variant="outline" className="surface-tile text-ink-strong">
                     {value as number}
                   </Badge>
                 ),
                 class_name: (value: unknown) => (
-                  <span className="font-medium text-amber-800">{getClassItalian(value as string)}</span>
+                  <span className="font-medium text-ink">{getClassItalian(value as string)}</span>
                 ),
                 name: (value: unknown) => (
                   <div className="flex items-center gap-2">
-                    <Package className="w-4 h-4 text-amber-500" />
-                    <span className="font-medium text-amber-900">{value as string}</span>
+                    <Package className="w-4 h-4 text-frame" />
+                    <span className="font-medium text-ink-strong">{value as string}</span>
                   </div>
                 )
               }
@@ -171,14 +160,12 @@ export default function EquipmentPresetsPage() {
           })()}
 
           {/* Footer decorativo */}
-          <div className="text-center text-xs text-amber-400 pt-4 border-t border-amber-200">
+          <div className="text-center text-xs text-ink-muted pt-4 border-t border-frame/20">
             <p className="flex items-center justify-center gap-2">
               <Calendar className="w-3 h-3" />
               I preset predefiniti vengono automaticamente proposti durante la creazione del personaggio
             </p>
           </div>
-        </div>
-      </div>
-    </div>
+    </PageWrapper>
   )
 }

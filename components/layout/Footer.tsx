@@ -1,14 +1,9 @@
 // components/custom/Footer.tsx
-"use client";
-
 import Link from "next/link";
 import { appMetadata } from "@/lib/metadata";
 import { 
   Dice6, 
   Heart, 
-  Github, 
-  Twitter, 
-  Mail, 
   MapPin, 
   Clock,
   Shield,
@@ -16,33 +11,28 @@ import {
   Users,
   Sword,
   Crown,
+  Key,
   Gem
 } from "lucide-react";
-import { useState } from "react";
 
+// Solo destinazioni che esistono davvero: niente link che portano a un 404.
 const footerLinks = {
   esplora: [
     { href: "/characters", label: "Personaggi", icon: Users },
     { href: "/campaigns", label: "Campagne", icon: BookOpen },
-    { href: "/weapons", label: "Armi & Equipaggiamento", icon: Sword },
+    { href: "/create-character", label: "Crea personaggio", icon: Sword },
     { href: "/dashboard", label: "Dashboard", icon: Crown },
   ],
-  risorse: [
-    { href: "/about", label: "Chi Siamo" },
-    { href: "/guide", label: "Guide e Manuali" },
+  account: [
+    { href: "/login", label: "Accedi" },
+    { href: "/register", label: "Registrati" },
+    { href: "/forgot-password", label: "Password dimenticata" },
     { href: "/credits", label: "Ringraziamenti" },
-    { href: "/faq", label: "Domande Frequenti" },
-  ],
-  legali: [
-    { href: "/privacy", label: "Privacy Policy" },
-    { href: "/terms", label: "Termini di Servizio" },
-    { href: "/cookies", label: "Cookie Policy" },
-    { href: "/contacts", label: "Contatti" },
   ],
 };
 
 export default function Footer() {
-  const [year] = useState(() => new Date().getFullYear());
+  const year = new Date().getFullYear();
 
   return (
     <footer className="relative mt-auto">
@@ -61,12 +51,12 @@ export default function Footer() {
       {/* Bordo decorativo superiore */}
       <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-amber-500 to-transparent" />
       
-      {/* Pattern di carte fluttuanti (decorativo) */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-5">
-        <div className="absolute -top-10 -left-10 text-8xl rotate-12">♠</div>
-        <div className="absolute -bottom-10 -right-10 text-8xl -rotate-12">♣</div>
-        <div className="absolute top-1/3 right-20 text-6xl">♥</div>
-        <div className="absolute bottom-1/3 left-20 text-6xl">♦</div>
+      {/* Carte stilizzate (forme CSS, niente dipendenza dai glifi del sistema) */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.07]">
+        <div className="absolute -top-8 -left-8 h-48 w-32 rotate-12 rounded-xl border-2 border-amber-100" />
+        <div className="absolute -right-10 -bottom-10 h-56 w-36 -rotate-12 rounded-xl border-2 border-amber-100" />
+        <div className="absolute top-1/3 right-20 h-40 w-28 rotate-6 rounded-xl border-2 border-amber-100" />
+        <div className="absolute bottom-1/3 left-20 h-40 w-28 -rotate-6 rounded-xl border-2 border-amber-100" />
       </div>
 
       <div className="container mx-auto px-4 py-12 relative z-10">
@@ -84,29 +74,12 @@ export default function Footer() {
               Gestisci le tue schede personaggio di D&D 5e in modo semplice e intuitivo.
               Crea eroi leggendari, segui le loro avventure e tira i dadi con stile.
             </p>
-            <div className="flex gap-3 pt-2">
-              <a 
-                href="https://github.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-amber-300 hover:text-amber-100 transition-all duration-300 hover:scale-110"
-              >
-                <Github className="h-5 w-5" />
-              </a>
-              <a 
-                href="https://twitter.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-amber-300 hover:text-amber-100 transition-all duration-300 hover:scale-110"
-              >
-                <Twitter className="h-5 w-5" />
-              </a>
-              <a 
-                href="mailto:info@example.com" 
-                className="text-amber-300 hover:text-amber-100 transition-all duration-300 hover:scale-110"
-              >
-                <Mail className="h-5 w-5" />
-              </a>
+            <div className="flex items-center gap-3 pt-2 text-amber-300/80 text-sm">
+              <Link href="/credits" className="hover:text-amber-100 transition-colors">
+                Ringraziamenti
+              </Link>
+              <span className="ornament-diamond h-1 w-1 bg-amber-400/60" aria-hidden="true" />
+              <span>D&D 5e · SRD</span>
             </div>
           </div>
 
@@ -136,14 +109,14 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Risorse */}
+          {/* Account */}
           <div>
             <h3 className="text-amber-100 font-serif text-lg mb-4 flex items-center gap-2">
-              <BookOpen className="h-4 w-4 text-amber-400" />
-              Risorse
+              <Key className="h-4 w-4 text-amber-400" />
+              Account
             </h3>
             <ul className="space-y-2">
-              {footerLinks.risorse.map((link) => (
+              {footerLinks.account.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
@@ -185,13 +158,11 @@ export default function Footer() {
             <div className="w-full border-t border-amber-700/30" />
           </div>
           <div className="relative flex justify-center">
-            <div className="bg-gradient-to-br from-amber-900 to-stone-900 px-4 py-1 rounded-full">
-              <div className="flex items-center gap-2 text-amber-400/60 text-xs">
-                <span>⚔️</span>
-                <span>✧</span>
-                <span>🛡️</span>
-                <span>✧</span>
-                <span>🎲</span>
+            <div className="bg-gradient-to-br from-amber-900 to-stone-900 px-4 py-1.5 rounded-full">
+              <div className="flex items-center gap-2">
+                <span className="ornament-diamond h-1.5 w-1.5 bg-amber-400/60" aria-hidden="true" />
+                <span className="ornament-diamond h-2.5 w-2.5 border border-amber-400/60 bg-transparent" aria-hidden="true" />
+                <span className="ornament-diamond h-1.5 w-1.5 bg-amber-400/60" aria-hidden="true" />
               </div>
             </div>
           </div>
@@ -210,19 +181,12 @@ export default function Footer() {
           </div>
           
           <div className="flex flex-wrap gap-4 justify-center">
-            {footerLinks.legali.map((link, index) => (
-              <span key={link.href} className="flex items-center gap-2">
-                <Link
-                  href={link.href}
-                  className="text-amber-200/60 hover:text-amber-100 transition-colors duration-300 text-xs"
-                >
-                  {link.label}
-                </Link>
-                {index < footerLinks.legali.length - 1 && (
-                  <span className="text-amber-700/50">|</span>
-                )}
-              </span>
-            ))}
+            <Link
+              href="/credits"
+              className="text-amber-200/60 hover:text-amber-100 transition-colors duration-300 text-xs"
+            >
+              Ringraziamenti e licenze
+            </Link>
           </div>
 
           <div className="text-amber-200/60 text-xs flex items-center gap-1">

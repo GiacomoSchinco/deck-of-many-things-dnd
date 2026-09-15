@@ -1,8 +1,10 @@
 // app/credits/page.tsx
 import Link from 'next/link';
-import AncientCardContainer from '@/components/custom/AncientCardContainer';
-import { Button } from '@/components/ui/button';
-import { Heart, ExternalLink, ArrowLeft } from 'lucide-react';
+import { buttonVariants } from '@/components/ui/button-variants';
+import { cn } from '@/lib/utils';
+import { BookOpen, ExternalLink, ArrowLeft, Heart, Image as ImageIcon, PenLine, ScrollText } from 'lucide-react';
+import { PageWrapper } from '@/components/layout/PageWrapper';
+import { AncientScroll } from '@/components/custom/AncientScroll';
 
 export default function CreditsPage() {
   const authors = [
@@ -33,31 +35,22 @@ export default function CreditsPage() {
   ];
 
   return (
-    <main className="min-h-screen parchment-bg py-12">
-      <div className="container mx-auto px-4 max-w-4xl">
-        
-        {/* Torna indietro */}
-        <Link href="/" className="inline-block mb-6">
-          <Button variant="ghost" className="text-amber-700 hover:text-amber-900">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Torna alla Home
-          </Button>
+    <PageWrapper
+      withContainer={false}
+      title="Crediti"
+      subtitle="Fatto con passione, e con molti tiri di dado"
+      action={
+        <Link href="/" className={cn(buttonVariants({ variant: 'ghost' }))}>
+          <ArrowLeft className="h-4 w-4" />
+          Torna alla Home
         </Link>
-
-        {/* Header */}
-        <AncientCardContainer className="p-8 mb-8 text-center">
-          <h1 className="text-4xl font-serif font-bold text-amber-900 mb-4">
-            📜 Crediti
-          </h1>
-          <p className="text-lg text-amber-700 italic flex items-center justify-center gap-2">
-            Fatto con <Heart className="h-5 w-5 text-red-500 fill-red-500" /> e tanti dadi 🎲
-          </p>
-        </AncientCardContainer>
-
+      }
+    >
+      <div className="not-prose space-y-6">
         {/* Icone principali */}
-        <AncientCardContainer className="p-8 mb-8">
-          <h2 className="text-2xl font-serif font-bold text-amber-900 mb-4 flex items-center gap-2">
-            <span className="text-3xl">🎴</span> Game Icons
+        <AncientScroll className="p-8 mb-8">
+          <h2 className="text-2xl fantasy-title mb-4 flex items-center gap-2">
+            <ImageIcon className="w-6 h-6 text-frame" aria-hidden="true" /> Game Icons
           </h2>
           
           <p className="text-amber-800 mb-6 leading-relaxed">
@@ -73,28 +66,28 @@ export default function CreditsPage() {
             , un archivio meraviglioso di icone gratuite per giochi.
           </p>
 
-          <div className="bg-amber-100/50 p-4 rounded-lg border border-amber-900/20">
-            <p className="text-sm text-amber-800 font-mono">
+          <div className="surface-well p-4">
+            <p className="text-sm text-ink font-mono">
               Game icons provided by https://game-icons.net
             </p>
           </div>
-        </AncientCardContainer>
+        </AncientScroll>
 
         {/* Autori */}
-        <AncientCardContainer className="p-8 mb-8">
-          <h2 className="text-2xl font-serif font-bold text-amber-900 mb-6 flex items-center gap-2">
-            <span className="text-3xl">✍️</span> Autori
+        <AncientScroll className="p-8 mb-8">
+          <h2 className="text-2xl fantasy-title mb-6 flex items-center gap-2">
+            <PenLine className="w-6 h-6 text-frame" aria-hidden="true" /> Autori
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {authors.map((author) => (
               <div 
                 key={author.name} 
-                className="flex items-start gap-3 p-4 bg-amber-100/30 rounded-lg border border-amber-900/10 hover:bg-amber-100/50 transition-colors"
+                className="surface-tile interactive-quiet flex items-start gap-3 p-4"
               >
 
                 <div className="flex-1">
-                  <h3 className="font-serif font-bold text-amber-900">
+                  <h3 className="fantasy-title">
                     {author.name}
                   </h3>
                   <a 
@@ -110,12 +103,12 @@ export default function CreditsPage() {
               </div>
             ))}
           </div>
-        </AncientCardContainer>
+        </AncientScroll>
 
         {/* Licenza */}
-        <AncientCardContainer className="p-8 mb-8">
-          <h2 className="text-2xl font-serif font-bold text-amber-900 mb-4 flex items-center gap-2">
-            <span className="text-3xl">📋</span> Licenza
+        <AncientScroll className="p-8 mb-8">
+          <h2 className="text-2xl fantasy-title mb-4 flex items-center gap-2">
+            <ScrollText className="w-6 h-6 text-frame" aria-hidden="true" /> Licenza
           </h2>
 
           <div className="space-y-4 text-amber-800">
@@ -144,12 +137,93 @@ export default function CreditsPage() {
               </a>
             </p>
           </div>
-        </AncientCardContainer>
+        </AncientScroll>
+
+        {/* SRD — Dati di gioco */}
+        <AncientScroll className="p-8 mb-8">
+          <h2 className="text-2xl fantasy-title mb-4 flex items-center gap-2">
+            <BookOpen className="w-6 h-6 text-frame" aria-hidden="true" /> SRD — Dati di Gioco
+          </h2>
+
+          <div className="space-y-4 text-amber-800">
+            <p>
+              Tutti i dati di gioco presenti in questa applicazione (magie, oggetti, equipaggiamento,
+              mostri, classi, razze, talenti e qualsiasi altro contenuto proveniente dal regolamento)
+              sono basati sulle System Reference Document di Dungeons &amp; Dragons 5e e 5.5,
+              rese disponibili da Wizards of the Coast.
+            </p>
+
+            <p>
+              <strong>Licenza:</strong>{' '}
+              <a
+                href="https://creativecommons.org/licenses/by/4.0/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-amber-700 underline hover:text-amber-900"
+              >
+                Creative Commons Attribution 4.0 International (CC BY 4.0)
+              </a>{' '}
+              — <a
+                href="https://creativecommons.org/licenses/by/3.0/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-amber-700 underline hover:text-amber-900"
+              >
+                CC BY 3.0
+              </a>
+            </p>
+
+            <p>
+              Ciò significa che questi contenuti sono liberamente utilizzabili, condivisibili
+              e modificabili, purché venga fornito il credito appropriato a Wizards of the Coast.
+            </p>
+
+            <div className="bg-amber-100/50 p-4 rounded-lg border border-amber-900/20 font-mono text-sm">
+              <p>
+                This work includes material taken from the System Reference Document 5.1 (&quot;SRD 5.1&quot;)
+                and System Reference Document 5.2 (&quot;SRD 5.2&quot;) by Wizards of the Coast LLC.
+              </p>
+              <p className="mt-1">
+                Available at{' '}
+                <a
+                  href="https://dnd.wizards.com/resources/systems-reference-document"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-amber-700 underline hover:text-amber-900"
+                >
+                  dnd.wizards.com
+                </a>
+                .
+              </p>
+              <p className="mt-1">
+                Licensed under{' '}
+                <a
+                  href="https://creativecommons.org/licenses/by/4.0/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-amber-700 underline hover:text-amber-900"
+                >
+                  CC BY 4.0
+                </a>
+                {' '}and{' '}
+                <a
+                  href="https://creativecommons.org/licenses/by/3.0/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-amber-700 underline hover:text-amber-900"
+                >
+                  CC BY 3.0
+                </a>
+                .
+              </p>
+            </div>
+          </div>
+        </AncientScroll>
 
         {/* Ringraziamenti extra */}
-        <AncientCardContainer className="p-8">
-          <h2 className="text-2xl font-serif font-bold text-amber-900 mb-4 flex items-center gap-2">
-            <span className="text-3xl">🙏</span> Ringraziamenti Speciali
+        <AncientScroll variant='rolled' className="p-8">
+          <h2 className="text-2xl fantasy-title mb-4 flex items-center gap-2">
+            <Heart className="w-6 h-6 text-frame" aria-hidden="true" /> Ringraziamenti Speciali
           </h2>
 
           <ul className="space-y-2 text-amber-800">
@@ -173,7 +247,7 @@ export default function CreditsPage() {
               D&D e tutte le proprietà correlate sono di Wizards of the Coast.
             </p>
           </div>
-        </AncientCardContainer>
+        </AncientScroll>
 
         {/* Footer della pagina crediti */}
         <div className="text-center mt-8 text-sm text-amber-500">
@@ -183,6 +257,6 @@ export default function CreditsPage() {
           </p>
         </div>
       </div>
-    </main>
+    </PageWrapper>
   );
 }

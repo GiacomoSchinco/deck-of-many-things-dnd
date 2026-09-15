@@ -299,8 +299,8 @@ export default function TestUIPage() {
             level={5}
             background="Esploratore"
             alignment="Caotico Buono"
-            hp={28}
-            maxhp={38}
+            currentHp={28}
+            maxHp={38}
             isFlippable
           />
 
@@ -312,8 +312,8 @@ export default function TestUIPage() {
             level={7}
             background="Soldato"
             alignment="Legale Neutrale"
-            hp={62}
-            maxhp={78}
+            currentHp={62}
+            maxHp={78}
           />
         </div>
       </div>

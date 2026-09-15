@@ -4,19 +4,23 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button-variants';
 import { AncientScroll } from '@/components/custom/AncientScroll';
 import {
   LogOut,
   Key,
   Sword,
-  Scroll,
-  PlusCircle,
-  User as UserIcon
+  Users,
+  Crown,
+  User,
+  PlusCircle
 } from 'lucide-react';
-import type { User } from '@supabase/supabase-js';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import Loading from '@/components/custom/Loading';
 import { useMyRecentCharacters } from '@/hooks/queries/useCharacter';
+import { PageWrapper } from '@/components/layout/PageWrapper';
+import { cn } from '@/lib/utils';
 
 type DashboardCharacter = {
   id: string;
@@ -27,7 +31,7 @@ type DashboardCharacter = {
 };
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
   const { data: characters, isLoading: isCharactersLoading } = useMyRecentCharacters();
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -74,52 +78,40 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-parchment-100 to-parchment-200 p-6">
-      <div className="max-w-6xl mx-auto">
-        {/* Header con benvenuto */}
-        <div className="flex justify-between items-center mb-8">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-amber-200 rounded-full border-2 border-amber-700 flex items-center justify-center">
-              <UserIcon className="w-6 h-6 text-amber-700" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-serif font-bold text-amber-900">
-                Bentornato, {user.email?.split('@')[0] || 'Avventuriero'}
-              </h1>
-              <p className="text-amber-600 text-sm">
-                Il tuo grimorio personale ti aspetta
-              </p>
-            </div>
-          </div>
-
-          <Button
-            onClick={handleLogout}
-            variant="outline"
-            className="border-amber-700 text-amber-700 hover:bg-amber-100"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Esci
-          </Button>
-        </div>
-
+    <PageWrapper
+      withContainer={false}
+      title={`Bentornato, ${user.email?.split('@')[0] || 'Avventuriero'}`}
+      subtitle="Il tuo grimorio personale ti aspetta"
+      action={
+        <Button
+          onClick={handleLogout}
+          variant="outline"
+          className="border-amber-700 text-amber-700 hover:bg-amber-100"
+        >
+          <LogOut className="w-4 h-4 mr-2" />
+          Esci
+        </Button>
+      }
+    >
+      <div className="space-y-6">
         {/* Statistiche rapide e azioni */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Area account */}
           <AncientScroll className="p-6 h-full">
-            <h2 className="text-xl font-serif font-bold text-amber-900 mb-4 flex items-center gap-2">
+            <h2 className="text-xl fantasy-title mb-4 flex items-center gap-2">
               <Key className="w-5 h-5 text-amber-700" />
               Il Tuo Account
             </h2>
 
             <div className="space-y-4">
-              <div className="p-3 bg-amber-100/50 rounded-lg">
-                <p className="text-sm text-amber-600">Email</p>
-                <p className="text-amber-900 font-mono">{user.email}</p>
+              <div className="panel-inset p-3">
+                <p className="fantasy-label text-sm">Email</p>
+                <p className="font-mono text-ink-strong">{user.email}</p>
               </div>
 
-              <div className="p-3 bg-amber-100/50 rounded-lg">
-                <p className="text-sm text-amber-600">Ultimo accesso</p>
-                <p className="text-amber-900">
+              <div className="panel-inset p-3">
+                <p className="fantasy-label text-sm">Ultimo accesso</p>
+                <p className="text-ink-strong">
                   {new Date(user.last_sign_in_at || '').toLocaleDateString('it-IT', {
                     day: 'numeric',
                     month: 'long',
@@ -130,17 +122,18 @@ export default function DashboardPage() {
                 </p>
               </div>
 
-              <Link href="/reset-password">
-                <Button variant="outline" className="w-full border-amber-700 text-amber-700 hover:bg-amber-100">
-                  <Key className="w-4 h-4 mr-2" />
-                  Cambia Password
-                </Button>
+              <Link
+                href="/reset-password"
+                className={cn(buttonVariants({ variant: 'outline' }), 'w-full')}
+              >
+                <Key className="mr-2 h-4 w-4" />
+                Cambia Password
               </Link>
             </div>
           </AncientScroll>
           {/* Personaggi */}
           <AncientScroll className="p-6 h-full">
-            <h2 className="text-xl font-serif font-bold text-amber-900 mb-4 flex items-center gap-2">
+            <h2 className="text-xl fantasy-title mb-4 flex items-center gap-2">
               <Sword className="w-5 h-5 text-amber-700" />
               Personaggi
             </h2>
@@ -148,28 +141,30 @@ export default function DashboardPage() {
               <div className="flex flex-col h-full">
                 <div className="flex-1 overflow-y-auto pr-2 space-y-3">
                 {characters?.map((character: DashboardCharacter) => (
-                  <div key={character?.id} className="flex items-center gap-3 p-2 hover:bg-amber-100/50 rounded-lg transition-colors">
-                    <div className="w-10 h-10 bg-amber-200 rounded-full border border-amber-700 flex items-center justify-center">
-                      <span className="text-lg">🧝</span>
+                  <div key={character?.id} className="surface-tile interactive-quiet flex items-center gap-3 p-2">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-frame/40 bg-parchment-200 text-frame-deep shadow-emboss">
+                      <User className="h-5 w-5" />
                     </div>
                     <div className="flex-1">
-                      <p className="font-medium text-amber-900">{character?.name}</p>
-                      <p className="text-xs text-amber-600">{character?.classes?.name ?? character?.class ?? ''} · Livello {character?.level}</p>
+                      <p className="font-medium text-ink-strong">{character?.name}</p>
+                      <p className="text-xs text-ink-muted">{character?.classes?.name ?? character?.class ?? ''} · Livello {character?.level}</p>
                     </div>
-                    <Link href={`/characters/${character?.id}`} className="text-amber-700 hover:text-amber-900">
-                      <Button variant="ghost" size="sm">
-                        Visualizza
-                      </Button>
+                    <Link
+                      href={`/characters/${character?.id}`}
+                      className={buttonVariants({ variant: 'ghost', size: 'sm' })}
+                    >
+                      Visualizza
                     </Link>
                   </div>
                 ))}
                 </div>
-                <div>
-                  <Button variant="ghost" className="w-full mt-2 text-amber-700">
-                    <PlusCircle className="w-4 h-4 mr-2" />
-                    Carica altri personaggi
-                  </Button>
-                </div>
+                <Link
+                  href="/characters"
+                  className="mt-3 inline-flex items-center gap-2 text-sm font-medium"
+                >
+                  Vedi tutti i personaggi
+                  <Sword className="h-3.5 w-3.5" />
+                </Link>
               </div>
             </div>
           </AncientScroll>
@@ -177,35 +172,37 @@ export default function DashboardPage() {
 
         </div>
         {/* Griglia azioni rapide */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Link href="/characters">
-            <AncientCardContainer className="p-0 m-8 w-64 h-80 transform hover:scale-105 transition-transform">
-              <div className="p-4 text-center">
-                <div className="text-4xl mb-3">👥</div>
-                <h3 className="font-serif font-bold text-amber-900 mb-2">I Miei Personaggi</h3>
-                <p className="text-sm text-amber-700">Gestisci i tuoi eroi esistenti</p>
+        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
+          <Link href="/characters" className="group">
+            <AncientCardContainer className="h-56 transition-transform duration-300 group-hover:-translate-y-1">
+              <div className="flex h-full flex-col items-center justify-center p-6 text-center">
+                <span className="mb-3 inline-flex h-14 w-14 items-center justify-center rounded-full border border-frame/40 bg-frame-deep text-parchment-100 shadow-raised">
+                  <Users className="h-6 w-6" />
+                </span>
+                <h3 className="fantasy-title mb-2">I Miei Personaggi</h3>
+                <p className="text-sm text-ink-muted">Gestisci i tuoi eroi esistenti</p>
               </div>
             </AncientCardContainer>
           </Link>
-          <Link href="/campaigns">
-            <AncientCardContainer className="p-0 m-8 w-64 h-80 transform hover:scale-105 transition-transform">
-              <div className="h-full flex flex-col items-center justify-center p-6 text-center">
-                <div className="p-4 text-center">
-                  <div className="text-4xl mb-3">🏰</div>
-                  <h3 className="font-serif font-bold text-amber-900 mb-2">Campagne</h3>
-                  <p className="text-sm text-amber-700">Le tue avventure in corso</p>
-                </div>
+          <Link href="/campaigns" className="group">
+            <AncientCardContainer className="h-56 transition-transform duration-300 group-hover:-translate-y-1">
+              <div className="flex h-full flex-col items-center justify-center p-6 text-center">
+                <span className="mb-3 inline-flex h-14 w-14 items-center justify-center rounded-full border border-frame/40 bg-frame-deep text-parchment-100 shadow-raised">
+                  <Crown className="h-6 w-6" />
+                </span>
+                <h3 className="fantasy-title mb-2">Campagne</h3>
+                <p className="text-sm text-ink-muted">Le tue avventure in corso</p>
               </div>
             </AncientCardContainer>
           </Link>
-          <Link href="/create-character">
-            <AncientCardContainer className="p-0 m-8 w-64 h-80 transform hover:scale-105 transition-transform">
-              <div className="h-full flex flex-col items-center justify-center p-6 text-center">
-                <div className="p-4 text-center">
-                  <div className="text-4xl mb-3">🎴</div>
-                  <h3 className="font-serif font-bold text-amber-900 mb-2">Nuovo Personaggio</h3>
-                  <p className="text-sm text-amber-700">Crea un nuovo eroe per la tua avventura</p>
-                </div>
+          <Link href="/create-character" className="group">
+            <AncientCardContainer className="h-56 transition-transform duration-300 group-hover:-translate-y-1">
+              <div className="flex h-full flex-col items-center justify-center p-6 text-center">
+                <span className="mb-3 inline-flex h-14 w-14 items-center justify-center rounded-full border border-frame/40 bg-frame-deep text-parchment-100 shadow-raised">
+                  <PlusCircle className="h-6 w-6" />
+                </span>
+                <h3 className="fantasy-title mb-2">Nuovo Personaggio</h3>
+                <p className="text-sm text-ink-muted">Crea un nuovo eroe per la tua avventura</p>
               </div>
             </AncientCardContainer>
           </Link>
@@ -213,14 +210,14 @@ export default function DashboardPage() {
         
 
         {/* Footer decorativo */}
-        <div className="mt-8 text-center text-sm text-amber-500">
-          <p className="flex items-center justify-center gap-2">
-            <Scroll className="w-4 h-4" />
-            Deck of Many Things - Il tuo grimorio digitale
-            <Scroll className="w-4 h-4" />
-          </p>
+        <div className="mt-8 flex items-center justify-center gap-3 opacity-60">
+          <span className="h-px w-10 bg-frame/40" />
+          <span className="ornament-diamond h-1.5 w-1.5" />
+          <span className="text-sm text-ink-muted">Il tuo grimorio digitale</span>
+          <span className="ornament-diamond h-1.5 w-1.5" />
+          <span className="h-px w-10 bg-frame/40" />
         </div>
       </div>
-    </div>
+    </PageWrapper>
   );
 }

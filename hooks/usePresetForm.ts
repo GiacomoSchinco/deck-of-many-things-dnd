@@ -55,7 +55,7 @@ export function usePresetForm(initialData?: EquipmentPreset) {
 
   const selectedClass = classes?.find((c) => String(c.id) === preset.class_id)
 
-  // ---------- Fixed items ----------
+  // ---------- Oggetti fissi ----------
   const addItem = () =>
     setPreset((p) => ({ ...p, items: [...p.items, createEmptyItem()] }))
 
@@ -70,7 +70,7 @@ export function usePresetForm(initialData?: EquipmentPreset) {
   const removeItem = (index: number) =>
     setPreset((p) => ({ ...p, items: p.items.filter((_, i) => i !== index) }))
 
-  // ---------- Choices ----------
+  // ---------- Scelte ----------
   const addChoice = () =>
     setPreset((p) => ({ ...p, choices: [...p.choices, createEmptyChoice()] }))
 
@@ -122,7 +122,7 @@ export function usePresetForm(initialData?: EquipmentPreset) {
       return { ...p, choices: newChoices }
     })
 
-  // ---------- Submit ----------
+  // ---------- Invio form ----------
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!preset.name || !preset.class_id) {
@@ -136,18 +136,18 @@ export function usePresetForm(initialData?: EquipmentPreset) {
         description: preset.description || null,
         items: preset.items
           .filter(({ item_id }) => item_id > 0)
-          .map(({ item_id, quantity, name }) => ({ item_id, quantity, name })),
+          .map(({ item_id, quantity, name }) => ({ item_id, quantity, name: name ?? 'Oggetto sconosciuto' })),
         choices: preset.choices.map(({ description, count, items }) => ({
           description,
           count,
           items: items
             .filter(({ item_id }) => item_id > 0)
-            .map(({ item_id, quantity, name }) => ({ item_id, quantity, name })),
+            .map(({ item_id, quantity, name }) => ({ item_id, quantity, name: name ?? 'Oggetto sconosciuto' })),
         })),
         is_default: preset.is_default,
       }
       if (preset.id) {
-        await updatePreset.mutateAsync({ id: preset.id, ...payload })
+        await updatePreset.mutateAsync({ id: preset.id, data: { ...payload, id: preset.id } })
         toast.success('Preset aggiornato con successo')
       } else {
         await createPreset.mutateAsync(payload)
@@ -164,7 +164,7 @@ export function usePresetForm(initialData?: EquipmentPreset) {
     setPreset,
     classes,
     selectedClass,
-    // fixed items
+    // oggetti fissi
     addItem,
     updateItem,
     removeItem,

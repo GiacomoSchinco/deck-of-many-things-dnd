@@ -89,7 +89,7 @@ export default function ImportItemsPage() {
           requires_attunement: item.requires_attunement || false,
           category: item.category || null,
           description: item.description || null,
-          properties: item.properties || null
+          properties: (item.properties || null) as unknown as import('@/lib/supabase/types').Json
         }));
         
         // Controlla duplicati

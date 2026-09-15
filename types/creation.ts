@@ -1,25 +1,20 @@
-export interface CreationAbilityScores {
-  strength: number;
-  dexterity: number;
-  constitution: number;
-  intelligence: number;
-  wisdom: number;
-  charisma: number;
-}
+import type { AbilityScores } from './character'
+import type { EquipmentItem } from './equipment'
 
 export interface CreationData {
   name: string;
   playerName: string;
   alignment: string;
   background: string;
-
+  level: number;
   raceId: number | null;
   classId: number | null;
   campaignId: string | null;
 
-  abilityScores: CreationAbilityScores | null;
+  abilityScores: AbilityScores | null;
   skills?: string[];
-  equipment?: Array<Record<string, unknown>>;
+  spells?: string[];        // spell IDs scelti (cantrip + incantesimi)
+  equipment?: EquipmentItem[];
 }
 
 export type CreationStep =
@@ -30,6 +25,7 @@ export type CreationStep =
   | 'abilities'
   | 'skills'
   | 'equipment'
+  | 'spells'
   | 'review';
 
 export default CreationData;

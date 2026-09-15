@@ -1,12 +1,15 @@
 // app/api/classes/route.ts
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { createServerSupabase } from '@/lib/supabase/server'
+import { createServerSupabase, requireAuth } from '@/lib/supabase/server'
 
 export async function GET() {
   const cookieStore = await cookies()
   const supabase = createServerSupabase(cookieStore)
-  
+
+  const { error: authError } = await requireAuth(supabase)
+  if (authError) return authError
+
   const { data: campaigns, error } = await supabase
     .from('campaigns')
     .select(`
@@ -20,4 +23,31 @@ export async function GET() {
   }
 
   return NextResponse.json(campaigns)
+}
+
+export async function POST(request: Request) {
+  const cookieStore = await cookies()
+  const supabase = createServerSupabase(cookieStore)
+  const body = await request.json().catch(() => ({})) as { name?: string; description?: string }
+  const { name, description } = body
+
+  if (!name || name.trim() === '') {
+    return NextResponse.json({ error: 'Il nome della campagna è obbligatorio' }, { status: 400 })
+  }
+
+  // richiede utente autenticato e lo imposta come dungeon master di default
+  const { user, error: authError2 } = await requireAuth(supabase)
+  if (authError2) return authError2
+
+  const { data: campaign, error } = await supabase
+    .from('campaigns')
+    .insert({ name, description: description ?? null, created_by: user!.id, dungeon_master_id: user!.id })
+    .select()
+    .single()
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  return NextResponse.json(campaign)
 }

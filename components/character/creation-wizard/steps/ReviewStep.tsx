@@ -1,17 +1,22 @@
 // components/character/creation-wizard/steps/ReviewStep.tsx
-'use client';
+ 'use client';
 
+import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { CreationData } from '../hooks/useCharacterCreation';
+import { Button } from '@/components/ui/button';
+import type { CreationData } from '@/types/creation';
 import { calculateModifier } from '@/lib/calculations/abilityModifiers';
 import { useCharacterCalculations } from '@/hooks/useCharacterCalculations';
 import { useCampaign } from '@/hooks/queries/useCampaigns';
 import { useSkillList } from '@/hooks/queries/useSkills';
+import { getItalianAbilityFull } from '@/lib/utils/nameMappers';
+import type { ProficiencyType } from '@/types/character';
 import StatDiamond from '@/components/custom/StatDiamond';
 import { RaceClassCard } from '@/components/custom/RaceClassCard';
 import { FanCardGroup } from '@/components/custom/FanCardGroup';
-import { Package, Target } from 'lucide-react';
+import { Package, ScrollText } from 'lucide-react';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
+import { SkillsDisplay } from '@/components/custom/SkillsDisplay';
 import { WizardStep } from '../WizardStep';
 
 interface ReviewStepProps {
@@ -21,58 +26,44 @@ interface ReviewStepProps {
   loading: boolean;
 }
 
-// Mappa per i nomi delle caratteristiche
-const ABILITY_NAMES: Record<string, string> = {
-  strength: 'Forza',
-  dexterity: 'Destrezza',
-  constitution: 'Costituzione',
-  intelligence: 'Intelligenza',
-  wisdom: 'Saggezza',
-  charisma: 'Carisma',
-};
-
-const ABILITY_SHORT: Record<string, string> = {
-  strength: 'FOR',
-  dexterity: 'DES',
-  constitution: 'COS',
-  intelligence: 'INT',
-  wisdom: 'SAG',
-  charisma: 'CAR',
-};
-
 export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
+  const [rollHp, setRollHp] = useState(true);
+  const [seed, setSeed] = useState(0);
+
   const { calculations, isLoading: calcLoading, isReady } = useCharacterCalculations(
     data.raceId ?? null,
     data.classId ?? null,
     data.abilityScores ?? null,
+    data.level ?? 1,
+    rollHp,
+    seed,
   );
   const { data: campaign } = useCampaign(data.campaignId ?? null);
   const { data: allSkills } = useSkillList();
 
-  // Trova i dettagli delle skill selezionate
-  const selectedSkillsDetails = data.skills?.map(skillId => {
-    const skill = allSkills?.find(s => String(s.id) === skillId);
-    if (!skill) return null;
-    
-    const abilityScore = data.abilityScores?.[skill.ability as keyof typeof data.abilityScores] || 10;
-    const abilityModifier = calculateModifier(abilityScore);
-    const proficiencyBonus = 2; // Livello 1
-    
-    return {
-      id: skill.id,
-      name: skill.name_it,
-      ability: skill.ability,
-      abilityShort: ABILITY_SHORT[skill.ability] || skill.ability.slice(0,3).toUpperCase(),
-      abilityModifier: abilityModifier,
-      totalBonus: abilityModifier + proficiencyBonus,
-    };
-  }).filter((s): s is NonNullable<typeof s> => s !== null) ?? [];
+  // Skill selezionate (solo quelle scelte nel wizard)
+  const selectedSkillIds = new Set(data.skills ?? []);
+  const selectedSkills = (allSkills ?? []).filter(s => selectedSkillIds.has(String(s.id)));
+  const selectedSkillsMap = new Map<number, ProficiencyType>(
+    selectedSkills.map(s => [s.id, 'proficient' as ProficiencyType])
+  );
+
+  // Punteggi finali con bonus razza
+  const finalAbilityScores = data.abilityScores ? {
+    strength:     (data.abilityScores.strength     ?? 10) + (calculations?.raceData?.ability_bonuses?.strength     || 0),
+    dexterity:    (data.abilityScores.dexterity    ?? 10) + (calculations?.raceData?.ability_bonuses?.dexterity    || 0),
+    constitution: (data.abilityScores.constitution ?? 10) + (calculations?.raceData?.ability_bonuses?.constitution || 0),
+    intelligence: (data.abilityScores.intelligence ?? 10) + (calculations?.raceData?.ability_bonuses?.intelligence || 0),
+    wisdom:       (data.abilityScores.wisdom       ?? 10) + (calculations?.raceData?.ability_bonuses?.wisdom       || 0),
+    charisma:     (data.abilityScores.charisma     ?? 10) + (calculations?.raceData?.ability_bonuses?.charisma     || 0),
+  } : null;
 
   const equipmentList = data.equipment ?? [];
 
   return (
     <WizardStep
-      title="📜 Riepilogo Personaggio"
+      title="Riepilogo Personaggio"
+      icon={ScrollText}
       subtitle="Controlla i dati prima di creare il tuo eroe"
       onBack={onBack}
       onNext={onSave}
@@ -86,7 +77,7 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
         <div className="space-y-6">
           {/* Header con nome e allineamento */}
           <div className="text-center border-b-2 border-amber-700/30 pb-4">
-            <h1 className="text-3xl font-serif font-bold text-amber-900">
+            <h1 className="text-3xl fantasy-title">
               {data.name || 'Senza Nome'}
             </h1>
             <div className="flex justify-center gap-2 mt-2">
@@ -116,7 +107,7 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
           {/* Caratteristiche */}
           {data.abilityScores && (
             <div>
-              <h3 className="font-serif font-semibold text-amber-900 mb-3 text-center">
+              <h3 className="fantasy-title mb-3 text-center">
                 Caratteristiche
               </h3>
 
@@ -127,7 +118,7 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
                   const finalValue = value + bonus;
                   const modifier = calculateModifier(finalValue);
                   return (
-                    <StatDiamond key={key} label={ABILITY_NAMES[key] ?? key} value={finalValue} modifier={modifier} statKey={key} />
+                    <StatDiamond key={key} label={getItalianAbilityFull(key)} value={finalValue} modifier={modifier} statKey={key} />
                   );
                 })}
               </div>
@@ -139,10 +130,10 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
                   const finalValue = value + bonus;
                   const modifier = calculateModifier(finalValue);
                   return (
-                    <div key={key} className="flex items-center justify-between bg-amber-50 p-3 rounded">
+                    <div key={key} className="fantasy-row">
                       <div>
-                        <div className="text-sm font-semibold text-amber-800">{ABILITY_NAMES[key] ?? key}</div>
-                        <div className="text-lg font-serif font-bold text-amber-900">
+                        <div className="text-sm font-semibold text-amber-800">{getItalianAbilityFull(key)}</div>
+                        <div className="text-lg fantasy-title">
                           {finalValue} <span className="text-sm text-amber-600 ml-2">({modifier >= 0 ? `+${modifier}` : modifier})</span>
                         </div>
                       </div>
@@ -153,40 +144,30 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
             </div>
           )}
 
-          {/* 🆕 COMPETENZE SELEZIONATE CON DETTAGLI */}
-          {selectedSkillsDetails.length > 0 && (
-            <AncientCardContainer className="p-4">
-              <h3 className="font-serif font-bold text-amber-900 mb-3 flex items-center gap-2">
-                <Target className="w-4 h-4" />
-                Competenze di Classe
-                <span className="text-sm font-normal text-amber-500 ml-2">
-                  (Bonus competenza: +{calculations?.proficiencyBonus || 2})
-                </span>
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {selectedSkillsDetails.map((skill, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-2 bg-amber-50 rounded">
-                    <div>
-                      <span className="font-medium text-amber-900">{skill.name}</span>
-                      <p className="text-xs text-amber-600">
-                        {skill.abilityShort} ({skill.abilityModifier >= 0 ? `+${skill.abilityModifier}` : skill.abilityModifier})
-                      </p>
-                    </div>
-                    <Badge className="bg-amber-200 text-amber-900">
-                      +{skill.totalBonus}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-              <p className="text-xs text-amber-500 mt-3 text-center">
-                Bonus totale = modificatore di {selectedSkillsDetails[0]?.abilityShort} + bonus competenza (+2)
-              </p>
-            </AncientCardContainer>
+          {/* Competenze selezionate */}
+          {selectedSkills.length > 0 && finalAbilityScores && (
+            <SkillsDisplay
+              gridCols={2}
+              information={false}
+              skills={selectedSkills}
+              characterSkills={selectedSkillsMap}
+              abilityScores={finalAbilityScores}
+              proficiencyBonus={calculations?.proficiencyBonus ?? 2}
+            />
           )}
 
           {/* Statistiche di combattimento (calcolate) */}
           {isReady && calculations && (
-            <FanCardGroup size="sm">
+            <>
+              <div className="flex justify-center gap-2 mb-3">
+                <Button variant={rollHp ? 'default' : 'ghost'} size="sm" onClick={() => setRollHp(true)}>Tira HP</Button>
+                <Button variant={!rollHp ? 'default' : 'ghost'} size="sm" onClick={() => setRollHp(false)}>Usa media</Button>
+                {rollHp && (
+                  <Button variant="outline" size="sm" onClick={() => setSeed((s) => s + 1)}>Ritira</Button>
+                )}
+              </div>
+
+              <FanCardGroup size="sm">
               <div className="flex flex-col items-center justify-center h-full p-1 text-center">
                 <p className="text-xs text-amber-700">Punti ferita</p>
                 <p className="text-xl font-bold text-amber-900">{calculations.combatStats.max_hp}</p>
@@ -210,18 +191,19 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
                 <p className="text-xl font-bold text-amber-900">+{calculations.proficiencyBonus}</p>
               </div>
             </FanCardGroup>
+            </>
           )}
 
           {/* Equipaggiamento */}
           {equipmentList.length > 0 && (
             <AncientCardContainer className="p-4">
-              <h3 className="font-serif font-bold text-amber-900 mb-3 flex items-center gap-2">
+              <h3 className="fantasy-title mb-3 flex items-center gap-2">
                 <Package className="w-4 h-4" />
                 Equipaggiamento Iniziale
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {equipmentList.map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-2 p-2 bg-amber-50 rounded">
+                  <div key={idx} className="fantasy-row">
                     <Package className="w-4 h-4 text-amber-700" />
                     <span className="text-amber-900 flex-1">{item.name ?? `Item #${item.item_id}`}</span>
                     {item.quantity > 1 && (

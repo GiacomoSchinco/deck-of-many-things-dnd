@@ -1,8 +1,24 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { createServerSupabase } from '@/lib/supabase/server'
+import { createServerSupabase, requireAuth } from '@/lib/supabase/server'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/lib/supabase/types'
 
-//GET /api/characters/[id] -> personaggio specifico con TUTTI i dettagli
+// Helper per verificare se l'utente è admin
+async function isAdmin(supabase: SupabaseClient<Database>) {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return false
+  
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+  
+  return profile?.role === 'admin'
+}
+
+// GET /api/characters/[id] -> personaggio specifico con TUTTI i dettagli
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -12,14 +28,13 @@ export async function GET(
   const supabase = createServerSupabase(cookieStore)
 
   // Ottieni l'utente loggato
-  const { data: { user } } = await supabase.auth.getUser()
-  
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
-  }
+  const { user, error: authError } = await requireAuth(supabase)
+  if (authError) return authError
 
-  // Carica personaggio con TUTTI i dettagli
-  const { data: character, error } = await supabase
+  const admin = await isAdmin(supabase)
+
+  // Costruisci la query base
+  let query = supabase
     .from('characters')
     .select(`
       *,
@@ -38,8 +53,13 @@ export async function GET(
       notes (*)
     `)
     .eq('id', id)
-    .eq('user_id', user.id)
-    .single()
+
+  // Se non è admin, filtra per user_id
+  if (!admin) {
+    query = query.eq('user_id', user!.id)
+  }
+
+  const { data: character, error } = await query.single()
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 404 })
@@ -48,7 +68,7 @@ export async function GET(
   return NextResponse.json(character)
 }
 
-// ✏️ PUT - Aggiornamento personaggio
+// PUT - Aggiornamento personaggio
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -59,16 +79,14 @@ export async function PUT(
 
   const supabase = createServerSupabase(cookieStore)
 
-  // Ottieni l'utente loggato
-  const { data: { user } } = await supabase.auth.getUser()
-  
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
-  }
+  const { user: userPut, error: authErrorPut } = await requireAuth(supabase)
+  if (authErrorPut) return authErrorPut
+
+  const admin = await isAdmin(supabase)
 
   try {
-    // Aggiorna personaggio
-    const { data: character, error: charError } = await supabase
+    // Costruisci la query di update
+    let updateQuery = supabase
       .from('characters')
       .update({
         name: body.name,
@@ -82,9 +100,13 @@ export async function PUT(
         alignment: body.alignment,
       })
       .eq('id', id)
-      .eq('user_id', user.id)
-      .select()
-      .single()
+
+    // Se non è admin, filtra per user_id
+    if (!admin) {
+      updateQuery = updateQuery.eq('user_id', userPut!.id)
+    }
+
+    const { data: character, error: charError } = await updateQuery.select().single()
 
     if (charError) throw charError
 
@@ -109,10 +131,8 @@ export async function PUT(
     if (body.combatStats) {
       const { error: combatError } = await supabase
         .from('combat_stats')
-        .upsert({
-          character_id: id,
-          ...body.combatStats
-        })
+        .update(body.combatStats)
+        .eq('character_id', id)
 
       if (combatError) throw combatError
     }
@@ -128,25 +148,31 @@ export async function PUT(
   }
 }
 
-// 🗑️ DELETE - Eliminazione personaggio
+// DELETE - Eliminazione personaggio
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const cookieStore = await cookies()
+  const { id } = await params
   const supabase = createServerSupabase(cookieStore)
 
-  const { data: { user } } = await supabase.auth.getUser()
-  
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
-  }
+  const { user: userDel, error: authErrorDel } = await requireAuth(supabase)
+  if (authErrorDel) return authErrorDel
 
-  const { error } = await supabase
+  const admin = await isAdmin(supabase)
+
+  let deleteQuery = supabase
     .from('characters')
     .delete()
     .eq('id', id)
-    .eq('user_id', user.id)
+
+  // Se non è admin, filtra per user_id
+  if (!admin) {
+    deleteQuery = deleteQuery.eq('user_id', userDel!.id)
+  }
+
+  const { error } = await deleteQuery
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })

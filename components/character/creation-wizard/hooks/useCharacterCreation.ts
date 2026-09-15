@@ -1,177 +1,220 @@
 // components/character/creation-wizard/hooks/useCharacterCreation.ts
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { useCreateCharacter } from '@/hooks/mutations/useCharacterMutations';
+import { useCreateCharacter, useDeleteCharacter } from '@/hooks/mutations/useCharacterMutations';
 import { useSkillMutations } from '@/hooks/mutations/useSkillMutations';
 import { useCharacterCalculations } from '@/hooks/useCharacterCalculations';
 import { useInventoryMutations } from '@/hooks/mutations/useInventoryMutations';
+import { useApplySavingThrows } from '@/hooks/mutations/useSavingThrowMutations';
+import { useAddCharacterSpells, useInitSpellSlots } from '@/hooks/mutations/useCharacterSpellMutations';
 import { useCreationStore } from '@/store/useCreationStore';
 import type { CreationStep } from '@/types/creation';
+import { getSpellProgression } from '@/lib/rules/spellcasting';
+import type { SpellCastingClass } from '@/lib/rules/spellcasting';
+import { getEnglishClass } from '@/lib/utils/nameMappers';
+
+// Ordine canonico degli step del wizard
+const BASE_STEPS: CreationStep[] = [
+  'basic-info', 'race', 'class', 'campaign',
+  'abilities', 'skills', 'equipment', 'spells', 'review',
+];
 
 export function useCharacterCreation() {
   const router = useRouter();
-  const createCharacter = useCreateCharacter();
-  const skillMutations = useSkillMutations();
-  const inventoryMutations = useInventoryMutations();
 
-  const { currentStep, data, setStep, updateData, reset, _hasHydrated } = useCreationStore();
+  // Controlla l'intero flusso di salvataggio (creazione + post-steps).
+  // Usato per bloccare il wizard con un overlay di loading finché non si
+  // naviga alla pagina del personaggio o si torna in stato di errore.
+  const [isSaving, setIsSaving] = useState(false);
+
+  // ─── Mutations ────────────────────────────────────────────────────────────
+  const createCharacter    = useCreateCharacter();
+  const deleteCharacter    = useDeleteCharacter();
+  const skillMutations     = useSkillMutations();
+  const inventoryMutations = useInventoryMutations();
+  const addSpells          = useAddCharacterSpells();
+  const initSpellSlots     = useInitSpellSlots();
+  const applySavingThrows  = useApplySavingThrows();
+
+  // ─── Store & calcoli derivati ─────────────────────────────────────────────
+  const currentStep  = useCreationStore((s) => s.currentStep);
+  const data         = useCreationStore((s) => s.data);
+  const setStep      = useCreationStore((s) => s.setStep);
+  const updateData   = useCreationStore((s) => s.updateData);
+  const reset        = useCreationStore((s) => s.reset);
+  const isHydrated   = useCreationStore((s) => s.hasHydrated);
 
   const calculations = useCharacterCalculations(
-    data.raceId ?? null,
-    data.classId ?? null,
+    data.raceId   ?? null,
+    data.classId  ?? null,
     data.abilityScores ?? null,
+    data.level    ?? 1,
   );
 
-  const steps: CreationStep[] = ['basic-info', 'race', 'class', 'campaign', 'abilities', 'skills', 'equipment', 'review'];
-  
-  const nextStep = () => {
-    const currentIndex = steps.indexOf(currentStep);
-    if (currentIndex < steps.length - 1) {
-      setStep(steps[currentIndex + 1]);
+  // ─── Step attivi ──────────────────────────────────────────────────────────
+  // Rimuove lo step 'spells' se la classe non ha spellcasting o se il flag è attivo
+  const steps: CreationStep[] = (() => {
+    const { classData } = calculations.calculations ?? {};
+    const skipFlag = process.env.NEXT_PUBLIC_SKIP_SPELLS_STEP === '1'
+                  || process.env.NEXT_PUBLIC_SKIP_SPELLS_STEP === 'true';
+    if (skipFlag || (classData && !classData.spellcasting))
+      return BASE_STEPS.filter(s => s !== 'spells');
+    return BASE_STEPS;
+  })();
+
+  // ─── Navigazione wizard ───────────────────────────────────────────────────
+  const idx      = steps.indexOf(currentStep);
+  const nextStep = () => idx < steps.length - 1 && setStep(steps[idx + 1]);
+  const prevStep = () => idx > 0                 && setStep(steps[idx - 1]);
+
+  // ─── Salvataggio dati aggiuntivi ──────────────────────────────────────────
+  /**
+   * Salva in sequenza ciò che non fa parte del record principale:
+   * skill, inventario, tiri salvezza, incantesimi, spell slot iniziali.
+   * Se una qualsiasi sotto-operazione fallisce, lancia un'eccezione così che
+   * il chiamante possa gestire il rollback (eliminazione del personaggio).
+   */
+  const savePostCreationData = async (characterId: string) => {
+    const { classData } = calculations.calculations ?? {};
+
+    // 1) Skill di competenza scelte dal giocatore
+    if (data.skills?.length) {
+      await skillMutations.create.mutateAsync({
+        characterId,
+        skills: data.skills.map(id => ({ skill_id: parseInt(id, 10), proficiency_type: 'proficient' as const })),
+      });
+    }
+
+    // 2) Equipaggiamento iniziale
+    if (data.equipment?.length) {
+      const items = data.equipment
+        .map(item => ({ item_id: item.item_id, quantity: Math.max(1, item.quantity) }))
+        .filter(i => i.item_id > 0);
+
+      if (items.length) await inventoryMutations.create.mutateAsync({ characterId, items });
+    }
+
+    // 3) Tiri salvezza garantiti dalla classe
+    if (classData?.saving_throws?.length) {
+      await applySavingThrows.mutateAsync({
+        characterId,
+        savingThrows: classData.saving_throws.map((ability: string) => ({ ability, proficient: true })),
+      });
+    }
+
+    // 4) Incantesimi noti scelti nel wizard
+    if (data.spells?.length) {
+      const spellIds = data.spells.map(id => parseInt(id, 10)).filter(id => !isNaN(id));
+      if (spellIds.length) await addSpells.mutateAsync({ characterId, spellIds });
+    }
+
+    // 5) Spell slot iniziali (da regole locali, senza DB)
+    if (classData?.spellcasting) {
+      const englishClass = getEnglishClass(classData.name) as SpellCastingClass;
+      const spellAbility = classData.spellcasting.spellcasting_ability as 'intelligence' | 'wisdom' | 'charisma';
+      const score = data.abilityScores?.[spellAbility] ?? 10;
+      const abilityMod = Math.floor((score - 10) / 2);
+      const prog = getSpellProgression(englishClass, data.level ?? 1, abilityMod);
+
+      const slots = Object.entries(prog.spellSlots)
+        .map(([lvl, n]) => ({ spell_level: Number(lvl), total_slots: n, used_slots: 0 }))
+        .filter(s => s.total_slots > 0);
+
+      // Warlock: pact magic
+      if (prog.pactMagic && prog.pactMagic.slots > 0) {
+        slots.push({ spell_level: prog.pactMagic.level, total_slots: prog.pactMagic.slots, used_slots: 0 });
+      }
+
+      if (slots.length) await initSpellSlots.mutateAsync({ characterId, slots });
     }
   };
 
-  const prevStep = () => {
-    const currentIndex = steps.indexOf(currentStep);
-    if (currentIndex > 0) {
-      setStep(steps[currentIndex - 1]);
-    }
-  };
-
-  const goToStep = (step: CreationStep) => {
-    setStep(step);
-  };
-
+  // ─── Salvataggio personaggio ──────────────────────────────────────────────
+  /**
+   * Flusso:
+   *  1. Imposta isSaving = true → il wizard mostra il loading overlay
+   *  2. Crea il personaggio principale
+   *  3. Salva i dati collegati (skill, inventario, ecc.)
+   *  4. Successo  → reset store + naviga alla scheda personaggio
+   *  5. Qualsiasi errore → elimina il personaggio se è stato creato (rollback),
+   *     mostra il toast di errore, NON resetta lo store (l'utente può correggere
+   *     e riprovare senza reinserire tutto)
+   */
   const saveCharacter = async () => {
     if (!data.name || !data.raceId || !data.classId || !data.abilityScores) {
-      toast.error('Dati incompleti');
-      return;
+      toast.error('Dati incompleti'); return;
     }
-
     if (!calculations.calculations) {
-      toast.error('Calcoli non pronti, riprova tra un momento');
-      return;
+      toast.error('Calcoli non pronti, riprova tra un momento'); return;
     }
 
-    createCharacter.mutate(
-      {
-        name: data.name,
-        playerName: data.playerName || undefined,
-        campaignId: data.campaignId || undefined,
-        raceId: String(data.raceId),
-        classId: String(data.classId),
-        level: 1,
-        experience: 0,
-        background: data.background || undefined,
-        alignment: data.alignment || undefined,
-        abilityScores: (() => {
-          const bonuses: Record<string, number> = calculations.calculations.raceData?.ability_bonuses || {};
-          const base = data.abilityScores!;
-          return {
-            strength:     base.strength     + (bonuses['strength']     || 0),
-            dexterity:    base.dexterity    + (bonuses['dexterity']    || 0),
-            constitution: base.constitution + (bonuses['constitution'] || 0),
-            intelligence: base.intelligence + (bonuses['intelligence'] || 0),
-            wisdom:       base.wisdom       + (bonuses['wisdom']       || 0),
-            charisma:     base.charisma     + (bonuses['charisma']     || 0),
-          };
-        })(),
-        combatStats: calculations.calculations.combatStats,
-      },
-      {
-        onSuccess: async (character) => {
-          toast.success('Personaggio creato!');
+    // Applica i bonus razziali alle statistiche base
+    const bonuses: Record<string, number> = calculations.calculations.raceData?.ability_bonuses ?? {};
+    const base = data.abilityScores;
+    const withBonuses = {
+      strength:     base.strength     + (bonuses.strength     ?? 0),
+      dexterity:    base.dexterity    + (bonuses.dexterity    ?? 0),
+      constitution: base.constitution + (bonuses.constitution ?? 0),
+      intelligence: base.intelligence + (bonuses.intelligence ?? 0),
+      wisdom:       base.wisdom       + (bonuses.wisdom       ?? 0),
+      charisma:     base.charisma     + (bonuses.charisma     ?? 0),
+    };
 
-          try {
-            // 1) Save selected skills (if any) using mutations
-            if (data.skills && data.skills.length > 0) {
-              const skillsToInsert = data.skills.map((skillId) => ({
-                skill_id: parseInt(skillId, 10),
-                proficiency_type: 'proficient' as const,
-              }));
+    setIsSaving(true);
+    let createdId: string | null = null;
 
-              try {
-                await skillMutations.create.mutateAsync({ characterId: character.id, skills: skillsToInsert });
-              } catch (e) {
-                console.error('Errore salvataggio skill (mutation):', e);
-              }
-            }
+    try {
+      const character = await createCharacter.mutateAsync({
+        name:          data.name,
+        playerName:    data.playerName  || undefined,
+        campaignId:    data.campaignId  || undefined,
+        raceId:        String(data.raceId),
+        classId:       String(data.classId),
+        level:         data.level ?? 1,
+        experience:    0,
+        background:    data.background  || undefined,
+        alignment:     data.alignment   || undefined,
+        abilityScores: withBonuses,
+        combatStats:   calculations.calculations.combatStats,
+      });
 
-            // 2) If equipment was selected during creation, save inventory server-side
-            // Il server legge tutti i dati (name, description, properties, type, weight) dal catalogo items
-            if (data.equipment && data.equipment.length > 0) {
-              const itemsDetails = data.equipment
-                .map((item) => {
-                  const itemObj = item as Record<string, unknown>;
-                  const rawId = itemObj['item_id'];
-                  const itemId: number | null = typeof rawId === 'string'
-                    ? (rawId.trim() === '' ? null : parseInt(rawId, 10))
-                    : (typeof rawId === 'number' ? rawId : null);
-                  const qty = Math.max(1, Math.trunc(Number(itemObj['quantity'] ?? 1) || 1));
-                  return itemId !== null ? { item_id: itemId, quantity: qty } : null;
-                })
-                .filter((i): i is { item_id: number; quantity: number } => i !== null);
+      createdId = character.id;
+      await savePostCreationData(character.id);
 
-              try {
-                const payload = await inventoryMutations.create.mutateAsync({ characterId: character.id, items: itemsDetails });
-                console.log(`✅ Inventario salvato: ${payload?.inserted ?? 0} oggetti`);
-              } catch (e) {
-                console.error('Errore salvataggio inventario (mutation):', e);
-              }
-            }
+      // Tutto ok: reset store e naviga
+      reset();
+      router.push(`/characters/${character.id}`);
 
-            // 3) Save class saving throws
-            const savingThrows = calculations.calculations?.classData?.saving_throws;
-            if (savingThrows && savingThrows.length > 0) {
-              try {
-                const res = await fetch(`/api/characters/${character.id}/saving-throws`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    saving_throws: savingThrows.map((ability: string) => ({
-                      ability,
-                      proficient: true,
-                    })),
-                  }),
-                });
-                if (!res.ok) {
-                  const err = await res.json();
-                  throw new Error(err.error || 'Errore salvataggio tiri salvezza');
-                }
-                console.log(`✅ Tiri salvezza salvati: ${savingThrows.join(', ')}`);
-              } catch (e) {
-                console.error('Errore salvataggio tiri salvezza:', e);
-              }
-            }
-          } catch (e) {
-            console.error(e);
-            toast.error('Errore durante il salvataggio aggiuntivo');
-          } finally {
-            reset();
-            router.push(`/characters/${character.id}`);
-          }
-        },
-        onError: (err) => {
-          toast.error(err instanceof Error ? err.message : 'Errore durante il salvataggio');
-        },
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Errore durante il salvataggio';
+      toast.error(msg);
+
+      // Rollback: elimina il personaggio se era già stato creato sul server
+      if (createdId) {
+        await deleteCharacter.mutateAsync(createdId).catch(() => {});
       }
-    );
+
+      // NON resettiamo lo store: i dati dell'utente rimangono intatti per un nuovo tentativo
+      setIsSaving(false);
+    }
   };
 
   return {
     currentStep,
+    steps,
+    stepIndex:    idx,
     data,
-    loading: createCharacter.isPending,
+    loading:      isSaving,
     updateData,
     nextStep,
     prevStep,
-    goToStep,
     saveCharacter,
     calculations,
-    isFirstStep: currentStep === 'basic-info',
-    isLastStep: currentStep === 'review',
-    isHydrated: _hasHydrated,
+    isFirstStep:  currentStep === 'basic-info',
+    isLastStep:   currentStep === 'review',
+    isHydrated,
   };
 }

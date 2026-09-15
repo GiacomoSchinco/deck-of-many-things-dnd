@@ -7,6 +7,25 @@ import { Button } from '@/components/ui/button';
 import AncientContainer from '@/components/custom/AncientContainer';
 import { AlertCircle, CheckCircle, Loader2, BookOpen, Database, Sparkles } from 'lucide-react';
 
+// Forma dei record presenti in public/spells.json
+interface ImportedSpell {
+  name: string;
+  level: number;
+  school: string;
+  casting_time?: string | null;
+  range?: string | null;
+  components?: string[];
+  duration?: string | null;
+  description?: string | null;
+  description_it?: string | null;
+  cantrip_upgrade?: string | null;
+  higher_level_slot?: string | null;
+  material?: boolean | null;
+  ritual?: boolean | null;
+  concentration?: boolean | null;
+  classes?: string[];
+}
+
 export default function ImportSpellsPage() {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0 });
@@ -34,7 +53,7 @@ export default function ImportSpellsPage() {
       const response = await fetch('/spells.json');
       if (!response.ok) throw new Error('File spells.json non trovato');
       
-      const spells = await response.json();
+      const spells: ImportedSpell[] = await response.json();
       setProgress({ current: 0, total: spells.length });
       addLog('success', `✅ Caricati ${spells.length} incantesimi dal JSON`);
       
@@ -59,9 +78,9 @@ export default function ImportSpellsPage() {
         const batch = spells.slice(i, i + BATCH_SIZE);
         
         // Prepara i dati
-        const formattedBatch = batch.map(spell => {
+        const formattedBatch = batch.map((spell: ImportedSpell) => {
           // Gestisci componenti
-          let components = spell.components || [];
+          const components = spell.components || [];
           if (spell.material && !components.includes('M')) {
             components.push('M');
           }
@@ -91,7 +110,7 @@ export default function ImportSpellsPage() {
         });
         
         // Filtra eventuali duplicati (controlla se già esiste)
-        const names = formattedBatch.map(s => s.name);
+        const names = formattedBatch.map((s: { name: string }) => s.name);
         const { data: existing } = await supabase
           .from('spells')
           .select('name')
@@ -99,7 +118,7 @@ export default function ImportSpellsPage() {
         
         const existingNames = new Set(existing?.map(e => e.name) || []);
         
-        const newSpells = formattedBatch.filter(s => !existingNames.has(s.name));
+        const newSpells = formattedBatch.filter((s: { name: string }) => !existingNames.has(s.name));
         skipped += formattedBatch.length - newSpells.length;
         
         if (newSpells.length === 0) {
@@ -256,7 +275,7 @@ export default function ImportSpellsPage() {
             <p className="font-semibold mb-1">⚠️ Note importanti:</p>
             <ul className="list-disc list-inside space-y-0.5">
               <li>Assicurati che il file <code className="bg-amber-100 px-1 rounded">spells.json</code> sia nella cartella <code className="bg-amber-100 px-1 rounded">public/</code></li>
-              <li>L'import verifica i duplicati per nome</li>
+              <li>L&apos;import verifica i duplicati per nome</li>
               <li>Batch da 25 incantesimi per volta (più sicuro)</li>
               <li>Pausa di 100ms tra i batch</li>
               <li>Puoi eseguirlo più volte senza problemi</li>

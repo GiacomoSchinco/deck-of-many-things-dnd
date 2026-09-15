@@ -1,6 +1,8 @@
 import { NextRequest } from "next/server";
 
-const BASE_URL = process.env.NEXT_PUBLIC_OPEN5E_BASE! + "/v2/weapons/";
+// Fallback su api.open5e.com per evitare URL "undefined" se la env var non è configurata
+const OPEN5E_BASE = (process.env.NEXT_PUBLIC_OPEN5E_BASE ?? "https://api.open5e.com").replace(/\/+$/, "");
+const BASE_URL = `${OPEN5E_BASE}/v2/weapons/`;
 
 export async function GET(req: NextRequest) {
   // Propaga eventuali query (?search=..., ?ordering=...)

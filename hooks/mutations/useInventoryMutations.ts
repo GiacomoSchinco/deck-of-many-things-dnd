@@ -26,13 +26,20 @@ export function useCreateInventory(characterId?: string | null) {
         body: JSON.stringify({ items: itemsToSend })
       })
       if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error || 'Errore creazione inventory')
+        const text = await res.text()
+        let message = text || res.statusText || 'Errore creazione inventory'
+        try {
+          const parsed = JSON.parse(text)
+          message = parsed?.error || parsed?.message || message
+        } catch {
+          // non è JSON, mantieni il testo grezzo
+        }
+        throw new Error(message)
       }
       return res.json() as Promise<{ inserted: number; items?: InventoryItem[] }>
     },
     onSuccess: (_, variables) => {
-      // variables may be array (unknown characterId) or object with characterId
+      // variables può essere un array (characterId sconosciuto) o un oggetto con characterId
       let cid: string | null | undefined = characterId
       if (!Array.isArray(variables) && variables && 'characterId' in variables) {
         cid = variables.characterId

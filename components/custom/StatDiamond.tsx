@@ -92,7 +92,7 @@ export default function StatDiamond({
                 {value}
               </span>
               {raceBonus > 0 && (
-                <span className="text-sm text-green-600 font-semibold">
+                <span className="text-sm font-semibold text-success">
                   +{raceBonus}
                 </span>
               )}

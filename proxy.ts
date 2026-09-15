@@ -20,7 +20,7 @@ export async function proxy(req: NextRequest) {
     }
   )
 
-  const { data: { session } } = await supabase.auth.getSession()
+  const { data: { user } } = await supabase.auth.getUser()
 
   const isPublicRoute =
     req.nextUrl.pathname === '/' ||
@@ -31,12 +31,12 @@ export async function proxy(req: NextRequest) {
     req.nextUrl.pathname.startsWith('/public/images/') ||
     req.nextUrl.pathname.startsWith('/images')
 
-  if (!session && !isPublicRoute) {
+  if (!user && !isPublicRoute) {
     const redirectUrl = new URL('/login', req.url)
     return NextResponse.redirect(redirectUrl)
   }
 
-  if (session && (req.nextUrl.pathname === '/login' || req.nextUrl.pathname === '/register')) {
+  if (user && (req.nextUrl.pathname === '/login' || req.nextUrl.pathname === '/register')) {
     const redirectUrl = new URL('/dashboard', req.url)
     return NextResponse.redirect(redirectUrl)
   }

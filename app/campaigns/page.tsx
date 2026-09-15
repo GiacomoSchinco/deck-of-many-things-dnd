@@ -1,14 +1,18 @@
 "use client";
-import { Button } from '@/components/ui/button';
 import { useCampaigns } from '@/hooks/queries/useCampaigns';
 import type { Campaign } from '@/types';
 import Loading from '@/components/custom/Loading';
 import DataTable from '@/components/custom/DataTable';
+import { Badge } from '@/components/ui/badge';
+import { buttonVariants } from '@/components/ui/button-variants';
+import { EmptyState } from '@/components/ui/empty-state';
 import Link from 'next/link';
 import { PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
+import { PageWrapper } from '@/components/layout/PageWrapper';
 export default function CampaignsPage() {
-    const { data: campaigns, isLoading } = useCampaigns();
+    const { data: campaigns, isLoading, isError } = useCampaigns();
     const router = useRouter();
 
     function getCharactersCount(chars: unknown): number {
@@ -28,37 +32,51 @@ export default function CampaignsPage() {
     if (isLoading) {
         return <Loading />;
     }
+    if (isError) {
+        return (
+          <PageWrapper withContainer={false} title="Le Mie Campagne" maxWidth="xl">
+            <EmptyState
+              title="Impossibile caricare le campagne"
+              description="Riprova tra qualche istante."
+            />
+          </PageWrapper>
+        );
+    }
 
     return (
-           <div className="container mx-auto p-4 md:p-6 space-y-6">
-      {/* Header con titolo e pulsante nuovo personaggio */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-4xl font-serif font-bold text-amber-900">
-            Le Mie Campagne
-          </h1>
-          <p className="text-amber-700 mt-1">
-            Gestisci tutte le tue campagne e avventure
-          </p>
-        </div>
-
-        <Link href="/create-campaign">
-          <Button className="bg-amber-700 hover:bg-amber-800">
-            <PlusCircle className="w-4 h-4 mr-2" />
+      <PageWrapper
+        withContainer={false}
+        title="Le Mie Campagne"
+        subtitle="Gestisci tutte le tue campagne e avventure"
+        action={
+          <Link
+            href="/campaigns/create"
+            className={cn(buttonVariants())}
+          >
+            <PlusCircle className="w-4 h-4" />
             Nuova Campagna
-          </Button>
-        </Link>
-      </div>
-            <DataTable<Campaign>
-                title='Campagne'
+          </Link>
+        }
+      >
+        <div className="not-prose">
+        <DataTable<Campaign>
                 initialData={tableData as Campaign[]}
                 visibleColumns={["name", "charactersCount"]}
                 labels={{
                     name: "Nome",
                     charactersCount: "Personaggi",
                 }}
+                customRenderers={{
+                    charactersCount: (value: unknown) => (
+                        <Badge variant="outline" className="surface-tile text-ink-strong">
+                            {Number(value) || 0}
+                        </Badge>
+                    ),
+                }}
                 onRowClick={handleRowClick}
+                pagination
             />
         </div>
+      </PageWrapper>
     );
 }

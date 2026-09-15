@@ -5,9 +5,11 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import { WizardStep } from '../WizardStep';
+import { Sparkles } from 'lucide-react';
 import { DndIcon } from '@/components/icons/DndIcon';
 import type { DndIconName } from '@/components/icons/DndIcon';
 import type { AbilityScores } from '@/types/character';
+import { ABILITY_LIST, getAbilityShort } from '@/lib/utils/nameMappers';
 
 interface AbilityScoresStepProps {
   initialScores?: AbilityScores | null;
@@ -17,14 +19,7 @@ interface AbilityScoresStepProps {
   onConfirm: (scores: AbilityScores) => void;
 }
 
-const ABILITIES = [
-  { key: 'strength', label: 'FOR', name: 'Forza', icon: 'strength' },
-  { key: 'dexterity', label: 'DES', name: 'Destrezza', icon: 'dexterity' },
-  { key: 'constitution', label: 'COS', name: 'Costituzione', icon: 'constitution' },
-  { key: 'intelligence', label: 'INT', name: 'Intelligenza', icon: 'intelligence' },
-  { key: 'wisdom', label: 'SAG', name: 'Saggezza', icon: 'wisdom' },
-  { key: 'charisma', label: 'CAR', name: 'Carisma', icon: 'charisma' },
-];
+const ABILITIES = ABILITY_LIST.map(a => ({ ...a, icon: a.key as DndIconName }));
 
 export function AbilityScoresStep({
   initialScores,
@@ -79,7 +74,8 @@ export function AbilityScoresStep({
 
   return (
     <WizardStep
-      title="🎲 Punteggi di Caratteristica"
+      title="Punteggi di Caratteristica"
+      icon={Sparkles}
       subtitle="Tira 4d6 e droppa il risultato più basso per ogni caratteristica"
       onBack={onBack}
       onNext={handleConfirm}
@@ -91,17 +87,11 @@ export function AbilityScoresStep({
             <span className="font-semibold">{raceName}:</span> bonus razziali applicati
           </p>
           <div className="flex flex-wrap justify-center gap-2 mt-1">
-            {Object.entries(raceBonuses).map(([stat, bonus]) => {
-              const statMap: Record<string, string> = {
-                strength: 'FOR', dexterity: 'DES', constitution: 'COS',
-                intelligence: 'INT', wisdom: 'SAG', charisma: 'CAR'
-              };
-              return (
+            {Object.entries(raceBonuses).map(([stat, bonus]) => (
                 <span key={stat} className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
-                  {statMap[stat]}+{bonus}
+                  {getAbilityShort(stat)}+{bonus}
                 </span>
-              );
-            })}
+              ))}
           </div>
         </div>
       )}
@@ -137,7 +127,7 @@ export function AbilityScoresStep({
 
                 <div className="flex-1 flex items-center justify-center z-10">
                   <div className="text-center">
-                    <h3 className="font-serif font-bold text-amber-900 mb-4 text-4xl">
+                    <h3 className="fantasy-title mb-4 text-4xl">
                       {baseScore}
                       {raceBonus > 0 && (
                         <span className="text-green-600 text-xl ml-1">+{raceBonus}</span>
@@ -169,10 +159,10 @@ export function AbilityScoresStep({
           const raceBonus = raceBonuses[key] || 0;
 
           return (
-            <div key={key} className="flex items-center justify-between bg-amber-50 p-3 rounded">
+            <div key={key} className="fantasy-row">
               <div>
                 <div className="text-sm font-semibold text-amber-800">{name}</div>
-                <div className="text-2xl font-serif font-bold text-amber-900">
+                <div className="text-2xl fantasy-title">
                   {baseScore}
                   {raceBonus > 0 && <span className="text-green-600 text-lg ml-1">+{raceBonus}</span>}
                 </div>

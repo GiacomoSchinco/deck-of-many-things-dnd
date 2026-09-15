@@ -9,6 +9,7 @@ import type {
   ArmorProperties,
   AmmunitionProperties,
   ConsumableProperties,
+  CurrencyProperties,
   ToolProperties,
   GearProperties,
 } from '@/types/item';
@@ -18,6 +19,11 @@ import {
   Zap,
   FlaskConical,
   Wrench,
+  Coins,
+  Clock,
+  Crosshair,
+  Package,
+  TriangleAlert,
 } from 'lucide-react';
 
 interface ItemPropertiesDetailProps {
@@ -47,8 +53,9 @@ export function ItemPropertiesDetail({ item, className }: ItemPropertiesDetailPr
           <span className="text-purple-600 font-medium">+{w.magicBonus} magico</span>
         )}
         {w.range && (
-          <span className="text-amber-500">
-            🏹 {w.range.normal}m{w.range.long ? `/${w.range.long}m` : ''}
+          <span className="flex items-center gap-1 text-amber-500">
+            <Crosshair className="h-3 w-3" aria-hidden="true" />
+            {w.range.normal}m{w.range.long ? `/${w.range.long}m` : ''}
           </span>
         )}
         {w.properties && w.properties.length > 0 && (
@@ -76,7 +83,10 @@ export function ItemPropertiesDetail({ item, className }: ItemPropertiesDetailPr
           <span className="text-purple-600 font-medium">+{a.magicBonus} magico</span>
         )}
         {a.stealthDisadvantage && (
-          <span className="text-red-400">⚠️ Svantaggio furtività</span>
+          <span className="flex items-center gap-1 text-destructive">
+            <TriangleAlert className="h-3 w-3" aria-hidden="true" />
+            Svantaggio furtività
+          </span>
         )}
         {a.strengthRequirement && (
           <span className="text-orange-500">FOR {a.strengthRequirement}+</span>
@@ -125,10 +135,15 @@ export function ItemPropertiesDetail({ item, className }: ItemPropertiesDetailPr
           <FlaskConical className="w-3 h-3" />
           {c.effect}
         </span>
-        {c.duration && <span className="text-amber-500">⏱ {c.duration}</span>}
+        {c.duration && (
+          <span className="flex items-center gap-1 text-amber-500">
+            <Clock className="h-3 w-3" aria-hidden="true" />
+            {c.duration}
+          </span>
+        )}
         {c.usesMax && (
           <span className="text-amber-500">
-            {c.uses ?? c.usesMax}/{c.usesMax} usi
+            {(c.charges ?? c.usesMax)}/{c.usesMax} usi
           </span>
         )}
       </div>
@@ -153,8 +168,9 @@ export function ItemPropertiesDetail({ item, className }: ItemPropertiesDetailPr
     const g = p as GearProperties;
     if (!g.capacity) return null;
     return (
-      <div className={`mt-2 text-xs text-amber-500${className ? ` ${className}` : ''}`}>
-        📦 Capacità: {g.capacity} kg
+      <div className={`mt-2 flex items-center gap-1 text-xs text-amber-500${className ? ` ${className}` : ''}`}>
+        <Package className="h-3 w-3" aria-hidden="true" />
+        Capacità: {g.capacity} kg
       </div>
     );
   }

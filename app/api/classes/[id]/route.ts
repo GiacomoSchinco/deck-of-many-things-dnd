@@ -14,7 +14,7 @@ export async function GET(
   const { data: classData, error } = await supabase
     .from('classes')
     .select('*')
-    .eq('id', id)
+    .eq('id', parseInt(id))
     .single()
 
   if (error) {

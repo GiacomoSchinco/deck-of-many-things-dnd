@@ -8,6 +8,7 @@ import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import Loading from '@/components/custom/Loading';
 import { AncientScroll } from '@/components/custom/AncientScroll';
 import { WizardStep } from '../WizardStep';
+import { Crown } from 'lucide-react';
 
 interface CampaignStepProps {
   initialCampaignId?: string | null;
@@ -52,7 +53,8 @@ export function CampaignStep({ initialCampaignId, onBack, onSelect }: CampaignSt
 
   return (
     <WizardStep
-      title="🏰 Scegli la Campagna"
+      title="Scegli la Campagna"
+      icon={Crown}
       subtitle="Seleziona una campagna per il tuo personaggio"
       onBack={onBack}
       onNext={handleContinue}

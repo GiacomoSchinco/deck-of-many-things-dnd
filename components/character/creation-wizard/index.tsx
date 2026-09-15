@@ -11,12 +11,31 @@ import { ReviewStep } from './steps/ReviewStep';
 import { CampaignStep } from './steps/CampaignStep';
 import { EquipmentStep } from './steps/EquipmentStep';
 import { SkillsStep } from './steps/SkillsStep';
+import { SpellsStep } from './steps/SpellsStep';
 import Loading from '@/components/custom/Loading';
+import { WizardStepper } from '@/components/shared/WizardStepper';
 import type { Race } from '@/types/race';
+import type { CreationStep } from '@/types/creation';
+import { PageWrapper } from '@/components/layout/PageWrapper';
+
+/** Etichette leggibili per lo stepper, nell'ordine del flusso. */
+const STEP_LABELS: Record<CreationStep, string> = {
+  'basic-info': 'Dati',
+  race: 'Razza',
+  class: 'Classe',
+  campaign: 'Campagna',
+  abilities: 'Caratteristiche',
+  skills: 'Competenze',
+  equipment: 'Equipaggiamento',
+  spells: 'Incantesimi',
+  review: 'Riepilogo',
+};
 
 export function CreationWizard() {
   const {
     currentStep,
+    steps,
+    stepIndex,
     data,
     loading,
     updateData,
@@ -135,6 +154,21 @@ export function CreationWizard() {
             }}
           />
         );
+
+      case 'spells':
+        return (
+          <SpellsStep
+            classId={data.classId!}
+            intelligenceScore={data.abilityScores?.intelligence ?? 10}
+            initialSelectedSpells={data.spells || []}
+            onBack={prevStep}
+            onChange={(spellIds) => updateData({ spells: spellIds })}
+            onConfirm={(spellIds) => {
+              updateData({ spells: spellIds });
+              nextStep();
+            }}
+          />
+        );
       case 'review':
         return (
           <ReviewStep
@@ -151,40 +185,29 @@ export function CreationWizard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-parchment-100 to-parchment-200 p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-serif text-amber-900 mb-6 text-center">
-          Creazione Personaggio
-        </h1>
-
+    <PageWrapper
+      withContainer={false}
+      variant='minimal'
+      title="Creazione Personaggio"
+      subtitle="Segui i passi per dare vita al tuo eroe"
+      centerHeader
+    >
+      <div className="mx-auto max-w-3xl space-y-8">
         {!isHydrated ? (
           <Loading />
         ) : (
-          <div className="max-w-2xl mx-auto space-y-6">
-            {/* Progress bar */}
-            <div className="h-2 bg-amber-200 rounded-full">
-              <div
-                className="h-full bg-amber-700 rounded-full transition-all"
-                style={{
-                  width: `${currentStep === 'basic-info' ? 12 :
-                      currentStep === 'race' ? 25 :
-                        currentStep === 'class' ? 37 :
-                          currentStep === 'campaign' ? 50 :
-                            currentStep === 'abilities' ? 62 :
-                              currentStep === 'skills' ? 75 :
-                                currentStep === 'equipment' ? 87 : 100
-                    }%`
-                }}
-              />
-            </div>
+          <>
+            {/* Avanzamento: step attivi e posizione corrente dal hook */}
+            <WizardStepper
+              steps={steps.map((step) => STEP_LABELS[step] ?? step)}
+              current={stepIndex}
+            />
 
-            {/* Step content */}
-            <div className="bg-parchment-100 rounded-lg p-6 shadow-xl border-2 border-amber-900/30">
-              {renderStep()}
-            </div>
-          </div>
+            {/* Contenuto dello step */}
+            <div>{renderStep()}</div>
+          </>
         )}
       </div>
-    </div>
+    </PageWrapper>
   );
 }

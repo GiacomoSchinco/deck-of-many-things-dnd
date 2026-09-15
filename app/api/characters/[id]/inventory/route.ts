@@ -2,6 +2,9 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { createServerSupabase } from '@/lib/supabase/server'
+import type { Database } from '@/lib/supabase/types'
+
+type Tables = Database['public']['Tables']
 
 export async function GET(
   request: Request,
@@ -19,6 +22,28 @@ export async function GET(
     const page = Number(searchParams.get('page') ?? '1')
     const pageSize = Number(searchParams.get('pageSize') ?? '50')
 
+    // Rileva se la tabella inventory usa le colonne legacy `item_name`/`item_type`
+    // oppure le colonne semplificate `name`/`type`. Proviamo prima `name` e poi il fallback.
+    let nameCol = 'name'
+    let typeCol = 'type'
+    try {
+      const test = await supabase.from('inventory').select('name').limit(1).maybeSingle()
+      if (test.error) {
+        nameCol = 'item_name'
+      }
+    } catch {
+      nameCol = 'item_name'
+    }
+
+    try {
+      const test2 = await supabase.from('inventory').select('type').limit(1).maybeSingle()
+      if (test2.error) {
+        typeCol = 'item_type'
+      }
+    } catch {
+      typeCol = 'item_type'
+    }
+
     let query = supabase
       .from('inventory')
       .select('*', { count: 'exact' })
@@ -30,12 +55,12 @@ export async function GET(
     }
 
     if (itemType) {
-      query = query.eq('item_type', itemType)
+      query = query.eq(typeCol, itemType)
     }
 
     if (search && search.trim()) {
       const like = `%${search}%`
-      query = query.or(`item_name.ilike.${like},description.ilike.${like}`)
+      query = query.or(`${nameCol}.ilike.${like},description.ilike.${like}`)
     }
 
     const from = (Math.max(1, page) - 1) * pageSize
@@ -87,15 +112,23 @@ export async function POST(
     const body = await request.json()
     const newItems = body?.items
 
-    if (!Array.isArray(newItems) || !newItems.every((i) => typeof i.item_id === 'number')) {
-      return NextResponse.json({ error: 'items deve essere un array di { item_id, quantity }' }, { status: 400 })
+    // Accetta identificatori oggetto in più formati: { item_id }, { itemId }, { id }, stringhe numeriche
+    const validShape = Array.isArray(newItems) && newItems.every((i) => {
+      const rawId = i?.item_id ?? i?.itemId ?? i?.id
+      return typeof rawId === 'number' || (typeof rawId === 'string' && /^\d+$/.test(rawId))
+    })
+
+    if (!validShape) {
+      return NextResponse.json({ error: 'items deve essere un array di { item_id|itemId|id, quantity }' }, { status: 400 })
     }
 
     // 1. Aggrega quantità per item_id (gestisce duplicati nel payload)
     const qtyMap = new Map<number, number>()
     for (const item of newItems) {
+      const rawId = item?.item_id ?? item?.itemId ?? item?.id
+      const itemId = typeof rawId === 'string' ? Number(rawId) : rawId
       const qty = Math.max(1, Math.trunc(Number(item.quantity) || 1))
-      qtyMap.set(item.item_id, (qtyMap.get(item.item_id) ?? 0) + qty)
+      qtyMap.set(itemId, (qtyMap.get(itemId) ?? 0) + qty)
     }
 
     const itemIds = [...qtyMap.keys()]
@@ -122,8 +155,31 @@ export async function POST(
     const existingMap = new Map((existingItems ?? []).map((i) => [i.item_id as number, i.quantity as number]))
 
     // 4. Prepara insert / update
-    const toInsert = []
-    const toUpdate = []
+    const toInsert: Record<string, unknown>[] = []
+    const toUpdate: { item_id: number; new_quantity: number }[] = []
+
+    // Rileva i nomi delle colonne dell'inventario una volta sola per il flusso POST
+    let nameCol = 'name'
+    let typeCol = 'type'
+    let valueCol = 'value'
+    try {
+      const tn = await supabase.from('inventory').select('name').limit(1).maybeSingle()
+      if (tn.error) nameCol = 'item_name'
+    } catch {
+      nameCol = 'item_name'
+    }
+    try {
+      const tt = await supabase.from('inventory').select('type').limit(1).maybeSingle()
+      if (tt.error) typeCol = 'item_type'
+    } catch {
+      typeCol = 'item_type'
+    }
+    try {
+      const tv = await supabase.from('inventory').select('value').limit(1).maybeSingle()
+      if (tv.error) valueCol = 'cost'
+    } catch {
+      valueCol = 'cost'
+    }
 
     for (const [itemId, quantityToAdd] of qtyMap.entries()) {
       const cat = catalogMap.get(itemId)
@@ -134,20 +190,23 @@ export async function POST(
       } else {
         const props = cat.properties as Record<string, unknown> | null
         const itemType = (props?.itemType as string | undefined) ?? (cat.type as string) ?? 'gear'
-        toInsert.push({
+        const row: Record<string, unknown> = {
           character_id: id,
           item_id: itemId,
-          item_name: cat.name,
-          item_type: itemType,
           quantity: quantityToAdd,
           weight: cat.weight ?? 0,
           equipped: false,
           description: cat.description ?? null,
           notes: null,
-          cost: cat.value ?? null,
-          cost_unit: cat.currency ?? 'po',
           properties: props ?? {},
-        })
+        }
+
+        // Assegna le chiavi rilevate (nameCol/typeCol/valueCol rilevate in precedenza)
+        row[nameCol] = cat.name
+        row[typeCol] = itemType
+        row[valueCol] = cat.value ?? null
+
+        toInsert.push(row)
       }
     }
 
@@ -161,15 +220,15 @@ export async function POST(
     }
 
     // 5. Inserisci nuovi oggetti
-    let inserted = []
+    let inserted: Record<string, unknown>[] = []
     if (toInsert.length > 0) {
-      // Filtra righe valide (devono avere almeno item_name)
-      const validRows = toInsert.filter(row => row.item_name)
-      
+      // Filtra righe valide (devono avere almeno il nome nella colonna rilevata)
+      const validRows = toInsert.filter(row => Boolean(row[nameCol]))
+
       if (validRows.length > 0) {
         const { data, error } = await supabase
           .from('inventory')
-          .insert(validRows)
+          .insert(validRows as Tables['inventory']['Insert'][])
           .select()
 
         if (error) {

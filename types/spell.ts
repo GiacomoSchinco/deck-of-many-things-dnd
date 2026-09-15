@@ -70,7 +70,8 @@ export interface Spell {
   // Lancio
   casting_time: string | null;            // Tempo di lancio
   range: string | null;                   // Gittata
-  components: SpellComponents | null;      // Componenti
+  components: SpellComponents | string[] | null; // Componenti (oggetto o array di lettere ['V','S','M'])
+  material?: string | null;               // Materiale (alcune API lo pongono a livello top-level)
   duration: string | null;                 // Durata
   
   // Descrizione
@@ -97,7 +98,6 @@ export interface SpellKnown {
   id: string;                              // UUID PRIMARY KEY
   character_id: string;                     // UUID del personaggio
   spell_id: number;                         // FK verso spells
-  prepared: boolean;                         // Se preparato (per classi che preparano)
   spellcasting_ability: 'intelligence' | 'wisdom' | 'charisma';  // Caratteristica per lanciare
   
   // Dati dello spell (popolati dalla relazione)
@@ -109,6 +109,14 @@ export interface SpellKnown {
 // ===========================================
 // SLOT INCANTESIMI
 // ===========================================
+
+export interface PreparedSpell {
+  id: string;
+  character_id: string;
+  spell_id: number;
+  created_at?: string;
+  spell?: Spell;
+}
 
 export interface SpellSlot {
   character_id: string;                     // UUID del personaggio

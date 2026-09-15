@@ -1,6 +1,6 @@
 // app/api/spells/[id]/route.ts
 import { cookies } from 'next/headers'
-import { createServerSupabase } from '@/lib/supabase/server'
+import { createServerSupabase, requireAuth } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
 export async function GET(
@@ -33,10 +33,8 @@ export async function PUT(
   const { id } = await params
   const supabase = createServerSupabase(cookieStore)
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
-  }
+  const { error: authError } = await requireAuth(supabase)
+  if (authError) return authError
 
   const body = await request.json()
 
@@ -76,10 +74,8 @@ export async function DELETE(
   const { id } = await params
   const supabase = createServerSupabase(cookieStore)
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
-  }
+  const { error: authError2 } = await requireAuth(supabase)
+  if (authError2) return authError2
 
   const { error } = await supabase
     .from('spells')

@@ -2,7 +2,6 @@
 'use client';
 
 import Image from 'next/image';
-import { Check } from 'lucide-react';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import { cn } from '@/lib/utils';
 import { CARD_SIZES } from '@/lib/utils/cardSizes';
@@ -30,7 +29,7 @@ export function RaceClassCard({
   size = 'md',
   disabled = false
 }: RaceClassCardProps) {
-  
+
   //const englishName = getEnglishName(name, type);
   const folder = type === 'race' ? 'races' : 'classes';
   const isInteractive = !!onSelect;
@@ -52,9 +51,9 @@ export function RaceClassCard({
       {/* Bordo selezione */}
       {isSelected && (
         <>
-          <div className="absolute inset-0 border-4 border-antique-gold rounded-lg pointer-events-none" />
-          <div className="absolute top-2 right-2 bg-antique-gold rounded-full p-1">
-            <Check className="w-4 h-4 text-amber-950" />
+          <div className="absolute inset-0 rounded-lg pointer-events-none" />
+          <div className="absolute top-2 right-2 z-10 bg-green-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+            Selezionata!
           </div>
         </>
       )}
@@ -79,7 +78,7 @@ export function RaceClassCard({
       onClick={() => onSelect!(id!)}
       disabled={disabled}
       className={cn(
-        'relative transition-all duration-300 transform hover:scale-105 focus:outline-none',
+        'relative transition-all duration-300 focus:outline-none',
         sizeMap[size],
         disabled && 'opacity-50 cursor-not-allowed hover:scale-100'
       )}

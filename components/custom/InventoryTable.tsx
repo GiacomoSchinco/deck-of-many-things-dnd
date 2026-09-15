@@ -31,7 +31,7 @@ export default function InventoryTable({ items = [], onRowClick, onEdit, onDelet
 
   function DeleteButton({ row }: { row: Record<string, unknown> }) {
     const id = String(row['id'] ?? '')
-    const name = String(row['item_name'] ?? 'oggetto')
+    const name = String(row['name'] ?? 'oggetto')
     const [confirming, setConfirming] = useState(false)
 
     const handleDelete = async () => {
@@ -131,12 +131,12 @@ export default function InventoryTable({ items = [], onRowClick, onEdit, onDelet
     <DataTable
       initialData={localData}
       columns={[
-        { key: 'item_name', label: 'Nome' },
+        { key: 'name', label: 'Nome' },
         {
           key: 'quantity', label: 'Quantità',
           render: (_v, row) => <QuantityEditor row={row as Record<string, unknown>} />,
         },
-        ...(!hideType ? [{ key: 'item_type', label: 'Tipo', render: (v: unknown) => getItalianItemType(String(v ?? '')) }] : []),
+        ...(!hideType ? [{ key: 'type', label: 'Tipo', render: (v: unknown) => getItalianItemType(String(v ?? '')) }] : []),
         {
           key: 'info', label: 'Info',
           render: (_v, row) => {
@@ -174,14 +174,14 @@ export default function InventoryTable({ items = [], onRowClick, onEdit, onDelet
             const base = String(v ?? '');
             const parts: string[] = [];
 
-            // Avoid duplicating damage/damageType in description (they have their own column now)
+            // Evita di duplicare danno/tipoDanno nella descrizione (hanno già una colonna dedicata)
             if (p?.itemType === 'weapon') {
               if (Array.isArray(p.properties)) parts.push(...(p.properties as string[]));
             } else if (p?.itemType === 'armor') {
               // Armor-specific: don't duplicate armor props (they have their own column)
               // keep description as-is
             } else {
-              if (Array.isArray(p?.properties)) parts.push(...(p!.properties as string[]));
+              if (Array.isArray(p?.properties)) parts.push(...(p?.properties as string[]));
             }
 
             return base + (parts.length ? ` (${parts.join(' · ')})` : '');

@@ -59,6 +59,35 @@ export function useUpdateSavingThrow(characterId: string | null, ability: string
   });
 }
 
+// Versione con characterId nel payload (utile quando l'id è noto solo al momento della chiamata)
+export function useApplySavingThrows() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      characterId,
+      savingThrows,
+    }: {
+      characterId: string;
+      savingThrows: CreateSavingThrowDTO[];
+    }) => {
+      const res = await fetch(`/api/characters/${characterId}/saving-throws`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ saving_throws: savingThrows }),
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Errore salvataggio tiri salvezza');
+      }
+      return res.json();
+    },
+    onSuccess: (_data, { characterId }) => {
+      queryClient.invalidateQueries({ queryKey: ['saving-throws', characterId] });
+    },
+  });
+}
+
 // Hook unificato
 export function useSavingThrowMutations(characterId: string | null) {
   return {

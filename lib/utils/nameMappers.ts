@@ -1,5 +1,8 @@
 // lib/utils/nameMappers.ts
 
+import { SPELL_SCHOOL_ORDER, SPELL_SCHOOLS } from '@/lib/theme/schools'
+import { getSpellSchoolItalian, type SpellSchool } from '@/types/spell'
+
 // ─── RAZZE ────────────────────────────────────────────────────────────────────
 
 /** Italiano → inglese (lowercase, come arriva dal DB / Open5e slug) */
@@ -29,7 +32,8 @@ export const raceItalianNames: Record<string, string> = {
 }
 
 /** Restituisce il nome italiano di una razza. Accetta sia inglese lowercase che Title Case. */
-export function getItalianRace(name: string): string {
+export function getItalianRace(name?: string): string {
+  if (!name) return ''
   return raceItalianNames[name.toLowerCase()] ?? name
 }
 
@@ -72,7 +76,8 @@ export const classItalianNames: Record<string, string> = {
   'warlock':  'Warlock',
 }
 /** Restituisce il nome italiano di una classe. Accetta inglese lowercase o Title Case. */
-export function getItalianClass(name: string): string {
+export function getItalianClass(name?: string): string {
+  if (!name) return ''
   return classItalianNames[name.toLowerCase()] ?? name
 }
 
@@ -88,20 +93,18 @@ export function getItalianClasses(names: string[]): string[] {
 
 // ─── SCUOLE DI MAGIA ──────────────────────────────────────────────────────────
 
-export const schoolItalianNames: Record<string, string> = {
-  'abjuration':  'Abiurazione',
-  'conjuration': 'Evocazione',
-  'divination':  'Divinazione',
-  'enchantment': 'Ammaliamento',
-  'evocation':   'Invocazione',
-  'illusion':    'Illusione',
-  'necromancy':  'Necromanzia',
-  'transmutation':'Trasmutazione',
+// Le mappe delle scuole vivono in `lib/theme/schools.ts` (unica fonte: nome
+// italiano, icona, colore). Qui restano solo gli helper storici.
+
+export function getItalianSchool(name?: string): string {
+  if (!name) return ''
+  return getSpellSchoolItalian(name as SpellSchool)
 }
 
-export function getItalianSchool(name: string): string {
-  return schoolItalianNames[name.toLowerCase()] ?? name
-}
+/** Classi Tailwind per i badge delle scuole di magia (badge pill). */
+export const schoolBadgeColors: Record<string, string> = Object.fromEntries(
+  SPELL_SCHOOL_ORDER.map((key) => [key, SPELL_SCHOOLS[key].badge])
+)
 
 export const itemTypeItalianNames: Record<string, string> = {
   'weapon':     'Arma',
@@ -112,18 +115,140 @@ export const itemTypeItalianNames: Record<string, string> = {
   'tool':       'Attrezzo',
   'currency':   'Moneta',
 }
-export function getItalianItemType(type: string): string {
+export function getItalianItemType(type?: string): string {
+  if (!type) return ''
   return itemTypeItalianNames[type.toLowerCase()] ?? type
 }
 
 export const currencyItalianNames: Record<string, string> = {
-  'po': "Pezzo d'oro",
-  'pa': "Pezzo d'argento",
-  'pr': "Pezzo di rame",
-  'pe': 'Electrum',
-  'mo': 'Moneta',
+  'po': "Moneta d'Oro",
+  'pa': "Moneta di Platino",
+  'pr': "Moneta d'Elettro",
+  'pe': "Moneta d'Argento",
+  'mo': "Moneta di Rame",
 }
 
-export function getItalianCurrency(c: string): string {
+export function getItalianCurrency(c?: string): string {
+  if (!c) return ''
   return currencyItalianNames[c.toLowerCase()] ?? c
+}
+
+// ─── RARITÀ ───────────────────────────────────────────────────────────────────
+
+export const rarityItalianNames: Record<string, string> = {
+  'common':    'Comune',
+  'uncommon':  'Non Comune',
+  'rare':      'Raro',
+  'very rare': 'Molto Raro',
+  'legendary': 'Leggendario',
+  'artifact':  'Artefatto',
+}
+
+export function getItalianRarity(rarity?: string): string {
+  if (!rarity) return ''
+  return rarityItalianNames[rarity.toLowerCase()] ?? rarity
+}
+export const abilityItalianNames: Record<string, string> = {
+  'str': 'Forza',
+  'dex': 'Destrezza',
+  'con': 'Costituzione',
+  'int': 'Intelligenza',
+  'wis': 'Saggezza',
+  'cha': 'Carisma',
+}
+export function getItalianAbility(abbr?: string): string {
+  if (!abbr) return ''
+  return abilityItalianNames[abbr.toLowerCase()] ?? abbr
+}
+
+/** Chiavi full English → nome italiano */
+export const abilityFullItalianNames: Record<string, string> = {
+  strength:     'Forza',
+  dexterity:    'Destrezza',
+  constitution: 'Costituzione',
+  intelligence: 'Intelligenza',
+  wisdom:       'Saggezza',
+  charisma:     'Carisma',
+}
+
+/** Chiavi full English → abbreviazione italiana (3 lettere maiuscole) */
+export const abilityShortNames: Record<string, string> = {
+  strength:     'FOR',
+  dexterity:    'DES',
+  constitution: 'COS',
+  intelligence: 'INT',
+  wisdom:       'SAG',
+  charisma:     'CAR',
+}
+
+export function getItalianAbilityFull(name?: string): string {
+  if (!name) return ''
+  return abilityFullItalianNames[name.toLowerCase()] ?? name
+}
+
+export function getAbilityShort(name?: string): string {
+  if (!name) return ''
+  return abilityShortNames[name.toLowerCase()] ?? name.slice(0, 3).toUpperCase()
+}
+
+/**
+ * Array ordinato delle 6 caratteristiche con id, nome italiano e abbreviazione.
+ * Usato da AbilityScoresStep, StatDiamond, ecc.
+ */
+export const ABILITY_LIST: { key: string; label: string; name: string }[] = [
+  { key: 'strength',     label: 'FOR', name: 'Forza' },
+  { key: 'dexterity',    label: 'DES', name: 'Destrezza' },
+  { key: 'constitution', label: 'COS', name: 'Costituzione' },
+  { key: 'intelligence', label: 'INT', name: 'Intelligenza' },
+  { key: 'wisdom',       label: 'SAG', name: 'Saggezza' },
+  { key: 'charisma',     label: 'CAR', name: 'Carisma' },
+]
+
+/** I 9 allineamenti D&D in italiano. */
+export const ALIGNMENTS: string[] = [
+  'Legale Buono',
+  'Neutrale Buono',
+  'Caotico Buono',
+  'Legale Neutrale',
+  'Neutrale',
+  'Caotico Neutrale',
+  'Legale Malvagio',
+  'Neutrale Malvagio',
+  'Caotico Malvagio',
+]
+
+// ─── COLORI PER TIPO OGGETTO ──────────────────────────────────────────────────
+
+/** Colori testo Tailwind per icone del tipo oggetto (usato in ItemCard). */
+export const itemTypeIconColors: Record<string, string> = {
+  weapon:     'text-red-800',
+  armor:      'text-blue-800',
+  gear:       'text-amber-800',
+  consumable: 'text-green-800',
+  ammunition: 'text-yellow-800',
+  tool:       'text-purple-800',
+  currency:   'text-amber-600',
+}
+
+/** Colori bordo Tailwind per gruppi inventario (usato in InventoryGrouped). */
+export const itemTypeBorderColors: Record<string, string> = {
+  weapon:     'border-red-800/30 hover:border-red-700/50',
+  armor:      'border-blue-800/30 hover:border-blue-700/50',
+  gear:       'border-amber-800/30 hover:border-amber-700/50',
+  consumable: 'border-green-800/30 hover:border-green-700/50',
+  ammunition: 'border-yellow-800/30 hover:border-yellow-700/50',
+  tool:       'border-purple-800/30 hover:border-purple-700/50',
+  currency:   'border-amber-600/30 hover:border-amber-500/50',
+}
+
+// ─── COLORI PER RARITÀ ────────────────────────────────────────────────────────
+
+/** Colori testo Tailwind per badge rarità (usato in ItemCard, ItemForm). */
+export const rarityTextColors: Record<string, string> = {
+  common:     'text-gray-500',
+  uncommon:   'text-green-600',
+  rare:       'text-blue-600',
+  'very rare':'text-purple-600',
+  legendary:  'text-orange-600',
+  artifact:   'text-red-600',
 }

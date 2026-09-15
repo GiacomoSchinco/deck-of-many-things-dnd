@@ -1,16 +1,12 @@
 // components/character/creation-wizard/steps/ClassStep.tsx
 'use client';
 
-import { useState } from 'react';
 import { useClasses } from '@/hooks/queries/useClasses';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { RaceClassCard } from '../../../custom/RaceClassCard';
-import AncientCardContainer from '@/components/custom/AncientCardContainer';
-import Loading from '@/components/custom/Loading';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { WizardStep } from '../WizardStep';
-import type { ClassFeature } from '@/types/class';
+import { SelectionStep } from './SelectionStep';
+import { getItalianClass, getItalianAbilityFull } from '@/lib/utils/nameMappers';
+import { Sword } from 'lucide-react';
+import type { DndClass, ClassFeature } from '@/types/class';
 
 interface ClassStepProps {
   initialClassId?: number | null;
@@ -20,191 +16,95 @@ interface ClassStepProps {
 
 export function ClassStep({ initialClassId, onBack, onSelect }: ClassStepProps) {
   const { data: classes, isLoading, error } = useClasses();
-  const [selectedClassId, setSelectedClassId] = useState<number | null>(initialClassId ?? null);
-  const [currentIndex, setCurrentIndex] = useState(() => {
-    if (!initialClassId || !classes) return 0;
-    const idx = classes.findIndex(c => c.id === initialClassId);
-    return idx >= 0 ? idx : 0;
-  });
 
-  const selectedClass = classes?.[currentIndex];
-  const totalClasses = classes?.length || 0;
+  const formatArray = (arr: string[] | undefined) =>
+    !arr || arr.length === 0 ? 'Nessuna' : arr.join(', ');
 
-  const handlePrevious = () => {
-    setCurrentIndex(prev => (prev > 0 ? prev - 1 : totalClasses - 1));
-  };
+  const renderDetails = (cls: DndClass) => (
+    <>
+      <div className="flex justify-between items-center">
+        <h3 className="text-2xl fantasy-title">{getItalianClass(cls.name)}</h3>
+        <Badge variant="outline" className="bg-amber-100">
+          Dado Vita: {cls.hit_die}
+        </Badge>
+      </div>
 
-  const handleNext = () => {
-    setCurrentIndex(prev => (prev < totalClasses - 1 ? prev + 1 : 0));
-  };
+      <p className="text-amber-700">{cls.description}</p>
 
-  const handleSelectCurrent = () => {
-    if (selectedClass) {
-      setSelectedClassId(selectedClass.id);
-    }
-  };
-
-  const handleConfirm = () => {
-    if (selectedClassId) {
-      onSelect(selectedClassId);
-    }
-  };
-
-  // Formatta array in stringa leggibile
-  const formatArray = (arr: string[] | undefined) => {
-    if (!arr || arr.length === 0) return 'Nessuna';
-    return arr.join(', ');
-  };
-
-  if (isLoading) {
-    return <Loading />;
-  }
-
-  if (error || !selectedClass) {
-    return (
-      <AncientCardContainer className="p-6 text-center">
-        <p className="text-red-500">Errore: {error?.message || 'Nessuna classe disponibile'}</p>
-        <Button onClick={() => window.location.reload()} variant="outline" className="mt-4">
-          Riprova
-        </Button>
-      </AncientCardContainer>
-    );
-  }
-
-  const isSelected = selectedClassId === selectedClass.id;
-
-  return (
-    <WizardStep
-      title="⚔️ Scegli la tua Classe"
-      subtitle="Sfoglia le carte con le frecce e seleziona la tua classe"
-      onBack={onBack}
-      onNext={handleConfirm}
-      nextDisabled={!selectedClassId}
-      nextLabel="Avanti: Punteggi →"
-    >
-      {/* Carosello principale */}
-      <div className="relative flex items-center justify-center gap-4">
-        {/* Freccia sinistra */}
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={handlePrevious}
-          className="rounded-full border-2 border-amber-700 text-amber-700 hover:bg-amber-100 w-12 h-12"
-        >
-          <ChevronLeft className="w-6 h-6" />
-        </Button>
-
-        {/* Carta centrale */}
-        <div className="relative">
-          <RaceClassCard
-            id={selectedClass.id}
-            name={selectedClass.name}
-            type="class"
-            isSelected={isSelected}
-            onSelect={handleSelectCurrent}
-            size="md"
-          />
-          
-          {/* Indicatore di selezione */}
-          {isSelected && (
-            <div className="absolute -top-4 -right-4 bg-green-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
-              Selezionata!
-            </div>
-          )}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <h4 className="font-semibold text-amber-800 mb-2">Tiri Salvezza</h4>
+          <div className="flex flex-wrap gap-2">
+            {cls.saving_throws?.map((save, idx) => (
+              <Badge key={idx} className="bg-amber-200 text-amber-900 border-amber-700">
+                {save.slice(0, 3).toUpperCase()}
+              </Badge>
+            ))}
+          </div>
         </div>
 
-        {/* Freccia destra */}
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={handleNext}
-          className="rounded-full border-2 border-amber-700 text-amber-700 hover:bg-amber-100 w-12 h-12"
-        >
-          <ChevronRight className="w-6 h-6" />
-        </Button>
-      </div>
-
-      {/* Indicatore di posizione */}
-      <div className="text-center text-amber-600">
-        {currentIndex + 1} di {totalClasses}
-      </div>
-
-      {/* Dettagli della classe corrente */}
-      <AncientCardContainer className="mt-6 p-6">
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-2xl font-serif font-bold text-amber-900">
-              {selectedClass.name}
-            </h3>
-            <Badge variant="outline" className="bg-amber-100">
-              Dado Vita: {selectedClass.hit_die}
+        {cls.spellcasting && (
+          <div>
+            <h4 className="font-semibold text-amber-800 mb-2">Incantesimi</h4>
+            <Badge variant="outline" className="border-purple-700 text-purple-800">
+              {String.fromCharCode(10022)} Incantatore: {getItalianAbilityFull(cls.spellcasting.spellcasting_ability)}
             </Badge>
           </div>
+        )}
+      </div>
 
-          <p className="text-amber-700">
-            {selectedClass.description}
+      <div>
+        <h4 className="font-semibold text-amber-800 mb-2">Competenze</h4>
+        <div className="space-y-2">
+          <p className="text-sm">
+            <span className="font-medium text-amber-900">Armature:</span>{' '}
+            <span className="text-amber-700">{formatArray(cls.armor_proficiencies)}</span>
           </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Tiri salvezza */}
-            <div>
-              <h4 className="font-semibold text-amber-800 mb-2">Tiri Salvezza</h4>
-              <div className="flex flex-wrap gap-2">
-                {selectedClass.saving_throws?.map((save, idx) => (
-                  <Badge key={idx} className="bg-amber-200 text-amber-900 border-amber-700">
-                    {save.slice(0,3).toUpperCase()}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-
-            {/* Incantesimi (se presenti) */}
-            {selectedClass.spellcasting && (
-              <div>
-                <h4 className="font-semibold text-amber-800 mb-2">Incantesimi</h4>
-                <Badge variant="outline" className="border-purple-700 text-purple-800">
-                  ✦ Incantatore: {selectedClass.spellcasting.spellcasting_ability === 'intelligence' ? 'Intelligenza' :
-                               selectedClass.spellcasting.spellcasting_ability === 'wisdom' ? 'Saggezza' : 'Carisma'}
-                </Badge>
-              </div>
-            )}
-          </div>
-
-          {/* Competenze */}
-          <div>
-            <h4 className="font-semibold text-amber-800 mb-2">Competenze</h4>
-            <div className="space-y-2">
-              <p className="text-sm">
-                <span className="font-medium text-amber-900">Armature:</span>{' '}
-                <span className="text-amber-700">{formatArray(selectedClass.armor_proficiencies)}</span>
-              </p>
-              <p className="text-sm">
-                <span className="font-medium text-amber-900">Armi:</span>{' '}
-                <span className="text-amber-700">{formatArray(selectedClass.weapon_proficiencies)}</span>
-              </p>
-              <p className="text-sm">
-                <span className="font-medium text-amber-900">Attrezzi:</span>{' '}
-                <span className="text-amber-700">{formatArray(selectedClass.tool_proficiencies)}</span>
-              </p>
-            </div>
-          </div>
-
-          {/* Caratteristiche di livello 1 */}
-          <div>
-            <h4 className="font-semibold text-amber-800 mb-2">Caratteristiche (Livello 1)</h4>
-            <ul className="space-y-2">
-              {selectedClass.features
-                ?.filter((f: ClassFeature) => f.level === 1)
-                .map((feature: ClassFeature, idx: number) => (
-                  <li key={idx} className="text-sm">
-                    <span className="font-medium text-amber-900">{feature.name}:</span>{' '}
-                    <span className="text-amber-700">{feature.description}</span>
-                  </li>
-                ))}
-            </ul>
-          </div>
+          <p className="text-sm">
+            <span className="font-medium text-amber-900">Armi:</span>{' '}
+            <span className="text-amber-700">{formatArray(cls.weapon_proficiencies)}</span>
+          </p>
+          <p className="text-sm">
+            <span className="font-medium text-amber-900">Attrezzi:</span>{' '}
+            <span className="text-amber-700">{formatArray(cls.tool_proficiencies)}</span>
+          </p>
         </div>
-      </AncientCardContainer>
-    </WizardStep>
+      </div>
+
+      <div>
+        <h4 className="font-semibold text-amber-800 mb-2">Caratteristiche (Livello 1)</h4>
+        <ul className="space-y-2">
+          {cls.features
+            ?.filter((f: ClassFeature) => f.level === 1)
+            .map((feature: ClassFeature, idx: number) => (
+              <li key={idx} className="text-sm">
+                <span className="font-medium text-amber-900">{feature.name}:</span>{' '}
+                <span className="text-amber-700">{feature.description}</span>
+              </li>
+            ))}
+        </ul>
+      </div>
+    </>
+  );
+
+  return (
+    <SelectionStep<DndClass>
+      data={classes}
+      isLoading={isLoading}
+      error={error}
+      initialId={initialClassId}
+      type="class"
+      title="Scegli la tua Classe"
+      subtitle="Sfoglia le carte con le frecce e seleziona la tua classe"
+      nextLabel="Avanti: Punteggi →"
+      searchPlaceholder="Cerca classe..."
+      noResultsText="Nessuna classe trovata"
+      emptyDataText="Nessuna classe disponibile"
+      icon={Sword}
+      getItalianName={getItalianClass}
+      onBack={onBack}
+      onSelect={onSelect}
+      renderDetails={renderDetails}
+    />
   );
 }

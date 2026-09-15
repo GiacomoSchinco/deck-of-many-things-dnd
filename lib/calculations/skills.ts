@@ -1,2 +1,2 @@
-// TODO: implement skill bonus calculations
+// TODO: implementare i calcoli dei bonus abilità
 export {};
