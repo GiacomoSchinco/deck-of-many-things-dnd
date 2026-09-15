@@ -292,7 +292,7 @@ export default function TestUIPage() {
         <h2 className="text-2xl font-serif">Esempio Scheda Personaggio (mock)</h2>
         <div className="flex flex-wrap gap-6">
           <CharacterCard
-            id={1}
+            id="1"
             name="Eldrin Willowshade"
             race="Elfo dei Boschi"
             characterClass="Ranger"
@@ -305,7 +305,7 @@ export default function TestUIPage() {
           />
 
           <CharacterCard
-            id={2}
+            id="2"
             name="Brunna Martelloferro"
             race="Nano delle Colline"
             characterClass="Thief"

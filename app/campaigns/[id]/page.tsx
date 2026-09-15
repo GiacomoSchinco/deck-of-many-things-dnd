@@ -13,7 +13,7 @@ import { AncientScroll } from '@/components/custom/AncientScroll';
 import { PageWrapper } from '@/components/layout/PageWrapper';
 
 type CampaignCharacter = {
-    id: number; // ← attenzione: id deve essere number per CharacterCard
+    id: string;
     name: string;
     level: number;
     race: string;
