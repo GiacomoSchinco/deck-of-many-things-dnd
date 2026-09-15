@@ -6,10 +6,20 @@ import Loading from '@/components/custom/Loading';
 import DataTable from '@/components/custom/DataTable';
 import AncientContainer from '@/components/custom/AncientContainer';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { getItalianClass, getItalianRace } from '@/lib/utils/nameMappers';
+import { useDeleteCharacter } from '@/hooks/mutations/useCharacterMutations';
+import { toast } from 'sonner';
 import { useState, useEffect } from 'react';
 
 // Utility per estrarre il nome da strutture nested
@@ -33,6 +43,7 @@ export default function CharactersPage() {
   const router = useRouter();
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedQuery(query.trim()), 500);
@@ -40,6 +51,7 @@ export default function CharactersPage() {
   }, [query]);
 
   const { data: characters, isLoading, error } = useCharacters();
+  const deleteCharacter = useDeleteCharacter();
 
   if (isLoading) return <Loading />;
 
@@ -54,6 +66,17 @@ export default function CharactersPage() {
   const formatDate = (iso?: string) => {
     if (!iso) return '';
     return new Intl.DateTimeFormat('it-IT', { dateStyle: 'medium' }).format(new Date(iso));
+  };
+
+  const handleDelete = async () => {
+    if (!pendingDelete) return;
+    try {
+      await deleteCharacter.mutateAsync(pendingDelete.id);
+      toast.success(`${pendingDelete.name} è stato eliminato`);
+      setPendingDelete(null);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Errore durante l'eliminazione");
+    }
   };
 
   const tableData = (characters ?? [])
@@ -108,8 +131,50 @@ export default function CharactersPage() {
             extractNames(row?.races).map(getItalianRace).join(', '),
         }}
         onRowClick={(id) => router.push(`/characters/${id}`)}
+        onDelete={(id, row) =>
+          setPendingDelete({
+            id: String(id),
+            name: String((row as { name?: string }).name ?? 'questo personaggio'),
+          })
+        }
         pagination
       />
+
+      {/* `DialogContent` montato solo mentre è aperto: è la regola del progetto
+          per i dialog affidabili (con base-ui il popup resterebbe altrimenti nel
+          DOM in stato di chiusura, bloccando i click sulla pagina). */}
+      <Dialog
+        open={pendingDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingDelete(null);
+        }}
+      >
+        {pendingDelete && (
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="font-serif text-lg">
+                Eliminare {pendingDelete.name}?
+              </DialogTitle>
+              <DialogDescription>
+                L&apos;operazione non è reversibile: con il personaggio vengono rimossi anche
+                equipaggiamento, competenze e incantesimi associati.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setPendingDelete(null)}>
+                Annulla
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={deleteCharacter.isPending}
+              >
+                {deleteCharacter.isPending ? 'Eliminazione...' : 'Elimina definitivamente'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        )}
+      </Dialog>
     </AncientContainer>
   );
 }

@@ -38,9 +38,11 @@ export function useCreateCharacter() {
       return res.json();
     },
     onSuccess: () => {
-      // Invalida le query correlate
-      queryClient.invalidateQueries({ queryKey: ['characters', 'me'] });
-      queryClient.invalidateQueries({ queryKey: ['characters', 'all'] });
+      // `['characters']` è la chiave della lista admin (`useCharacters`) e, per
+      // prefisso, copre anche `['characters','me']` e `['characters','campaign',id]`.
+      // Prima c'era `['characters','all']`: nessuna query usa quella chiave, quindi
+      // la lista personaggi dell'admin non si aggiornava dopo la creazione.
+      queryClient.invalidateQueries({ queryKey: ['characters'] });
     },
   });
 }
@@ -89,8 +91,9 @@ export function useDeleteCharacter() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['characters', 'me'] });
-      queryClient.invalidateQueries({ queryKey: ['characters', 'all'] });
+      // Vedi la nota in `useCreateCharacter`: `['characters','all']` non era la
+      // chiave di nessuna query, quindi la lista admin non si aggiornava.
+      queryClient.invalidateQueries({ queryKey: ['characters'] });
     },
   });
 }
