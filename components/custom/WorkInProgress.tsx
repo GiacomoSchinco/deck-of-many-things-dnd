@@ -2,6 +2,7 @@
 
 import AncientCardStack from "@/components/custom/AncientCardStack";
 import { AntiqueButton } from "@/components/custom/AntiqueButton";
+import { Construction, Sword } from "lucide-react";
 
 export default function WorkInProgress() {
     return (
@@ -11,8 +12,8 @@ export default function WorkInProgress() {
                     <h1 className="text-3xl font-serif text-amber-900 mb-3 text-center">
                         Work in Progress
                     </h1>
-                    <div className="text-7xl mb-4 filter drop-shadow-lg">
-                        🏗️
+                    <div className="mb-4 text-frame/70">
+                        <Construction className="h-16 w-16" strokeWidth={1.5} aria-hidden="true" />
                     </div>
                     <p className="text-amber-700 text-sm italic mt-2 text-center">
                         La gilda dei costruttori è al lavoro
@@ -22,9 +23,9 @@ export default function WorkInProgress() {
 
             {/* Linea decorativa */}
             <div className="flex items-center justify-center gap-4">
-                <div className="w-20 h-1 bg-gradient-to-r from-transparent via-amber-700 to-transparent" />
-                <span className="text-3xl text-amber-700">⚔️</span>
-                <div className="w-20 h-1 bg-gradient-to-r from-transparent via-amber-700 to-transparent" />
+                <div className="h-px w-20 bg-frame/40" />
+                <Sword className="h-6 w-6 text-frame" aria-hidden="true" />
+                <div className="h-px w-20 bg-frame/40" />
             </div>
 
             <p className="max-w-xl text-center text-xl text-amber-800 font-serif italic">

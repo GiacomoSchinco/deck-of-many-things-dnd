@@ -14,7 +14,7 @@ import type { ProficiencyType } from '@/types/character';
 import StatDiamond from '@/components/custom/StatDiamond';
 import { RaceClassCard } from '@/components/custom/RaceClassCard';
 import { FanCardGroup } from '@/components/custom/FanCardGroup';
-import { Package } from 'lucide-react';
+import { Package, ScrollText } from 'lucide-react';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import { SkillsDisplay } from '@/components/custom/SkillsDisplay';
 import { WizardStep } from '../WizardStep';
@@ -62,7 +62,8 @@ export function ReviewStep({ data, onBack, onSave, loading }: ReviewStepProps) {
 
   return (
     <WizardStep
-      title="📜 Riepilogo Personaggio"
+      title="Riepilogo Personaggio"
+      icon={ScrollText}
       subtitle="Controlla i dati prima di creare il tuo eroe"
       onBack={onBack}
       onNext={onSave}

@@ -7,12 +7,14 @@ import { useSpells } from '@/hooks/queries/useSpells';
 import { useAddPreparedSpells, useRemovePreparedSpells } from '@/hooks/mutations/useCharacterSpellMutations';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Search, Check, RefreshCw } from 'lucide-react';
+import { SpellSearchInput } from '@/components/shared/SpellSearchInput';
+import { SpellFlagBadges, SpellMetaRow } from '@/components/shared/SpellSummary';
+import { Check, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Spell } from '@/types/spell';
-import { getItalianSchool, schoolBadgeColors } from '@/lib/utils/nameMappers';
+import { getSchoolMeta } from '@/lib/theme/schools';
 import { filterByName } from '@/lib/utils';
+import { groupSpellsByLevel } from '@/lib/utils/spellLevels';
 
 interface PreparedSpellsManagerProps {
   characterId: string;
@@ -76,12 +78,7 @@ export default function PreparedSpellsManager({
 
   const filteredSpells = useMemo(() => filterByName(availableSpells, search), [availableSpells, search]);
 
-  // Raggruppa per livello
-  const byLevel: Record<number, Spell[]> = {};
-  for (const spell of filteredSpells) {
-    if (!byLevel[spell.level]) byLevel[spell.level] = [];
-    byLevel[spell.level].push(spell);
-  }
+  const { byLevel, levels } = groupSpellsByLevel(filteredSpells, (spell) => spell.level);
 
   const handleToggle = async (spellId: number, currentlyPrepared: boolean) => {
     // Limite massimo
@@ -153,57 +150,35 @@ export default function PreparedSpellsManager({
       </div>
 
       {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-500" />
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Cerca incantesimo..."
-          className="pl-9 bg-amber-50 border-amber-300"
-        />
-      </div>
+      <SpellSearchInput value={search} onChange={setSearch} />
 
       {/* Lista per livello */}
-      {Object.keys(byLevel)
-        .map(Number)
-        .sort((a, b) => a - b)
-        .map((level) => (
+      {levels.map((level) => (
           <div key={level} className="space-y-2">
-            <h4 className="fantasy-title font-semibold border-b border-amber-200 pb-1">
+            <h4 className="fantasy-title font-semibold border-b border-frame/20 pb-1">
               Livello {level}
             </h4>
             <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
               {byLevel[level].map((spell) => {
                 const isPrepared = preparedSpellIds.has(spell.id);
+                const school = getSchoolMeta(spell.school);
                 return (
                   <div
                     key={spell.id}
                     className={`
-                      flex items-center justify-between p-3 rounded-lg border transition-all
-                      ${isPrepared 
-                        ? 'bg-green-50 border-green-300' 
-                        : 'fantasy-section hover:bg-amber-100/50'
-                      }
+                      flex items-center justify-between surface-tile p-3
+                      ${isPrepared ? 'border-antique-gold/70 shadow-e2' : ''}
                     `}
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-medium text-amber-900">{spell.name}</span>
-                        <Badge className={`text-xs ${schoolBadgeColors[spell.school] ?? 'bg-gray-100'}`}>
-                          {getItalianSchool(spell.school)}
+                        <span className="font-medium text-ink-strong">{spell.name}</span>
+                        <Badge className={`text-xs ${school.badge}`}>
+                          {school.it}
                         </Badge>
-                        {spell.ritual && (
-                          <Badge className="text-xs bg-emerald-100 text-emerald-800">Rituale</Badge>
-                        )}
-                        {spell.concentration && (
-                          <Badge className="text-xs bg-orange-100 text-orange-800">Concentrazione</Badge>
-                        )}
+                        <SpellFlagBadges spell={spell} />
                       </div>
-                      <div className="flex gap-3 text-xs text-amber-600 mt-1">
-                        {spell.casting_time && <span>⏱ {spell.casting_time}</span>}
-                        {spell.range && <span>🎯 {spell.range}</span>}
-                        {spell.duration && <span>⏳ {spell.duration}</span>}
-                      </div>
+                      <SpellMetaRow spell={spell} />
                     </div>
 
                     <Button

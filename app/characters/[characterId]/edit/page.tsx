@@ -3,11 +3,12 @@ import WorkInProgress from "@/components/custom/WorkInProgress";
 // import CharacterEditForm from "@/components/characters/CharacterEditForm";
 
 type PageProps = {
-    params: { characterId: string };
+    // In Next 16 i params sono una Promise e vanno attesi prima dell'uso
+    params: Promise<{ characterId: string }>;
 };
 
-export default function EditCharacterPage({ params }: PageProps) {
-    const { characterId } = params;
+export default async function EditCharacterPage({ params }: PageProps) {
+    const { characterId } = await params;
 
     if (!characterId) return <WorkInProgress />;
 

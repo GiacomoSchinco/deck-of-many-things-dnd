@@ -9,8 +9,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Plus, Save, Trash2, Copy, GripVertical, Package } from 'lucide-react'
+import { Plus, Save, Trash2, Copy, GripVertical, Package, Pencil, Sparkles, Star } from 'lucide-react'
 import { getItalianClass } from '@/lib/utils/nameMappers'
+import { PageWrapper } from '@/components/layout/PageWrapper'
+import { Badge } from '@/components/ui/badge'
 import ItemRow from '@/components/custom/ItemRow'
 import ChoiceGroup from '@/components/custom/ChoiceGroup'
 import { useDeleteEquipmentPreset } from '@/hooks/mutations/useEquipmentPresetMutations'
@@ -94,51 +96,49 @@ export default function CreateEquipmentPresetPage({ initialData }: Props) {
   }
 
   return (
-    <div className="container mx-auto p-4 md:p-6 max-w-5xl">
-      <div className="bg-gradient-to-br from-parchment-100 to-parchment-200 rounded-xl border-2 border-amber-900/30 shadow-xl overflow-hidden">
-        {/* Header decorativo */}
-        <div className="bg-amber-900/10 border-b border-amber-900/20 px-6 py-4">
-          <h1 className="text-2xl fantasy-title flex items-center gap-2">
-            {preset.id ? '✏️ Modifica Preset' : '✨ Nuovo Preset'}
-            {preset.id && (
-              <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">
-                ID: {preset.id}
-              </span>
-            )}
-          </h1>
-            <p className="text-amber-600 text-sm mt-1">
-            Configura l&apos;equipaggiamento iniziale per una classe
-          </p>
-        </div>
-
-        <form onSubmit={onSubmit} className="p-6 space-y-8">
+    <>
+      <PageWrapper
+      title={preset.id ? 'Modifica Preset' : 'Nuovo Preset'}
+      subtitle="Configura l'equipaggiamento iniziale per una classe"
+      icon={preset.id ? <Pencil className="w-6 h-6" /> : <Sparkles className="w-6 h-6" />}
+      maxWidth="lg"
+      action={
+        preset.id ? (
+          <Badge variant="outline" className="surface-tile text-ink-strong">
+            ID: {preset.id}
+          </Badge>
+        ) : undefined
+      }
+      contentClassName="space-y-8"
+    >
+      <form onSubmit={onSubmit} className="space-y-8">
           {/* === SEZIONE INFO BASE === */}
           <div className="fantasy-section p-5">
             <h2 className="text-lg fantasy-title mb-4 flex items-center gap-2">
-              <span className="w-1 h-6 bg-amber-600 rounded-full" />
+              <span className="w-1 h-6 bg-antique-gold/70 rounded-full" />
               Informazioni Base
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <Label className="text-amber-800 font-medium">Nome del preset *</Label>
+                <Label className="text-ink font-medium">Nome del preset *</Label>
                 <Input
                   value={preset.name}
                   onChange={(e) => setPreset((p) => ({ ...p, name: e.target.value }))}
                   placeholder="Es. Equipaggiamento Guerriero"
-                  className="mt-1.5 bg-white border-amber-300 focus:border-amber-500"
+                  className="mt-1.5"
                   required
                 />
               </div>
 
               <div>
-                <Label className="text-amber-800 font-medium">Classe *</Label>
+                <Label className="text-ink font-medium">Classe *</Label>
                 <Select
                   value={preset.class_id}
                   onValueChange={(value: string | null) =>
                     setPreset((p) => ({ ...p, class_id: value ?? '' }))
                   }
                 >
-                  <SelectTrigger className="mt-1.5 bg-white border-amber-300">
+                  <SelectTrigger className="mt-1.5">
                     <SelectValue>
                       {selectedClass ? getItalianClass(selectedClass.name) : 'Seleziona classe'}
                     </SelectValue>
@@ -155,23 +155,24 @@ export default function CreateEquipmentPresetPage({ initialData }: Props) {
             </div>
 
             <div className="mt-4">
-              <Label className="text-amber-800 font-medium">Descrizione (opzionale)</Label>
+              <Label className="text-ink font-medium">Descrizione (opzionale)</Label>
               <Input
                 value={preset.description}
                 onChange={(e) => setPreset((p) => ({ ...p, description: e.target.value }))}
                 placeholder="Breve descrizione del preset..."
-                className="mt-1.5 bg-white border-amber-300"
+                className="mt-1.5"
               />
             </div>
 
-            <div className="flex items-center space-x-2 mt-4 pt-2 border-t border-amber-200/50">
+            <div className="flex items-center space-x-2 mt-4 pt-2 border-t border-frame/20">
               <Checkbox
                 id="is_default"
                 checked={preset.is_default}
                 onCheckedChange={(checked) => setPreset((p) => ({ ...p, is_default: checked as boolean }))}
               />
-              <Label htmlFor="is_default" className="cursor-pointer text-amber-700">
-                ⭐ Imposta come preset predefinito per questa classe
+              <Label htmlFor="is_default" className="cursor-pointer flex items-center gap-1.5 text-ink">
+                <Star className="w-3.5 h-3.5 text-antique-gold" aria-hidden="true" />
+                Imposta come preset predefinito per questa classe
               </Label>
             </div>
           </div>
@@ -250,12 +251,12 @@ export default function CreateEquipmentPresetPage({ initialData }: Props) {
                 <AccordionItem 
                   key={choice.localKey} 
                   value={choice.localKey}
-                  className="border border-amber-200 rounded-lg overflow-hidden bg-white"
+                  className="surface-tile overflow-hidden"
                 >
-                  <div className="flex items-center justify-between bg-amber-50/30 px-4 py-2">
+                  <div className="flex items-center justify-between bg-parchment-200/40 px-4 py-2">
                     <div className="flex items-center gap-2">
-                      <GripVertical className="w-4 h-4 text-amber-400 cursor-move" />
-                      <AccordionTrigger className="hover:no-underline py-2 text-amber-800 font-medium">
+                      <GripVertical className="w-4 h-4 text-ink-muted/70 cursor-move" />
+                      <AccordionTrigger className="hover:no-underline py-2 text-ink font-medium">
                         {choice.description || `Gruppo ${cIndex + 1}`}
                       </AccordionTrigger>
                     </div>
@@ -338,18 +339,18 @@ export default function CreateEquipmentPresetPage({ initialData }: Props) {
             </div>
           </div>
         </form>
-      </div>
+    </PageWrapper>
 
       {/* Modale conferma eliminazione */}
       <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
-        <DialogContent className="max-w-sm bg-parchment-100 border-2 border-amber-900/30">
+        <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-red-700 flex items-center gap-2">
+            <DialogTitle className="text-destructive flex items-center gap-2">
               <Trash2 className="w-5 h-5" />
               Elimina Preset
             </DialogTitle>
-            <DialogDescription className="text-amber-700">
-              Sei sicuro di voler eliminare il preset <strong className="text-amber-900">&ldquo;{preset.name}&rdquo;</strong>?
+            <DialogDescription className="text-ink-muted">
+              Sei sicuro di voler eliminare il preset <strong className="text-ink-strong">&ldquo;{preset.name}&rdquo;</strong>?
               Questa operazione non può essere annullata.
             </DialogDescription>
           </DialogHeader>
@@ -358,12 +359,11 @@ export default function CreateEquipmentPresetPage({ initialData }: Props) {
               variant="outline"
               onClick={() => setShowDeleteModal(false)}
               disabled={deletePreset.isPending}
-              className="border-amber-400"
             >
               Annulla
             </Button>
             <Button
-              className="bg-red-600 hover:bg-red-700 text-white"
+              variant="destructive"
               onClick={handleDelete}
               disabled={deletePreset.isPending}
             >
@@ -373,6 +373,6 @@ export default function CreateEquipmentPresetPage({ initialData }: Props) {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   )
 }

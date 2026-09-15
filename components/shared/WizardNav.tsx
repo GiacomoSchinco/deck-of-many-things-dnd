@@ -40,7 +40,7 @@ export function WizardNav({
   className,
 }: WizardNavProps) {
   return (
-    <div className={cn('flex pt-4 border-t border-amber-200', onBack ? 'justify-between' : 'justify-end', className)}>
+    <div className={cn('flex gap-3 border-t border-frame/25 pt-4', onBack ? 'justify-between' : 'justify-end', className)}>
       {onBack && (
         <AntiqueButton type="button" variant="outline" size="sm" onClick={onBack}>
           {backLabel}

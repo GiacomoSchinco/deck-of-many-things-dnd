@@ -77,3 +77,37 @@ export function getAvailableSpellLevels(
   // Costruisce [0, 1, 2, ... maxLevel]
   return Array.from({ length: maxLevel + 1 }, (_, i) => i);
 }
+
+// ─── RAGGRUPPAMENTO PER LIVELLO ──────────────────────────────────────────────
+
+export interface SpellsByLevel<T> {
+  byLevel: Record<number, T[]>;
+  /** Livelli presenti, in ordine crescente e senza buchi. */
+  levels: number[];
+}
+
+/**
+ * Raggruppa una lista di incantesimi per livello.
+ *
+ * Il ciclo era ricopiato in quattro posti (due volte solo dentro
+ * `LevelUpSpellsStep`) e ogni copia ordinava i livelli a modo suo: due
+ * ordinavano, due si affidavano all'ordine di inserimento. Restituire anche
+ * `levels` già ordinati toglie ai chiamanti la possibilità di sbagliare.
+ *
+ * `getLevel` è obbligatorio perché non tutte le liste contengono `Spell`:
+ * `Spellbook` raggruppa `SpellKnown` e il livello sta in `item.spell.level`.
+ */
+export function groupSpellsByLevel<T>(
+  spells: readonly T[],
+  getLevel: (item: T) => number,
+): SpellsByLevel<T> {
+  const byLevel: Record<number, T[]> = {};
+
+  for (const spell of spells) {
+    const level = getLevel(spell);
+    if (!byLevel[level]) byLevel[level] = [];
+    byLevel[level].push(spell);
+  }
+
+  return { byLevel, levels: Object.keys(byLevel).map(Number).sort((a, b) => a - b) };
+}

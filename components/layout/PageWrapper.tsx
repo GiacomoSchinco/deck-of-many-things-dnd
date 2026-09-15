@@ -3,8 +3,9 @@ import { cn } from '@/lib/utils';
 
 interface PageWrapperProps {
   children: React.ReactNode;
-  title?: string;
-  subtitle?: string;
+  /** Accetta nodi: permette il titolo in oro battuto (`.text-foil`) */
+  title?: React.ReactNode;
+  subtitle?: React.ReactNode;
   icon?: React.ReactNode;
   action?: React.ReactNode;
   className?: string;
@@ -41,19 +42,19 @@ export function PageWrapper({
   
   const variantStyles = {
     default: {
-      wrapper: 'bg-[#f4ecd8] text-[#3e2723]',
-      border: 'border-[#b89b72]',
-      shadow: 'shadow-[0_20px_50px_rgba(0,0,0,0.3),_inset_0_0_60px_rgba(139,69,19,0.15)]',
+      wrapper: 'bg-parchment-100 text-ink',
+      border: 'border-2 border-frame/40',
+      shadow: 'shadow-frame',
     },
     scroll: {
-      wrapper: 'bg-gradient-to-b from-[#f4ecd8] via-[#ede0c1] to-[#f4ecd8]',
-      border: 'border-x-4 border-[#8b4513]/40',
-      shadow: 'shadow-2xl',
+      wrapper: 'bg-gradient-to-b from-parchment-100 via-parchment-200 to-parchment-100 text-ink',
+      border: 'border-x-4 border-frame/50',
+      shadow: 'shadow-frame',
     },
     minimal: {
-      wrapper: 'bg-[#fdfbf7]',
-      border: 'border border-[#d2b48c]/30',
-      shadow: 'shadow-sm',
+      wrapper: 'bg-parchment-50 text-ink',
+      border: 'border border-frame/25',
+      shadow: 'shadow-e2',
     },
   };
 
@@ -61,14 +62,18 @@ export function PageWrapper({
 
   const content = (
     <div className={cn(
-      'relative overflow-hidden rounded-sm transition-all duration-500 w-full', 
-      variant !== 'minimal' && 'before:absolute before:inset-0 before:bg-[url("https://www.transparenttextures.com/patterns/p6.png")] before:opacity-30 before:pointer-events-none',
+      'relative overflow-hidden rounded-frame w-full transition-all duration-500', 
       style.border, 
       style.shadow, 
       style.wrapper, 
       className
     )}>
-      
+
+      {/* Grana di carta (SVG inline, nessuna richiesta esterna) */}
+      {variant !== 'minimal' && (
+        <div className="absolute inset-0 pointer-events-none paper-grain opacity-[0.05]" />
+      )}
+
       {/* Overlay Vignetta per effetto carta invecchiata */}
       {variant !== 'minimal' && (
         <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle,transparent_60%,rgba(62,39,35,0.05)_100%)]" />
@@ -77,11 +82,10 @@ export function PageWrapper({
       {/* Decorazioni angolari "Filigrana Oro" */}
       {showDecorations && variant === 'default' && (
         <>
-          <div className="absolute top-0 left-0 w-24 h-24 bg-[url('https://www.transparenttextures.com/patterns/vintage-specials.png')] opacity-20 rotate-0 pointer-events-none" />
-          <div className="absolute top-2 left-2 w-8 h-8 border-t-2 border-l-2 border-amber-600/40 rounded-tl-sm" />
-          <div className="absolute top-2 right-2 w-8 h-8 border-t-2 border-r-2 border-amber-600/40 rounded-tr-sm" />
-          <div className="absolute bottom-2 left-2 w-8 h-8 border-b-2 border-l-2 border-amber-600/40 rounded-bl-sm" />
-          <div className="absolute bottom-2 right-2 w-8 h-8 border-b-2 border-r-2 border-amber-600/40 rounded-br-sm" />
+          <div className="absolute top-3 left-3 w-8 h-8 border-t-2 border-l-2 border-frame/40 rounded-tl-sm pointer-events-none" />
+          <div className="absolute top-3 right-3 w-8 h-8 border-t-2 border-r-2 border-frame/40 rounded-tr-sm pointer-events-none" />
+          <div className="absolute bottom-3 left-3 w-8 h-8 border-b-2 border-l-2 border-frame/40 rounded-bl-sm pointer-events-none" />
+          <div className="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 border-frame/40 rounded-br-sm pointer-events-none" />
         </>
       )}
 
@@ -101,18 +105,18 @@ export function PageWrapper({
             )}>
               <div className="flex items-center gap-4">
                 {icon && (
-                  <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#3e2723] text-[#f4ecd8] shadow-lg border border-amber-600/30">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-full bg-frame-deep text-parchment-100 shadow-raised border border-frame/40">
                     {icon}
                   </div>
                 )}
                 <div>
                   {title && (
-                    <h1 className="text-3xl md:text-4xl font-serif font-bold text-[#3e2723] tracking-tight">
+                    <h1 className="text-3xl md:text-4xl font-serif font-bold text-ink-strong tracking-tight">
                       {title}
                     </h1>
                   )}
                   {subtitle && (
-                    <p className="text-amber-800/70 text-sm md:text-base mt-1 font-serif italic tracking-wide">
+                    <p className="fantasy-subtitle mt-1 tracking-wide">
                       {subtitle}
                     </p>
                   )}
@@ -121,22 +125,24 @@ export function PageWrapper({
               {action && <div className="animate-in fade-in slide-in-from-right-4">{action}</div>}
             </div>
             {/* Divisore decorato */}
-            <div className="mt-6 h-px w-full bg-gradient-to-r from-transparent via-amber-800/40 to-transparent relative">
-              <div className="absolute left-1/2 -translate-x-1/2 -top-1.5 text-[10px] opacity-40">✧</div>
+            <div className="divider-ornate mt-6 relative">
+              <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ornament-diamond w-1.5 h-1.5" />
             </div>
           </div>
         )}
 
-        <div className="prose prose-stone max-w-none">
+        <div className="max-w-none">
           {children}
         </div>
 
         {/* Footer con sigillo */}
         {showDecorations && (
-          <div className="mt-12 flex items-center justify-center gap-4 opacity-30 group-hover:opacity-60 transition-opacity">
-             <div className="h-px w-12 bg-amber-900/40" />
-             <span className="text-xs">⚔️</span>
-             <div className="h-px w-12 bg-amber-900/40" />
+          <div className="mt-12 flex items-center justify-center gap-3 opacity-40 transition-opacity group-hover:opacity-70">
+            <div className="h-px w-12 bg-frame/40" />
+            <span className="ornament-diamond w-1.5 h-1.5" />
+            <span className="block w-2.5 h-2.5 rotate-45 border border-frame/60" />
+            <span className="ornament-diamond w-1.5 h-1.5" />
+            <div className="h-px w-12 bg-frame/40" />
           </div>
         )}
       </div>

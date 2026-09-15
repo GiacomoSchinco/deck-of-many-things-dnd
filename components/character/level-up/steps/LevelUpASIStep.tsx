@@ -5,9 +5,20 @@ import { useState } from 'react';
 import { WizardNav } from '@/components/shared/WizardNav';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { RadioCard } from '@/components/ui/selectable-card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { TrendingUp, Sparkles } from 'lucide-react';
-import { ABILITY_LIST_ICONS, getItalianAbilityFull } from '@/lib/utils/nameMappers';
+import { Brain, Crown, Dumbbell, Flame, Footprints, Heart, TrendingUp, Sparkles } from 'lucide-react';
+import { getItalianAbilityFull } from '@/lib/utils/nameMappers';
+
+/** Caratteristiche con la relativa icona, per i select della scelta ASI. */
+const ABILITY_OPTIONS = [
+  { id: 'strength',     icon: Dumbbell },
+  { id: 'dexterity',    icon: Footprints },
+  { id: 'constitution', icon: Heart },
+  { id: 'intelligence', icon: Brain },
+  { id: 'wisdom',       icon: Flame },
+  { id: 'charisma',     icon: Crown },
+];
 
 interface LevelUpASIStepProps {
   character: { ability_scores?: Record<string, number> };
@@ -75,12 +86,20 @@ export default function LevelUpASIStep({
     }
   };
 
-  // Formatta il testo per il valore selezionato nel SelectTrigger
-  const formatSelectValue = (statId: string) => {
+  // Valore mostrato nel trigger del Select
+  const renderStatValue = (statId: string) => {
     const current = currentStats[statId] || 10;
     const newValue = getNewValue(statId);
-    const stat = ABILITY_LIST_ICONS.find(s => s.id === statId);
-    return `${stat?.icon || '📊'} ${getItalianAbilityFull(statId)} (${current} → ${newValue})`;
+    const Icon = ABILITY_OPTIONS.find(s => s.id === statId)?.icon;
+    return (
+      <span className="flex items-center gap-2">
+        {Icon && <Icon className="h-4 w-4 text-frame" />}
+        <span>{getItalianAbilityFull(statId)}</span>
+        <span className="stat-value text-xs text-ink-muted">
+          ({current} → {newValue})
+        </span>
+      </span>
+    );
   };
 
   return (
@@ -103,28 +122,22 @@ export default function LevelUpASIStep({
           onValueChange={(v) => setAsiType(v as 'increase' | 'feat')}
           className="space-y-3"
         >
-          <div className="flex items-start gap-3 p-3 rounded-lg border border-amber-200 bg-amber-50/30">
-            <RadioGroupItem value="increase" id="increase" className="mt-1" />
-            <Label htmlFor="increase" className="flex-1 cursor-pointer">
-              <div className="font-medium text-amber-900">Aumenta caratteristiche</div>
-              <div className="text-sm text-amber-600">
-                Aumenta una caratteristica di 2 o due caratteristiche di 1
-              </div>
-            </Label>
-          </div>
+          <RadioCard
+            value="increase"
+            title="Aumenta caratteristiche"
+            description="Aumenta una caratteristica di 2 o due caratteristiche di 1"
+          />
 
-          <div className="flex items-start gap-3 p-3 rounded-lg border border-amber-200 bg-amber-50/30">
-            <RadioGroupItem value="feat" id="feat" className="mt-1" />
-            <Label htmlFor="feat" className="flex-1 cursor-pointer">
-              <div className="font-medium text-amber-900 flex items-center gap-1">
-                <Sparkles className="w-4 h-4" />
+          <RadioCard
+            value="feat"
+            title={
+              <span className="flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4" aria-hidden="true" />
                 Scegli un talento
-              </div>
-              <div className="text-sm text-amber-600">
-                Sostituisci l&apos;ASI con un talento speciale
-              </div>
-            </Label>
-          </div>
+              </span>
+            }
+            description="Sostituisci l'ASI con un talento speciale"
+          />
         </RadioGroup>
       )}
 
@@ -150,16 +163,16 @@ export default function LevelUpASIStep({
               <Label>Caratteristica principale</Label>
               <Select value={selectedStat} onValueChange={(v) => v && setSelectedStat(v)}>
                 <SelectTrigger className="mt-1">
-                  <SelectValue>{formatSelectValue(selectedStat)}</SelectValue>
+                  <SelectValue>{renderStatValue(selectedStat)}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  {ABILITY_LIST_ICONS.map(stat => (
-                    <SelectItem key={stat.id} value={stat.id}>
+                  {ABILITY_OPTIONS.map(({ id, icon: Icon }) => (
+                    <SelectItem key={id} value={id}>
                       <span className="flex items-center gap-2">
-                        <span>{stat.icon}</span>
-                        <span>{getItalianAbilityFull(stat.id)}</span>
-                        <span className="text-amber-600 text-xs ml-2">
-                          ({currentStats[stat.id] || 10} → {getNewValue(stat.id)})
+                        <Icon className="h-4 w-4 text-frame" />
+                        <span>{getItalianAbilityFull(id)}</span>
+                        <span className="stat-value text-xs text-ink-muted">
+                          ({currentStats[id] || 10} → {getNewValue(id)})
                         </span>
                       </span>
                     </SelectItem>
@@ -173,18 +186,18 @@ export default function LevelUpASIStep({
                 <Label>Seconda caratteristica</Label>
                 <Select value={secondStat} onValueChange={(v) => v && setSecondStat(v)}>
                   <SelectTrigger className="mt-1">
-                    <SelectValue>{formatSelectValue(secondStat)}</SelectValue>
+                    <SelectValue>{renderStatValue(secondStat)}</SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    {ABILITY_LIST_ICONS
+                    {ABILITY_OPTIONS
                       .filter(s => s.id !== selectedStat)
-                      .map(stat => (
-                        <SelectItem key={stat.id} value={stat.id}>
+                      .map(({ id, icon: Icon }) => (
+                        <SelectItem key={id} value={id}>
                           <span className="flex items-center gap-2">
-                            <span>{stat.icon}</span>
-                            <span>{getItalianAbilityFull(stat.id)}</span>
-                            <span className="text-amber-600 text-xs ml-2">
-                              ({currentStats[stat.id] || 10} → {getNewValue(stat.id)})
+                            <Icon className="h-4 w-4 text-frame" />
+                            <span>{getItalianAbilityFull(id)}</span>
+                            <span className="stat-value text-xs text-ink-muted">
+                              ({currentStats[id] || 10} → {getNewValue(id)})
                             </span>
                           </span>
                         </SelectItem>

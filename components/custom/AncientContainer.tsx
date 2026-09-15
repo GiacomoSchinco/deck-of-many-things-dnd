@@ -4,6 +4,15 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 
+/**
+ * Cornice dei contenitori antichi. Era copiata identica in cinque file:
+ * ora il gradino di elevazione si sceglie qui una volta sola.
+ * `relative` non è decorativo: senza, le decorazioni angolari `absolute`
+ * uscivano dal contenitore agganciandosi al primo antenato posizionato.
+ */
+const FRAME_CLASS =
+  'relative overflow-hidden surface-raised border-2 border-amber-900/30';
+
 interface AncientContainerProps {
   children: React.ReactNode;
   title?: string;
@@ -32,14 +41,11 @@ export default function AncientContainer({
   showDecorations = true,
 }: AncientContainerProps) {
   return (
-    <div className={cn(
-      "bg-gradient-to-br from-parchment-100 to-parchment-200 rounded-xl border-2 border-amber-900/30 shadow-xl overflow-hidden",
-      className
-    )}>
+    <div className={cn(FRAME_CLASS, className)}>
       {/* Header decorativo */}
       {(title || subtitle || action) && (
         <div className={cn(
-          "bg-amber-900/10 border-b border-amber-900/20 px-6 py-5",
+          "bg-gradient-to-b from-parchment-300/50 to-parchment-100/10 border-b border-frame/25 px-6 py-5",
           headerClassName
         )}>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -72,7 +78,7 @@ export default function AncientContainer({
       {/* Footer decorativo */}
       {footer && (
         <div className={cn(
-          "text-center text-xs text-amber-400 pt-4 pb-4 border-t border-amber-200",
+          "text-center text-xs text-ink-muted pt-4 pb-4 border-t border-frame/20",
           footerClassName
         )}>
           {footer}
@@ -99,10 +105,7 @@ export function SimpleAncientContainer({
   className?: string;
 }) {
   return (
-    <div className={cn(
-      "bg-gradient-to-br from-parchment-100 to-parchment-200 rounded-xl border-2 border-amber-900/30 shadow-xl overflow-hidden",
-      className
-    )}>
+    <div className={cn(FRAME_CLASS, className)}>
       <div className="p-6">
         {children}
       </div>
@@ -125,10 +128,7 @@ export function AncientContainerWithHeader({
   contentClassName?: string;
 }) {
   return (
-    <div className={cn(
-      "bg-gradient-to-br from-parchment-100 to-parchment-200 rounded-xl border-2 border-amber-900/30 shadow-xl overflow-hidden",
-      className
-    )}>
+    <div className={cn(FRAME_CLASS, className)}>
       {header && (
         <div className="bg-amber-900/10 border-b border-amber-900/20">
           {header}

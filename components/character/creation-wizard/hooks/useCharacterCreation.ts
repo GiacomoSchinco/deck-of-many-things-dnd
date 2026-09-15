@@ -204,6 +204,8 @@ export function useCharacterCreation() {
 
   return {
     currentStep,
+    steps,
+    stepIndex:    idx,
     data,
     loading:      isSaving,
     updateData,

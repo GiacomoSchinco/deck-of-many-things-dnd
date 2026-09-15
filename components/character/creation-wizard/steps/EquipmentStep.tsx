@@ -11,7 +11,7 @@ import type {
 } from '@/types/equipment';
 import { Button } from '@/components/ui/button';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
-import { Check, Package, X } from 'lucide-react';
+import { Check, Package, Shield, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import Loading from '@/components/custom/Loading';
@@ -190,7 +190,8 @@ export function EquipmentStep({ classId, onConfirm, onChange, initialSelectedIte
 
   return (
     <WizardStep
-      title="⚔️ Equipaggiamento Iniziale"
+      title="Equipaggiamento Iniziale"
+      icon={Shield}
       subtitle="Scegli l'equipaggiamento con cui iniziare l'avventura"
       onBack={onBack}
       onNext={handleConfirm}

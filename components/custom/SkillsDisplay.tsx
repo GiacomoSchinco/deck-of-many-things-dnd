@@ -2,7 +2,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
-import { Info, CheckCircle2, Star, Circle } from 'lucide-react';
+import { BookOpen, Info, CheckCircle2, Star, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { calculateModifier } from '@/lib/calculations/abilityModifiers';
 import {
@@ -14,12 +14,17 @@ import {
 } from '@/components/ui/dialog';
 import type { Skill } from '@/types/skill';
 import type { AbilityScores, ProficiencyType } from '@/types/character';
-import { getAbilityShort, getItalianAbilityFull } from '@/lib/utils/nameMappers';
+import { getItalianAbilityFull } from '@/lib/utils/nameMappers';
 
 interface SkillsDisplayProps {
   information?: boolean;
   /** Numero di colonne della griglia (default: 3) */
   gridCols?: 1 | 2 | 3 | 4;
+  /**
+   * Titolo interno. Va spento quando il componente vive dentro una tab che si
+   * chiama già "Competenze", altrimenti la stessa parola compare due volte.
+   */
+  showTitle?: boolean;
   skills: Skill[];
   characterSkills: Map<number, ProficiencyType>;
   abilityScores: AbilityScores;
@@ -33,8 +38,12 @@ export function SkillsDisplay({
   characterSkills,
   abilityScores,
   proficiencyBonus,
-  information = true
+  information = true,
+  showTitle = true,
 }: SkillsDisplayProps) {
+
+  /** Segno sempre esplicito: "+3" si legge, "3" no. */
+  const formatModifier = (n: number) => (n >= 0 ? `+${n}` : `${n}`);
 
   const getSkillBonus = (skill: Skill) => {
     const abilityScore = abilityScores[skill.ability as keyof typeof abilityScores] || 10;
@@ -60,73 +69,80 @@ export function SkillsDisplay({
     return abilityMod;
   };
 
+  /**
+   * Come si compone il bonus, in parole: "Destrezza +1 + competenza 2".
+   * Serve nel tooltip e nel dettaglio, quindi deve essere leggibile da sola.
+   */
   const getBonusBreakdown = (skill: Skill) => {
     const abilityScore = abilityScores[skill.ability as keyof typeof abilityScores] || 10;
     const abilityMod = calculateModifier(abilityScore);
     const proficiency = characterSkills.get(skill.id);
+    const base = `${getItalianAbilityFull(skill.ability)} ${formatModifier(abilityMod)}`;
 
-    if (!proficiency || proficiency === 'none') {
-      return `${abilityMod >= 0 ? `+${abilityMod}` : abilityMod}`;
-    }
-
-    if (proficiency === 'proficient') {
-      return `${abilityMod >= 0 ? `+${abilityMod}` : abilityMod} + ${proficiencyBonus} (competenza)`;
-    }
-
-    if (proficiency === 'expertise') {
-      return `${abilityMod >= 0 ? `+${abilityMod}` : abilityMod} + ${proficiencyBonus} × 2 (perizia)`;
-    }
-
+    if (!proficiency || proficiency === 'none') return base;
+    if (proficiency === 'proficient') return `${base} + competenza ${proficiencyBonus}`;
+    if (proficiency === 'expertise') return `${base} + perizia ${proficiencyBonus * 2}`;
     if (proficiency === 'half') {
-      return `${abilityMod >= 0 ? `+${abilityMod}` : abilityMod} + ${Math.floor(proficiencyBonus / 2)} (mezza competenza)`;
+      return `${base} + mezza competenza ${Math.floor(proficiencyBonus / 2)}`;
     }
-
-    return `${abilityMod >= 0 ? `+${abilityMod}` : abilityMod}`;
+    return base;
   };
 
-  const selectedCount = Array.from(characterSkills.values()).filter(
-    v => v !== 'none'
-  ).length;
+  const trainedCount = Array.from(characterSkills.values()).filter((v) => v !== 'none').length;
+  const expertiseCount = Array.from(characterSkills.values()).filter((v) => v === 'expertise').length;
 
   return (
     <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-2">
-        <h3 className="text-xl fantasy-title flex items-center gap-2">
-          <span>🎯</span>Abilità
-          {information && (
-            selectedCount > 0 && (
-              <Badge className="bg-amber-100 text-amber-800 border-amber-300 text-sm">
-                {selectedCount} selezionate
-              </Badge>
-            )
+      {(showTitle || information) && (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          {showTitle ? (
+            <h3 className="flex items-center gap-2 text-xl fantasy-title">
+              <Target className="h-5 w-5 text-frame" aria-hidden="true" />
+              Competenze
+            </h3>
+          ) : (
+            <span className="eyebrow">Riepilogo competenze</span>
           )}
-        </h3>
 
-        <div className="text-xs text-amber-600 flex items-center gap-2 bg-amber-100/50 p-2 rounded-lg border border-amber-200">
-          <div className="flex items-center gap-1">
-            <Circle className="w-3 h-3 fill-green-500 text-green-500" />
-            <span>Competente</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Star className="w-3 h-3 fill-blue-500 text-blue-500" />
-            <span>Perizia</span>
-          </div>
-          <div className="w-px h-3 bg-amber-300" />
-          <span>
-            Bonus competenza: <strong className="text-amber-800">+{proficiencyBonus}</strong>
-          </span>
+          {/* La legenda non introduce simboli propri: mostra gli stessi badge
+              che si incontrano nelle tessere. Prima annunciava un cerchio
+              verde e una stella blu che nelle card non comparivano mai. */}
+          {information && (
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <span className="surface-tile inline-flex items-center gap-1.5 px-2.5 py-1 text-ink">
+                <CheckCircle2 className="h-3.5 w-3.5 text-frame" aria-hidden="true" />
+                <span className="stat-value text-sm">{trainedCount}</span>
+                competenti
+              </span>
+              {expertiseCount > 0 && (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-antique-gold/60 bg-antique-gold/15 px-2.5 py-1 text-frame-deep">
+                  <Star className="h-3.5 w-3.5 fill-current" aria-hidden="true" />
+                  <span className="stat-value text-sm">{expertiseCount}</span>
+                  con perizia
+                </span>
+              )}
+              <span className="surface-well px-2.5 py-1 text-ink-muted">
+                Bonus competenza{' '}
+                <strong className="stat-value text-ink-strong">
+                  {formatModifier(proficiencyBonus)}
+                </strong>
+              </span>
+            </div>
+          )}
         </div>
-      </div>
+      )}
 
-      {/* Griglia abilità */}
-      <div className={cn(
-        'gap-3',
-        gridCols === 1 ? 'grid grid-cols-1' :
-        gridCols === 2 ? 'grid grid-cols-1 md:grid-cols-2' :
-        gridCols === 4 ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4' :
-        'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-      )}>
+      {/* Griglia competenze. `auto-rows-fr` tiene le tessere della stessa riga
+          alla stessa altezza anche quando un nome va a capo. */}
+      <div
+        className={cn(
+          'grid auto-rows-fr gap-3',
+          gridCols === 1 && 'grid-cols-1',
+          gridCols === 2 && 'grid-cols-1 md:grid-cols-2',
+          gridCols === 3 && 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
+          gridCols === 4 && 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'
+        )}
+      >
         {skills.map((skill) => {
           const proficiency = characterSkills.get(skill.id);
           const isSelected = proficiency && proficiency !== 'none';
@@ -136,129 +152,106 @@ export function SkillsDisplay({
           const abilityMod = calculateModifier(abilityScore);
 
           return (
-            <div
+            <article
               key={skill.id}
               className={cn(
-                'group relative flex items-center justify-between p-3 rounded-lg border-2 transition-all duration-200 min-h-[70px]',
+                'group flex items-center justify-between gap-3 rounded-control border p-3',
+                'transition-[transform,box-shadow,border-color] duration-200 ease-soft',
                 isExpertise
-                  ? 'border-blue-400 bg-gradient-to-r from-blue-50/80 to-amber-50/50 shadow-md'
+                  ? 'surface-tile border-antique-gold/70 shadow-e2'
                   : isSelected
-                    ? 'border-amber-500 bg-gradient-to-r from-amber-100/80 to-amber-50/50 shadow-sm'
-                    : 'border-amber-200/60 bg-amber-50/30 hover:border-amber-400 hover:bg-amber-100/40'
+                    ? 'surface-flat border-antique-gold/45 hover:shadow-e2'
+                    : 'surface-flat border-frame/20 hover:border-frame/35 hover:shadow-e2'
               )}
             >
-              {/* Bordo laterale decorativo */}
-              {(isSelected || isExpertise) && (
-                <div className={cn(
-                  'absolute left-0 top-0 bottom-0 w-1 rounded-l-lg',
-                  isExpertise ? 'bg-blue-500' : 'bg-amber-600'
-                )} />
-              )}
-
-              <div className="flex-1 ml-2">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className={cn(
-                    "font-serif font-semibold text-base",
-                    isExpertise ? "text-blue-800" :
-                      isSelected ? "text-amber-800" : "text-amber-700"
-                  )}>
-                    {skill.name_it}
-                  </span>
-                  {isExpertise && (
-                    <Badge className="bg-blue-100 text-blue-700 border-blue-300 text-xs gap-1">
-                      <Star className="w-3 h-3" />
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="truncate font-medium text-ink-strong">{skill.name_it}</span>
+                  {/* Un solo linguaggio per lo stato: oro. La perizia è "più"
+                      della competenza (bordo pieno + stella), non un'altra
+                      categoria con un altro colore. */}
+                  {isExpertise ? (
+                    <Badge className="gap-1 border-antique-gold/60 bg-antique-gold/20 text-xs text-frame-deep">
+                      <Star className="h-3 w-3 fill-current" aria-hidden="true" />
                       Perizia
                     </Badge>
-                  )}
-                  {isSelected && !isExpertise && (
-                    <Badge className="bg-amber-100 text-amber-700 border-amber-300 text-xs gap-1">
-                      <CheckCircle2 className="w-3 h-3" />
+                  ) : isSelected ? (
+                    <Badge className="gap-1 border-frame/25 bg-parchment-200/70 text-xs text-ink">
+                      <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
                       Competente
                     </Badge>
-                  )}
+                  ) : null}
                 </div>
-                <p className={cn(
-                  'text-xs mt-0.5 font-mono',
-                  isExpertise ? 'text-blue-600' :
-                    isSelected ? 'text-amber-600' : 'text-amber-500'
-                )}>
-
-                  {getAbilityShort(skill.ability)} ({abilityMod >= 0 ? `+${abilityMod}` : abilityMod})
-                  {information && (
-                    <span>
-                      {isSelected && (
-                        <span className="ml-1 text-amber-500 text-[10px]">
-                          • competenza attiva
-                        </span>
-                      )}
-                    </span>
-                  )}
-
+                {/* Riga secondaria: solo il dato utile. Prima diceva anche
+                    "competenza attiva", che ripeteva il badge qui sopra. */}
+                <p className="mt-0.5 text-xs text-ink-muted">
+                  {getItalianAbilityFull(skill.ability)}{' '}
+                  <span className="stat-value text-xs">{formatModifier(abilityMod)}</span>
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
-                {/* Bonus */}
-                <div className="text-right">
-                  <span
-                    className={cn(
-                      'text-2xl font-bold font-mono tracking-tight',
-                      isExpertise ? 'text-blue-700' :
-                        isSelected ? 'text-amber-800' : 'text-amber-500'
-                    )}
-                    title={`Calcolo: ${getBonusBreakdown(skill)} = ${bonus >= 0 ? `+${bonus}` : bonus}`}
-                  >
-                    {bonus >= 0 ? `+${bonus}` : bonus}
-                  </span>
-                </div>
+              <div className="flex shrink-0 items-center gap-1.5">
+                {/* Il totale è sempre in inchiostro pieno: prima cambiava colore
+                    e sugli inesperti (ambra-500 su pergamena) i "+0" non si
+                    leggevano. Ora cambia il badge, non la leggibilità. */}
+                <span
+                  className="stat-value text-2xl"
+                  title={`Calcolo: ${getBonusBreakdown(skill)} = ${formatModifier(bonus)}`}
+                >
+                  {formatModifier(bonus)}
+                </span>
 
-                {/* Pulsante info */}
+                {/* Sempre visibile: prima compariva solo al passaggio del mouse,
+                    quindi su tablet e telefono non si scopriva che esistesse. */}
                 {skill.description && (
                   <Dialog>
                     <DialogTrigger
-                      className="p-1 rounded-full hover:bg-amber-200/50 transition-colors text-amber-400 hover:text-amber-600 opacity-0 group-hover:opacity-100 focus:opacity-100"
-                      aria-label="Info abilità"
+                      className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-ink-muted opacity-70 transition-[opacity,background-color,color] duration-200 hover:bg-parchment-200/70 hover:text-ink-strong hover:opacity-100 focus-visible:opacity-100"
+                      aria-label={`Dettagli di ${skill.name_it}`}
                     >
-                      <Info className="w-4 h-4" />
+                      <Info className="h-4 w-4" aria-hidden="true" />
                     </DialogTrigger>
-                    <DialogContent className="max-w-md bg-parchment-100 border-2 border-amber-900/30">
+                    <DialogContent className="max-w-md">
                       <DialogHeader>
-                        <DialogTitle className="text-2xl font-serif text-amber-900 flex items-center gap-2">
-                          <span>📖</span> {skill.name_it}
+                        <DialogTitle className="flex items-center gap-2 text-xl fantasy-title">
+                          <BookOpen className="h-4 w-4 text-frame" aria-hidden="true" />
+                          {skill.name_it}
                         </DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4 mt-2">
-                        <div className="flex items-center gap-2 text-sm text-amber-700">
-                          <Badge variant="outline" className="border-amber-600">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Badge variant="outline" className="surface-tile text-ink-strong">
                             {getItalianAbilityFull(skill.ability)}
                           </Badge>
                           {isExpertise && (
-                            <Badge className="bg-blue-100 text-blue-700 border-blue-300">
-                              <Star className="w-3 h-3 mr-1" />
+                            <Badge className="gap-1 border-antique-gold/60 bg-antique-gold/20 text-frame-deep">
+                              <Star className="h-3 w-3 fill-current" aria-hidden="true" />
                               Perizia
                             </Badge>
                           )}
                           {isSelected && !isExpertise && (
-                            <Badge className="bg-amber-100 text-amber-700 border-amber-300">
-                              <CheckCircle2 className="w-3 h-3 mr-1" />
+                            <Badge className="gap-1 border-frame/25 bg-parchment-200/70 text-ink">
+                              <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
                               Competente
                             </Badge>
                           )}
                         </div>
 
-                        <div className="bg-amber-100/50 p-4 rounded-lg border border-amber-200">
-                          <p className="text-amber-800 leading-relaxed">
-                            {skill.description}
-                          </p>
+                        <div className="surface-well p-4">
+                          <p className="leading-relaxed text-ink">{skill.description}</p>
                         </div>
 
-                        <div className="border-t border-amber-200 pt-3 text-xs text-amber-600">
-                          <p className="font-semibold">Bonus attuale:</p>
-                          <p className="font-mono mt-1 bg-amber-100 inline-block px-2 py-1 rounded">
-                            {getBonusBreakdown(skill)} = <strong className="text-amber-800">{bonus >= 0 ? `+${bonus}` : bonus}</strong>
-                          </p>
-                          <p className="mt-2">
-                            Prova di {skill.name_it}: <span className="font-mono">1d20 + {bonus >= 0 ? bonus : `(${bonus})`}</span>
+                        {/* Il calcolo si legge come una frase e poi come numero:
+                            prima era una stringa mono con i segni tutti attaccati. */}
+                        <div className="space-y-1.5 border-t border-frame/20 pt-3">
+                          <p className="eyebrow">Bonus attuale</p>
+                          <p className="stat-value text-lg">{formatModifier(bonus)}</p>
+                          <p className="text-xs text-ink-muted">{getBonusBreakdown(skill)}</p>
+                          <p className="pt-1 text-xs text-ink-muted">
+                            Prova di {skill.name_it}:{' '}
+                            <span className="stat-value text-xs">
+                              1d20 {formatModifier(bonus)}
+                            </span>
                           </p>
                         </div>
                       </div>
@@ -266,36 +259,10 @@ export function SkillsDisplay({
                   </Dialog>
                 )}
               </div>
-            </div>
+            </article>
           );
         })}
       </div>
-
-      {/* Legenda */}
-      {/*      <div className="mt-4 pt-3 border-t border-amber-200 text-xs text-amber-500 text-center">
-        <div className="flex items-center justify-center gap-4 flex-wrap">
-          <span className="flex items-center gap-1">
-            <span className="inline-block w-3 h-3 bg-amber-600 rounded-full" />
-            <span>Bordo = competenza selezionata</span>
-          </span>
-          <span className="flex items-center gap-1">
-            <CheckCircle2 className="w-3 h-3 text-amber-600" />
-            <span>Icona = competenza attiva</span>
-          </span>
-          <span className="flex items-center gap-1">
-            <Star className="w-3 h-3 text-blue-500" />
-            <span>Stella = perizia (doppio bonus)</span>
-          </span>
-          <span className="flex items-center gap-1">
-            <Info className="w-3 h-3" />
-            <span>ℹ️ al passaggio del mouse per dettagli</span>
-          </span>
-        </div>
-        <p className="mt-2 text-amber-400 text-[10px]">
-          Bonus totale = modificatore caratteristica {proficiencyBonus ? `+ bonus competenza (${proficiencyBonus})` : ''}
-          {proficiencyBonus && ' ×2 se perizia'}
-        </p>
-      </div>*/}
     </div>
   );
 }

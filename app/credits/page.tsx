@@ -1,9 +1,10 @@
 // app/credits/page.tsx
 import Link from 'next/link';
-import AncientCardContainer from '@/components/custom/AncientCardContainer';
-import { Button } from '@/components/ui/button';
-import { ExternalLink, ArrowLeft } from 'lucide-react';
+import { buttonVariants } from '@/components/ui/button-variants';
+import { cn } from '@/lib/utils';
+import { BookOpen, ExternalLink, ArrowLeft, Heart, Image as ImageIcon, PenLine, ScrollText } from 'lucide-react';
 import { PageWrapper } from '@/components/layout/PageWrapper';
+import { AncientScroll } from '@/components/custom/AncientScroll';
 
 export default function CreditsPage() {
   const authors = [
@@ -37,21 +38,19 @@ export default function CreditsPage() {
     <PageWrapper
       withContainer={false}
       title="Crediti"
-      subtitle="Fatto con ❤️ e tanti dadi 🎲"
+      subtitle="Fatto con passione, e con molti tiri di dado"
       action={
-        <Link href="/">
-          <Button variant="ghost" className="text-amber-700 hover:text-amber-900">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Torna alla Home
-          </Button>
+        <Link href="/" className={cn(buttonVariants({ variant: 'ghost' }))}>
+          <ArrowLeft className="h-4 w-4" />
+          Torna alla Home
         </Link>
       }
     >
       <div className="not-prose space-y-6">
         {/* Icone principali */}
-        <AncientCardContainer className="p-8 mb-8">
+        <AncientScroll className="p-8 mb-8">
           <h2 className="text-2xl fantasy-title mb-4 flex items-center gap-2">
-            <span className="text-3xl">🎴</span> Game Icons
+            <ImageIcon className="w-6 h-6 text-frame" aria-hidden="true" /> Game Icons
           </h2>
           
           <p className="text-amber-800 mb-6 leading-relaxed">
@@ -67,24 +66,24 @@ export default function CreditsPage() {
             , un archivio meraviglioso di icone gratuite per giochi.
           </p>
 
-          <div className="bg-amber-100/50 p-4 rounded-lg border border-amber-900/20">
-            <p className="text-sm text-amber-800 font-mono">
+          <div className="surface-well p-4">
+            <p className="text-sm text-ink font-mono">
               Game icons provided by https://game-icons.net
             </p>
           </div>
-        </AncientCardContainer>
+        </AncientScroll>
 
         {/* Autori */}
-        <AncientCardContainer className="p-8 mb-8">
+        <AncientScroll className="p-8 mb-8">
           <h2 className="text-2xl fantasy-title mb-6 flex items-center gap-2">
-            <span className="text-3xl">✍️</span> Autori
+            <PenLine className="w-6 h-6 text-frame" aria-hidden="true" /> Autori
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {authors.map((author) => (
               <div 
                 key={author.name} 
-                className="flex items-start gap-3 p-4 bg-amber-100/30 rounded-lg border border-amber-900/10 hover:bg-amber-100/50 transition-colors"
+                className="surface-tile interactive-quiet flex items-start gap-3 p-4"
               >
 
                 <div className="flex-1">
@@ -104,12 +103,12 @@ export default function CreditsPage() {
               </div>
             ))}
           </div>
-        </AncientCardContainer>
+        </AncientScroll>
 
         {/* Licenza */}
-        <AncientCardContainer className="p-8 mb-8">
+        <AncientScroll className="p-8 mb-8">
           <h2 className="text-2xl fantasy-title mb-4 flex items-center gap-2">
-            <span className="text-3xl">📋</span> Licenza
+            <ScrollText className="w-6 h-6 text-frame" aria-hidden="true" /> Licenza
           </h2>
 
           <div className="space-y-4 text-amber-800">
@@ -138,12 +137,12 @@ export default function CreditsPage() {
               </a>
             </p>
           </div>
-        </AncientCardContainer>
+        </AncientScroll>
 
         {/* SRD — Dati di gioco */}
-        <AncientCardContainer className="p-8 mb-8">
+        <AncientScroll className="p-8 mb-8">
           <h2 className="text-2xl fantasy-title mb-4 flex items-center gap-2">
-            <span className="text-3xl">📖</span> SRD — Dati di Gioco
+            <BookOpen className="w-6 h-6 text-frame" aria-hidden="true" /> SRD — Dati di Gioco
           </h2>
 
           <div className="space-y-4 text-amber-800">
@@ -219,12 +218,12 @@ export default function CreditsPage() {
               </p>
             </div>
           </div>
-        </AncientCardContainer>
+        </AncientScroll>
 
         {/* Ringraziamenti extra */}
-        <AncientCardContainer className="p-8">
+        <AncientScroll variant='rolled' className="p-8">
           <h2 className="text-2xl fantasy-title mb-4 flex items-center gap-2">
-            <span className="text-3xl">🙏</span> Ringraziamenti Speciali
+            <Heart className="w-6 h-6 text-frame" aria-hidden="true" /> Ringraziamenti Speciali
           </h2>
 
           <ul className="space-y-2 text-amber-800">
@@ -248,7 +247,7 @@ export default function CreditsPage() {
               D&D e tutte le proprietà correlate sono di Wizards of the Coast.
             </p>
           </div>
-        </AncientCardContainer>
+        </AncientScroll>
 
         {/* Footer della pagina crediti */}
         <div className="text-center mt-8 text-sm text-amber-500">

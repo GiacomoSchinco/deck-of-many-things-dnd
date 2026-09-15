@@ -21,6 +21,13 @@ import {
   Weight,
   Coins,
   Grid2x2,
+  Backpack,
+  Crosshair,
+  FlaskConical,
+  Layers,
+  Shield,
+  Sword,
+  Wrench,
 } from 'lucide-react';
 import {
   Dialog,
@@ -47,26 +54,32 @@ interface ItemPickerProps {
 
 
 const typeLabels: Record<ItemTypeFilter, string> = {
-  weapon: '⚔️ Armi',
-  armor: '🛡️ Armature',
-  gear: '🎒 Equipaggiamento',
-  consumable: '🧪 Consumabili',
-  ammunition: '🏹 Munizioni',
-  tool: '🔧 Attrezzi',
-  currency: '💰 Valuta',
-  all: '📦 Tutti'
+  weapon: 'Armi',
+  armor: 'Armature',
+  gear: 'Equipaggiamento',
+  consumable: 'Consumabili',
+  ammunition: 'Munizioni',
+  tool: 'Attrezzi',
+  currency: 'Valuta',
+  all: 'Tutti'
 };
 
-const typeIcons: Record<ItemTypeFilter, string> = {
-  weapon: '⚔️',
-  armor: '🛡️',
-  gear: '🎒',
-  consumable: '🧪',
-  ammunition: '🏹',
-  tool: '🔧',
-  currency: '💰',
-  all: '📦'
+const TYPE_ICONS = {
+  weapon: Sword,
+  armor: Shield,
+  gear: Backpack,
+  consumable: FlaskConical,
+  ammunition: Crosshair,
+  tool: Wrench,
+  currency: Coins,
+  all: Layers,
 };
+
+/** Icona del tipo di oggetto, con fallback generico. */
+function ItemTypeIcon({ type, className }: { type: ItemTypeFilter; className?: string }) {
+  const Icon = TYPE_ICONS[type] ?? Layers;
+  return <Icon className={className} aria-hidden="true" />;
+}
 
 export function ItemPicker({
   value,
@@ -151,7 +164,7 @@ export function ItemPicker({
             <div className="flex flex-col gap-0.5 min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 {displayItem && (
-                  <span className="text-lg">{typeIcons[displayItem.type] || '📦'}</span>
+                  <ItemTypeIcon type={displayItem.type} className="h-4 w-4 shrink-0 text-frame" />
                 )}
                 <span className={displayItem ? 'text-amber-900 font-medium' : isLoadingDisplay ? 'text-amber-400 animate-pulse' : 'text-amber-500'}>
                   {displayItem?.name || (isLoadingDisplay ? 'Caricamento...' : placeholder)}
@@ -219,13 +232,13 @@ export function ItemPicker({
                       <SelectValue placeholder="Tipo oggetto" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">📦 Tutti</SelectItem>
-                      <SelectItem value="weapon">⚔️ Armi</SelectItem>
-                      <SelectItem value="armor">🛡️ Armature</SelectItem>
-                      <SelectItem value="gear">🎒 Equipaggiamento</SelectItem>
-                      <SelectItem value="consumable">🧪 Consumabili</SelectItem>
-                      <SelectItem value="ammunition">🏹 Munizioni</SelectItem>
-                      <SelectItem value="tool">🔧 Attrezzi</SelectItem>
+                      <SelectItem value="all">{typeLabels.all}</SelectItem>
+                      <SelectItem value="weapon">{typeLabels.weapon}</SelectItem>
+                      <SelectItem value="armor">{typeLabels.armor}</SelectItem>
+                      <SelectItem value="gear">{typeLabels.gear}</SelectItem>
+                      <SelectItem value="consumable">{typeLabels.consumable}</SelectItem>
+                      <SelectItem value="ammunition">{typeLabels.ammunition}</SelectItem>
+                      <SelectItem value="tool">{typeLabels.tool}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -283,10 +296,10 @@ export function ItemPicker({
                                 item.rarity === 'very rare' && 'bg-purple-100 text-purple-800',
                                 item.rarity === 'legendary' && 'bg-orange-100 text-orange-800'
                               )}>
-                                {item.rarity === 'uncommon' && '🔹 Non comune'}
-                                {item.rarity === 'rare' && '✨ Raro'}
-                                {item.rarity === 'very rare' && '⭐ Molto raro'}
-                                {item.rarity === 'legendary' && '👑 Leggendario'}
+                                {item.rarity === 'uncommon' && 'Non comune'}
+                                {item.rarity === 'rare' && 'Raro'}
+                                {item.rarity === 'very rare' && 'Molto raro'}
+                                {item.rarity === 'legendary' && 'Leggendario'}
                               </Badge>
                             )}
                           </div>
@@ -314,7 +327,7 @@ export function ItemPicker({
                                 </span>
                               )}
                               {item.requires_attunement && (
-                                <span className="text-purple-500">🔗 Richiede sintonia</span>
+                                <span className="text-purple-500">Richiede sintonia</span>
                               )}
                             </div>
                           )}
@@ -340,7 +353,7 @@ export function ItemPicker({
                     {search && <span className="ml-1">per <span className="italic">&ldquo;{search}&rdquo;</span></span>}
                     {itemType !== 'all' && (
                       <span className="ml-1">
-                        di tipo <span className="font-medium">{typeLabels[itemType].replace(/^[^ ]+ /, '')}</span>
+                        di tipo <span className="font-medium">{typeLabels[itemType]}</span>
                       </span>
                     )}
                   </>

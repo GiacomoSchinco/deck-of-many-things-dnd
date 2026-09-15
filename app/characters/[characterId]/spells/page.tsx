@@ -44,12 +44,12 @@ export default function SpellPage() {
       title="Magie"
       subtitle="Gestisci le magie conosciute e preparate del tuo personaggio."
     >
-      <div className="not-prose">
+      <div>
       <Tabs defaultValue="known" className="space-y-4">
-        <TabsList className="bg-amber-100/50 border border-amber-200">
-          <TabsTrigger value="known">📖 Incantesimi Conosciuti</TabsTrigger>
+        <TabsList className="border border-frame/20 bg-parchment-200/50">
+          <TabsTrigger value="known">Incantesimi Conosciuti</TabsTrigger>
           {isPreparerClass && (
-            <TabsTrigger value="prepared">✨ Incantesimi Preparati</TabsTrigger>
+            <TabsTrigger value="prepared">Incantesimi Preparati</TabsTrigger>
           )}
         </TabsList>
 

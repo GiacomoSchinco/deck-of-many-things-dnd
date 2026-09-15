@@ -1,5 +1,8 @@
 // lib/utils/nameMappers.ts
 
+import { SPELL_SCHOOL_ORDER, SPELL_SCHOOLS } from '@/lib/theme/schools'
+import { getSpellSchoolItalian, type SpellSchool } from '@/types/spell'
+
 // ─── RAZZE ────────────────────────────────────────────────────────────────────
 
 /** Italiano → inglese (lowercase, come arriva dal DB / Open5e slug) */
@@ -90,33 +93,18 @@ export function getItalianClasses(names: string[]): string[] {
 
 // ─── SCUOLE DI MAGIA ──────────────────────────────────────────────────────────
 
-export const schoolItalianNames: Record<string, string> = {
-  'abjuration':  'Abiurazione',
-  'conjuration': 'Evocazione',
-  'divination':  'Divinazione',
-  'enchantment': 'Ammaliamento',
-  'evocation':   'Invocazione',
-  'illusion':    'Illusione',
-  'necromancy':  'Necromanzia',
-  'transmutation':'Trasmutazione',
-}
+// Le mappe delle scuole vivono in `lib/theme/schools.ts` (unica fonte: nome
+// italiano, icona, colore). Qui restano solo gli helper storici.
 
 export function getItalianSchool(name?: string): string {
   if (!name) return ''
-  return schoolItalianNames[name.toLowerCase()] ?? name
+  return getSpellSchoolItalian(name as SpellSchool)
 }
 
 /** Classi Tailwind per i badge delle scuole di magia (badge pill). */
-export const schoolBadgeColors: Record<string, string> = {
-  abjuration:    'bg-blue-100 text-blue-800',
-  conjuration:   'bg-amber-100 text-amber-800',
-  divination:    'bg-purple-100 text-purple-800',
-  enchantment:   'bg-pink-100 text-pink-800',
-  evocation:     'bg-red-100 text-red-800',
-  illusion:      'bg-teal-100 text-teal-800',
-  necromancy:    'bg-gray-800 text-gray-100',
-  transmutation: 'bg-indigo-100 text-indigo-800',
-}
+export const schoolBadgeColors: Record<string, string> = Object.fromEntries(
+  SPELL_SCHOOL_ORDER.map((key) => [key, SPELL_SCHOOLS[key].badge])
+)
 
 export const itemTypeItalianNames: Record<string, string> = {
   'weapon':     'Arma',
@@ -214,19 +202,6 @@ export const ABILITY_LIST: { key: string; label: string; name: string }[] = [
   { key: 'intelligence', label: 'INT', name: 'Intelligenza' },
   { key: 'wisdom',       label: 'SAG', name: 'Saggezza' },
   { key: 'charisma',     label: 'CAR', name: 'Carisma' },
-]
-
-/**
- * Array ordinato delle 6 caratteristiche con id, nome italiano e icona emoji.
- * Usato da LevelUpASIStep, ecc.
- */
-export const ABILITY_LIST_ICONS: { id: string; label: string; icon: string }[] = [
-  { id: 'strength',     label: 'Forza',        icon: '💪' },
-  { id: 'dexterity',    label: 'Destrezza',    icon: '🏃' },
-  { id: 'constitution', label: 'Costituzione', icon: '❤️' },
-  { id: 'intelligence', label: 'Intelligenza', icon: '🧠' },
-  { id: 'wisdom',       label: 'Saggezza',     icon: '🕯️' },
-  { id: 'charisma',     label: 'Carisma',      icon: '👑' },
 ]
 
 /** I 9 allineamenti D&D in italiano. */

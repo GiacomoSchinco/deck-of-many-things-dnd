@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { CircleCheck } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { AncientScroll } from '../custom/AncientScroll';
 import { Eye, EyeOff } from 'lucide-react';
@@ -50,8 +51,8 @@ export function ResetPasswordForm() {
   if (success) {
     return (
       <AncientScroll variant="rolled" className="max-w-md mx-auto p-6 text-center space-y-4">
-        <div className="text-4xl">✅</div>
-        <h2 className="text-amber-900">Password aggiornata!</h2>
+        <CircleCheck className="mx-auto h-10 w-10 text-success" aria-hidden="true" />
+        <h1 className="mb-0 text-amber-900">Password aggiornata!</h1>
         <p className="text-amber-700 text-sm">
           La tua password è stata reimpostata con successo. Verrai reindirizzato alla dashboard…
         </p>
@@ -61,7 +62,7 @@ export function ResetPasswordForm() {
 
   return (
     <AncientScroll variant="rolled" className="max-w-md mx-auto p-6">
-      <h2 className="text-center mb-6">Nuova Password</h2>
+      <h1 className="text-center mb-6">Nuova Password</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1">

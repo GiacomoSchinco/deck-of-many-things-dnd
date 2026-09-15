@@ -6,11 +6,12 @@ import { useClass } from '@/hooks/queries/useClasses';
 import { useSkillList } from '@/hooks/queries/useSkills';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { SelectableCard } from '@/components/ui/selectable-card';
+import { Note } from '@/components/ui/note';
 import { Checkbox } from '@/components/ui/checkbox';
 import AncientCardContainer from '@/components/custom/AncientCardContainer';
-import { Info, CheckCircle2 } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 import { WizardStep } from '../WizardStep';
-import { cn } from '@/lib/utils';
 import type { Skill } from '@/types/skill';
 import Loading from '@/components/custom/Loading';
 import { getAbilityShort } from '@/lib/utils/nameMappers';
@@ -104,7 +105,8 @@ export function SkillsStep({ classId, abilityScores, onConfirm, onChange, initia
 
   return (
     <WizardStep
-      title="🎯 Competenze di Classe"
+      title="Competenze di Classe"
+      icon={BookOpen}
       subtitle={`Scegli ${maxChoices} competenze in cui essere addestrato`}
       onBack={onBack}
       onNext={handleConfirm}
@@ -122,15 +124,13 @@ export function SkillsStep({ classId, abilityScores, onConfirm, onChange, initia
             const abilityShort = getAbilityShort(skill.ability);
             
             return (
-              <div
+              <SelectableCard
                 key={skill.id}
+                multiple
+                selected={isSelected}
+                showCheck={false}
                 onClick={() => toggleSkill(skill.id)}
-                className={cn(
-                  'flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all border-2',
-                  isSelected 
-                    ? 'border-green-500 bg-green-50' 
-                    : 'border-amber-900/20 hover:border-amber-700 bg-parchment-50'
-                )}
+                className="flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
                   <Checkbox
@@ -139,41 +139,30 @@ export function SkillsStep({ classId, abilityScores, onConfirm, onChange, initia
                     className="pointer-events-none"
                   />
                   <div>
-                    <Label className="font-medium text-amber-900 cursor-pointer">
+                    <Label className="font-medium text-ink-strong cursor-pointer">
                       {skill.name_it}
                     </Label>
-                    <p className="text-xs text-amber-600">
+                    <p className="text-xs text-ink-muted">
                       {abilityShort} ({modifier >= 0 ? `+${modifier}` : modifier})
                     </p>
                     {skill.description && (
-                      <p className="text-xs text-amber-500 mt-1 line-clamp-1">
+                      <p className="text-xs text-ink-muted/80 mt-1 line-clamp-1">
                         {skill.description}
                       </p>
                     )}
                   </div>
                 </div>
-                {isSelected && (
-                  <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
-                )}
-              </div>
+              </SelectableCard>
             );
           })}
         </div>
       </AncientCardContainer>
 
       {/* Info box */}
-      <div className="bg-amber-100/50 p-4 rounded-lg">
-        <div className="flex gap-2">
-          <Info className="w-5 h-5 text-amber-700 flex-shrink-0" />
-          <div className="text-sm text-amber-700">
-            <p className="font-semibold mb-1">Come funziona?</p>
-            <p>
-              Quando effettui una prova di abilità, aggiungi il modificatore dell&apos;abilità 
-              corrispondente. Se sei addestrato, aggiungi anche il bonus di competenza (+2 al 1° livello).
-            </p>
-          </div>
-        </div>
-      </div>
+      <Note title="Come funziona?">
+        Quando effettui una prova di abilità, aggiungi il modificatore dell&apos;abilità
+        corrispondente. Se sei addestrato, aggiungi anche il bonus di competenza (+2 al 1° livello).
+      </Note>
     </WizardStep>
   );
 }

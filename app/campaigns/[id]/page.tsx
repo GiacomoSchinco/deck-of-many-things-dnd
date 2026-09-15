@@ -7,6 +7,7 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link';
 import { Users, Sword } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import CharacterCard from '@/components/custom/CharacterCard'; // ← importa la tua card
 import { AncientScroll } from '@/components/custom/AncientScroll';
 import { PageWrapper } from '@/components/layout/PageWrapper';
@@ -66,8 +67,8 @@ export default function CampaignPage() {
             <div className="not-prose space-y-6">
             {/* Descrizione */}
             {campaign.description && (
-                <AncientScroll className="p-15" variant='rolled'>
-                    <p className="text-amber-700 leading-relaxed whitespace-pre-line">
+                <AncientScroll className="p-8" variant='rolled'>
+                    <p className="text-ink leading-relaxed whitespace-pre-line">
                         {campaign.description}
                     </p>
                 </AncientScroll>
@@ -84,13 +85,11 @@ export default function CampaignPage() {
                 </h2>
 
                 {!characters || characters.length === 0 ? (
-                    <AncientScroll className="p-12 text-center">
-                        <div className="flex flex-col items-center gap-4">
-                            <Users className="w-16 h-16 text-amber-700/30" />
-                            <p className="text-amber-700 text-lg">Nessun personaggio in questa campagna</p>
-                            <p className="text-amber-600 text-sm">Clicca su &quot;Aggiungi Personaggio&quot; per iniziare</p>
-                        </div>
-                    </AncientScroll>
+                    <EmptyState
+                        icon={Users}
+                        title="Nessun personaggio in questa campagna"
+                        description="Aggiungi il primo eroe per iniziare l'avventura."
+                    />
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {(characters as CampaignCharacter[]).map((character) => {

@@ -41,7 +41,7 @@ function SelectTrigger({
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "flex w-full items-center justify-between gap-1.5 rounded-lg border-2 border-amber-700/50 bg-parchment-100 py-2 pr-2 pl-2.5 text-sm whitespace-nowrap transition-colors outline-none select-none",
+        "flex w-full items-center justify-between gap-1.5 surface-well py-2 pr-2 pl-2.5 text-sm whitespace-nowrap transition-[box-shadow,border-color] outline-none select-none",
         "text-amber-900 hover:bg-parchment-200 hover:border-amber-700",
         "focus-visible:border-amber-700 focus-visible:ring-2 focus-visible:ring-amber-700/30",
         "disabled:cursor-not-allowed disabled:opacity-50",
@@ -90,7 +90,7 @@ function SelectContent({
         <SelectPrimitive.Popup
           data-slot="select-content"
           data-align-trigger={alignItemWithTrigger}
-          className={cn("relative isolate z-50 max-h-(--available-height) w-(--anchor-width) min-w-36 origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-parchment-100 text-amber-900 shadow-lg border-2 border-amber-700/40 ring-0 duration-100 data-[align-trigger=true]:animate-none data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95", className )}
+          className={cn("relative isolate z-50 max-h-(--available-height) w-(--anchor-width) min-w-36 origin-(--transform-origin) overflow-x-hidden overflow-y-auto surface-floating text-amber-900 duration-100 data-[align-trigger=true]:animate-none data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95", className )}
           {...props}
         >
           <SelectScrollUpButton />

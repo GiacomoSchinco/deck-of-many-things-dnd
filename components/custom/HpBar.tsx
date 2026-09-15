@@ -32,26 +32,37 @@ export default function HpBar({
   
   // Colore dinamico in base alla percentuale
   const getBarColor = () => {
-    if (percent <= 25) return 'bg-red-600';
-    if (percent <= 50) return 'bg-orange-500';
-    if (percent <= 75) return 'bg-amber-500';
-    return 'bg-green-600';
+    if (percent <= 25) return 'bg-destructive';
+    if (percent <= 50) return 'bg-antique-bronze';
+    if (percent <= 75) return 'bg-antique-gold';
+    return 'bg-success';
   };
 
   return (
     <div className={cn('space-y-1', className)}>
       {/* Barra HP con contenuto sovrapposto */}
       <div className="relative">
-        {/* Sfondo barra */}
-        <div className={cn('w-full bg-amber-900/40 rounded-full overflow-hidden', barHeight)}>
-          {/* Barra progresso */}
+        {/* Canale scavato nel materiale: il binario è una scanalatura scura con
+            ombra interna, non un rettangolo piatto. Il riempimento ha un
+            riflesso in alto, così la barra sembra un liquido e non una toppa. */}
+        <div
+          className={cn(
+            'w-full overflow-hidden rounded-full bg-frame-deep border border-black/25 shadow-inset-2',
+            barHeight
+          )}
+        >
           <div
             className={cn(
-              'h-full rounded-full transition-all duration-500 ease-out relative',
+              'relative h-full rounded-full transition-[width] duration-500 ease-soft',
               getBarColor()
             )}
             style={{ width: `${percent}%` }}
-          />
+          >
+            <span
+              className="absolute inset-x-0 top-0 h-1/2 rounded-t-full bg-white/25"
+              aria-hidden="true"
+            />
+          </div>
         </div>
         
         {/* Contenuto sovrapposto (icona + numeri) */}
@@ -61,7 +72,7 @@ export default function HpBar({
               <div className="relative">
                 <Heart className={cn('text-white drop-shadow-md', iconSize)} />
                 {current <= 0 && (
-                  <Skull className="absolute -top-1 -right-2 w-3 h-3 text-gray-300" />
+                  <Skull className="absolute -top-1 -right-2 w-3 h-3 text-parchment-200" />
                 )}
               </div>
             )}
@@ -73,8 +84,8 @@ export default function HpBar({
           {/* HP temporanei (opzionali) */}
           {tempHp > 0 && (
             <div className="flex items-center gap-1">
-              <Shield className={cn('text-blue-200 drop-shadow-md', iconSize)} />
-              <span className={cn('text-blue-100 font-medium drop-shadow-md', textClass)}>
+              <Shield className={cn('text-parchment-100 drop-shadow-md', iconSize)} />
+              <span className={cn('font-medium text-parchment-50 drop-shadow-md', textClass)}>
                 +{tempHp}
               </span>
             </div>
