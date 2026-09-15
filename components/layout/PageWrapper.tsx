@@ -3,8 +3,9 @@ import { cn } from '@/lib/utils';
 
 interface PageWrapperProps {
   children: React.ReactNode;
-  title?: string;
-  subtitle?: string;
+  /** Accetta nodi: permette il titolo in oro battuto (`.text-foil`) */
+  title?: React.ReactNode;
+  subtitle?: React.ReactNode;
   icon?: React.ReactNode;
   action?: React.ReactNode;
   className?: string;

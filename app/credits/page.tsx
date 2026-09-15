@@ -1,10 +1,10 @@
 // app/credits/page.tsx
 import Link from 'next/link';
-import AncientCardContainer from '@/components/custom/AncientCardContainer';
 import { buttonVariants } from '@/components/ui/button-variants';
 import { cn } from '@/lib/utils';
 import { BookOpen, ExternalLink, ArrowLeft, Heart, Image as ImageIcon, PenLine, ScrollText } from 'lucide-react';
 import { PageWrapper } from '@/components/layout/PageWrapper';
+import { AncientScroll } from '@/components/custom/AncientScroll';
 
 export default function CreditsPage() {
   const authors = [
@@ -48,7 +48,7 @@ export default function CreditsPage() {
     >
       <div className="not-prose space-y-6">
         {/* Icone principali */}
-        <AncientCardContainer className="p-8 mb-8">
+        <AncientScroll className="p-8 mb-8">
           <h2 className="text-2xl fantasy-title mb-4 flex items-center gap-2">
             <ImageIcon className="w-6 h-6 text-frame" aria-hidden="true" /> Game Icons
           </h2>
@@ -71,10 +71,10 @@ export default function CreditsPage() {
               Game icons provided by https://game-icons.net
             </p>
           </div>
-        </AncientCardContainer>
+        </AncientScroll>
 
         {/* Autori */}
-        <AncientCardContainer className="p-8 mb-8">
+        <AncientScroll className="p-8 mb-8">
           <h2 className="text-2xl fantasy-title mb-6 flex items-center gap-2">
             <PenLine className="w-6 h-6 text-frame" aria-hidden="true" /> Autori
           </h2>
@@ -103,10 +103,10 @@ export default function CreditsPage() {
               </div>
             ))}
           </div>
-        </AncientCardContainer>
+        </AncientScroll>
 
         {/* Licenza */}
-        <AncientCardContainer className="p-8 mb-8">
+        <AncientScroll className="p-8 mb-8">
           <h2 className="text-2xl fantasy-title mb-4 flex items-center gap-2">
             <ScrollText className="w-6 h-6 text-frame" aria-hidden="true" /> Licenza
           </h2>
@@ -137,10 +137,10 @@ export default function CreditsPage() {
               </a>
             </p>
           </div>
-        </AncientCardContainer>
+        </AncientScroll>
 
         {/* SRD — Dati di gioco */}
-        <AncientCardContainer className="p-8 mb-8">
+        <AncientScroll className="p-8 mb-8">
           <h2 className="text-2xl fantasy-title mb-4 flex items-center gap-2">
             <BookOpen className="w-6 h-6 text-frame" aria-hidden="true" /> SRD — Dati di Gioco
           </h2>
@@ -218,10 +218,10 @@ export default function CreditsPage() {
               </p>
             </div>
           </div>
-        </AncientCardContainer>
+        </AncientScroll>
 
         {/* Ringraziamenti extra */}
-        <AncientCardContainer className="p-8">
+        <AncientScroll variant='rolled' className="p-8">
           <h2 className="text-2xl fantasy-title mb-4 flex items-center gap-2">
             <Heart className="w-6 h-6 text-frame" aria-hidden="true" /> Ringraziamenti Speciali
           </h2>
@@ -247,7 +247,7 @@ export default function CreditsPage() {
               D&D e tutte le proprietà correlate sono di Wizards of the Coast.
             </p>
           </div>
-        </AncientCardContainer>
+        </AncientScroll>
 
         {/* Footer della pagina crediti */}
         <div className="text-center mt-8 text-sm text-amber-500">

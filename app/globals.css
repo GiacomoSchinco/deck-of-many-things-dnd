@@ -4,6 +4,16 @@
    e i popup restano in stato "ending" invece di sparire. */
 @import "tw-animate-css";
 
+/* Il progetto ha UN SOLO tema (pergamena chiara), ma i componenti di base si
+   portano dietro classi `dark:` di serie. In Tailwind v4 `dark:` si attiva con
+   la preferenza di sistema: su un computer impostato su scuro, una parte
+   dell'interfaccia usava i colori del tema scuro sopra il fondo pergamena —
+   testo slavato e contrasto insufficiente (tab inattive a 3.83:1 invece di
+   5.4:1). Legando la variante alla classe `.dark`, che qui non viene mai
+   impostata, quelle classi diventano inerti e l'aspetto non dipende più dal
+   sistema operativo dell'utente. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   /* 🎨 Colori personalizzati */
   --color-parchment-50: #fdf8f0;
@@ -48,7 +58,9 @@
 
   /* Muted — superfici recessive */
   --color-muted: hsl(40 38% 95%);
-  --color-muted-foreground: hsl(28 24% 40%);
+  /* Testo secondario dei componenti di base: deve restare leggibile sul fondo
+     pergamena (prima era al 40% di luminosità → 3.83:1, sotto la soglia 4.5) */
+  --color-muted-foreground: hsl(28 24% 33%);
 
   /* Accent */
   --color-accent: hsl(36 48% 78%);
@@ -62,17 +74,19 @@
   --color-success: hsl(140 40% 30%);
 
   /* 🎨 Scuole di magia — pigmenti da manoscritto miniato, non i colori
-     saturi di default. Tutte e otto hanno la stessa luminosità e una croma
-     contenuta: formano una famiglia coerente e nessuna "urla" sul fondo
-     pergamena. Erano definite in cinque file diversi con valori discordanti. */
-  --color-school-abjuration: #2f6ba0;
-  --color-school-conjuration: #3f7a52;
-  --color-school-divination: #2f7d8c;
-  --color-school-enchantment: #a04a72;
-  --color-school-evocation: #b5541f;
-  --color-school-illusion: #6f569e;
-  --color-school-necromancy: #4a4048;
-  --color-school-transmutation: #8a6f16;
+     saturi di default. Stessa luminosità e croma contenuta: formano una
+     famiglia coerente e nessuna "urla" sul fondo pergamena.
+     Vincolo: sono usati anche come COLORE DEL TESTO di badge a 12px, quindi
+     la luminosità è tarata per stare sopra 4.5:1 sul fondo pergamena
+     (misurato: prima 4 su 8 erano sotto la soglia, es. trasmutazione 4.24). */
+  --color-school-abjuration: #2a5c8a;
+  --color-school-conjuration: #356a45;
+  --color-school-divination: #286b78;
+  --color-school-enchantment: #8f3f65;
+  --color-school-evocation: #9e4413;
+  --color-school-illusion: #5f4889;
+  --color-school-necromancy: #403840;
+  --color-school-transmutation: #6f5a0e;
 
   /* Rarità degli oggetti — scala metallica (bronzo → argento → oro → piena) */
   --color-rarity-common: #6f5a41;
@@ -697,13 +711,16 @@
     opacity: 1;
   }
 
-  /** Titolo in oro battuto: gradiente metallico + incisione */
+  /** Titolo in oro battuto: gradiente metallico + incisione.
+     L'oro chiaro su pergamena non si legge (era il caso del nome dell'eroe):
+     la scala qui resta scura, dall'oro brunito al bronzo, così il metallo
+     si vede ma le lettere restano leggibili. */
   .text-foil {
-    background-image: linear-gradient(180deg, #f0d485 0%, #c2942a 46%, #8a610a 100%);
+    background-image: linear-gradient(180deg, #94700f 0%, #6b4f0a 52%, #3f2d05 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.4));
+    filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.45));
   }
 
   /** Card sezione con sfondo chiaro (step wizard, sezioni scheda) */

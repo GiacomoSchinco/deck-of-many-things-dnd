@@ -5,14 +5,19 @@ import { useState, useMemo } from 'react';
 import { useClass } from '@/hooks/queries/useClasses';
 import { useSpells } from '@/hooks/queries/useSpells';
 import { getSpellProgression, SpellCastingClass, SPELLCASTING_CLASSES, PREPARER_CLASSES } from '@/lib/rules/spellcasting';
-import { getEnglishClass, getItalianSchool, schoolBadgeColors } from '@/lib/utils/nameMappers';
+import { getEnglishClass } from '@/lib/utils/nameMappers';
+import { getSchoolMeta } from '@/lib/theme/schools';
+import { SelectableCard } from '@/components/ui/selectable-card';
 import { useCreationStore } from '@/store/useCreationStore';
 import { WizardStep } from '../WizardStep';
 import Loading from '@/components/custom/Loading';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { SpellDetailButton } from '@/components/shared/SpellDetailButton';
+import { SpellSearchInput } from '@/components/shared/SpellSearchInput';
+import { SpellFlagBadges } from '@/components/shared/SpellSummary';
+import { useSpellDetailDialog } from '@/hooks/useSpellDetailDialog';
 import { cn, filterByName } from '@/lib/utils';
-import { Sparkles, BookOpen, Search, CheckCircle2, Info, Lock } from 'lucide-react';
+import { Sparkles, BookOpen, Info, Lock } from 'lucide-react';
 import type { Spell } from '@/types/spell';
 import SpellDetailDialog from '@/components/custom/SpellDetailDialog';
 
@@ -46,7 +51,7 @@ export function SpellsStep({
   const [searchCantrips, setSearchCantrips] = useState('');
   const [searchSpells, setSearchSpells] = useState('');
   const [selected, setSelected] = useState<string[]>(initialSelectedSpells);
-  const [detailSpell, setDetailSpell] = useState<Spell | null>(null);
+  const { openDetail, dialogProps: spellDialogProps } = useSpellDetailDialog();
 
   const englishClassName = classData ? getEnglishClass(classData.name) : null;
   const savedLevel = useCreationStore((s) => s.data?.level ?? 1);
@@ -195,15 +200,11 @@ export function SpellsStep({
           <div className="space-y-4">
             {cantripsAllowed > 0 && (
               <>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-500" />
-                  <Input
-                    value={searchCantrips}
-                    onChange={(e) => setSearchCantrips(e.target.value)}
-                    placeholder="Cerca trucchetti..."
-                    className="pl-9 bg-amber-50 border-amber-300"
-                  />
-                </div>
+                <SpellSearchInput
+                  value={searchCantrips}
+                  onChange={setSearchCantrips}
+                  placeholder="Cerca trucchetti..."
+                />
                 <SpellSection
                 title={mode === 'edit' ? `Trucchetti conosciuti (max ${cantripsAllowed})` : `Trucchetti — scegli ${cantripsAllowed}`}
                   icon={<Sparkles className="w-4 h-4" />}
@@ -211,7 +212,7 @@ export function SpellsStep({
                   max={cantripsAllowed}
                   spells={filteredCantrips}
                   onToggle={(s) => toggle(s, 'cantrip')}
-                  onDetail={setDetailSpell}
+                  onDetail={openDetail}
                   lockedIds={[]}
                 />
               </>
@@ -231,7 +232,7 @@ export function SpellsStep({
             </div>
           </div>
         </WizardStep>
-        <SpellDetailDialog spell={detailSpell} open={detailSpell !== null} onClose={() => setDetailSpell(null)} />
+        <SpellDetailDialog {...spellDialogProps} />
       </>
     );
   }
@@ -248,15 +249,7 @@ export function SpellsStep({
         backLabel={mode === 'edit' ? 'Annulla' : undefined}
       >
         <div className="space-y-2 mb-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-500" />
-            <Input
-              value={searchSpells}
-              onChange={(e) => setSearchSpells(e.target.value)}
-              placeholder="Cerca incantesimo..."
-              className="pl-9 bg-amber-50 border-amber-300"
-            />
-          </div>
+          <SpellSearchInput value={searchSpells} onChange={setSearchSpells} />
           <div className="flex gap-3 text-sm flex-wrap">
             {cantripsAllowed > 0 && (
               <span className={cn(
@@ -284,15 +277,12 @@ export function SpellsStep({
         <div className="space-y-6">
           {cantripsAllowed > 0 && (
             <>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-500" />
-                <Input
-                  value={searchCantrips}
-                  onChange={(e) => setSearchCantrips(e.target.value)}
-                  placeholder="Cerca trucchetti..."
-                  className="pl-9 bg-amber-50 border-amber-300 mb-2"
-                />
-              </div>
+              <SpellSearchInput
+                value={searchCantrips}
+                onChange={setSearchCantrips}
+                placeholder="Cerca trucchetti..."
+                className="mb-2"
+              />
               <SpellSection
                 title={mode === 'edit' ? `Trucchetti conosciuti (max ${cantripsAllowed})` : `Trucchetti — scegli ${cantripsAllowed}`}
                 icon={<Sparkles className="w-4 h-4" />}
@@ -300,7 +290,7 @@ export function SpellsStep({
                 max={cantripsAllowed}
                 spells={filteredCantrips}
                 onToggle={(s) => toggle(s, 'cantrip')}
-                onDetail={setDetailSpell}
+                onDetail={openDetail}
                 lockedIds={[]}
               />
             </>
@@ -323,7 +313,7 @@ export function SpellsStep({
                     max={isWizard ? wizardSpellbookSize : spellsAllowed}
                     spells={spellsForLevel}
                     onToggle={(s) => toggle(s, 'spell')}
-                    onDetail={setDetailSpell}
+                    onDetail={openDetail}
                     lockedIds={[]}
                   />
                 );
@@ -332,7 +322,7 @@ export function SpellsStep({
           )}
         </div>
       </WizardStep>
-      <SpellDetailDialog spell={detailSpell} open={detailSpell !== null} onClose={() => setDetailSpell(null)} />
+      <SpellDetailDialog {...spellDialogProps} />
     </>
   );
 }
@@ -378,64 +368,37 @@ function SpellSection({
             const isDisabled = isLocked || (!isSelected && selectedInSection >= max);
 
             return (
-              <button
-                key={spell.id}
-                type="button"
-                onClick={() => !isLocked && onToggle(spell)}
-                disabled={isDisabled && !isLocked}
-                title={isLocked ? 'Incantesimo già conosciuto — rimuovilo dalla scheda del personaggio' : undefined}
-                className={cn(
-                  'flex items-start gap-2 p-2 rounded-lg border-2 text-left transition-all',
-                  isSelected && isLocked
-                    ? 'border-amber-400 bg-amber-100 text-amber-800 cursor-default ring-1 ring-amber-300'
-                    : isSelected
-                    ? 'border-amber-600 bg-amber-100 text-amber-900 shadow-sm ring-1 ring-amber-400'
-                    : isDisabled
-                    ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed opacity-50'
-                    : 'border-amber-200 bg-white hover:border-amber-400 hover:bg-amber-50 text-amber-800',
-                )}
-              >
-                {isLocked
-                  ? <Lock className="w-4 h-4 mt-0.5 shrink-0 text-amber-500" />
-                  : <CheckCircle2
-                      className={cn(
-                        'w-4 h-4 mt-0.5 shrink-0 transition-colors',
-                        isSelected ? 'text-amber-600' : 'text-gray-300',
-                      )}
-                    />
-                }
-                <div className="min-w-0 flex-1">
-                  <p className={cn('text-sm font-medium truncate', isSelected && 'font-bold')}>{spell.name}</p>
-                  <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-                    {spell.school && (
-                      <span className={cn(
-                        'text-xs px-1.5 py-0.5 rounded-full',
-                        schoolBadgeColors[spell.school] ?? 'bg-gray-100 text-gray-600',
-                      )}>
-                        {getItalianSchool(spell.school)}
-                      </span>
-                    )}
-                    {spell.ritual && (
-                      <Badge variant="outline" className="text-xs py-0 h-4">Rituale</Badge>
-                    )}
-                    {spell.concentration && (
-                      <Badge variant="outline" className="text-xs py-0 h-4">Conc.</Badge>
-                    )}
-                  </div>
-                </div>
-                <span
-                  role="button"
-                  onClick={(e) => { e.stopPropagation(); onDetail(spell); }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onDetail(spell); }
-                  }}
-                  className="shrink-0 p-0.5 text-amber-400 hover:text-amber-700 transition-colors cursor-pointer"
-                  tabIndex={0}
-                  aria-label={`Dettagli ${spell.name}`}
+              <div key={spell.id} className="flex items-stretch gap-1.5">
+                <SelectableCard
+                  multiple
+                  size="sm"
+                  selected={isSelected}
+                  disabled={isDisabled}
+                  onClick={() => onToggle(spell)}
+                  className="flex flex-1 items-start gap-2"
                 >
-                  <Info className="w-3.5 h-3.5" />
-                </span>
-              </button>
+                  {isLocked && (
+                    <Lock className="mt-0.5 h-4 w-4 shrink-0 text-ink-muted" aria-hidden="true" />
+                  )}
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-medium text-ink-strong">{spell.name}</span>
+                    <span className="mt-0.5 flex flex-wrap items-center gap-1">
+                      {spell.school && (
+                        <Badge className={cn('text-xs py-0 h-4', getSchoolMeta(spell.school).badge)}>
+                          {getSchoolMeta(spell.school).it}
+                        </Badge>
+                      )}
+                      <SpellFlagBadges spell={spell} variant="compact" />
+                      {isLocked && <span className="text-xs text-ink-muted">già conosciuto</span>}
+                    </span>
+                  </span>
+                </SelectableCard>
+
+                {/* Il comando "dettagli" sta FUORI dall'area selezionabile: prima
+                    era annidato dentro di essa (comando dentro comando: HTML non
+                    valido, click ambiguo, illecito per gli screen reader). */}
+                <SpellDetailButton spellName={spell.name} onOpen={() => onDetail(spell)} />
+              </div>
             );
           })}
         </div>

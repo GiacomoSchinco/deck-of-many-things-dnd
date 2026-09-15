@@ -7,12 +7,14 @@ import { useSpells } from '@/hooks/queries/useSpells';
 import { useAddPreparedSpells, useRemovePreparedSpells } from '@/hooks/mutations/useCharacterSpellMutations';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Search, Check, RefreshCw, Clock, Hourglass, Target } from 'lucide-react';
+import { SpellSearchInput } from '@/components/shared/SpellSearchInput';
+import { SpellFlagBadges, SpellMetaRow } from '@/components/shared/SpellSummary';
+import { Check, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Spell } from '@/types/spell';
 import { getSchoolMeta } from '@/lib/theme/schools';
 import { filterByName } from '@/lib/utils';
+import { groupSpellsByLevel } from '@/lib/utils/spellLevels';
 
 interface PreparedSpellsManagerProps {
   characterId: string;
@@ -76,12 +78,7 @@ export default function PreparedSpellsManager({
 
   const filteredSpells = useMemo(() => filterByName(availableSpells, search), [availableSpells, search]);
 
-  // Raggruppa per livello
-  const byLevel: Record<number, Spell[]> = {};
-  for (const spell of filteredSpells) {
-    if (!byLevel[spell.level]) byLevel[spell.level] = [];
-    byLevel[spell.level].push(spell);
-  }
+  const { byLevel, levels } = groupSpellsByLevel(filteredSpells, (spell) => spell.level);
 
   const handleToggle = async (spellId: number, currentlyPrepared: boolean) => {
     // Limite massimo
@@ -153,21 +150,10 @@ export default function PreparedSpellsManager({
       </div>
 
       {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-500" />
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Cerca incantesimo..."
-          className="pl-9 bg-amber-50 border-amber-300"
-        />
-      </div>
+      <SpellSearchInput value={search} onChange={setSearch} />
 
       {/* Lista per livello */}
-      {Object.keys(byLevel)
-        .map(Number)
-        .sort((a, b) => a - b)
-        .map((level) => (
+      {levels.map((level) => (
           <div key={level} className="space-y-2">
             <h4 className="fantasy-title font-semibold border-b border-frame/20 pb-1">
               Livello {level}
@@ -190,33 +176,9 @@ export default function PreparedSpellsManager({
                         <Badge className={`text-xs ${school.badge}`}>
                           {school.it}
                         </Badge>
-                        {spell.ritual && (
-                          <Badge className="text-xs border-school-illusion/35 bg-school-illusion/10 text-school-illusion">Rituale</Badge>
-                        )}
-                        {spell.concentration && (
-                          <Badge className="text-xs border-antique-gold/40 bg-antique-gold/15 text-frame-deep">Concentrazione</Badge>
-                        )}
+                        <SpellFlagBadges spell={spell} />
                       </div>
-                      <div className="flex gap-3 text-xs text-ink-muted mt-1">
-                        {spell.casting_time && (
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" aria-hidden="true" />
-                            {spell.casting_time}
-                          </span>
-                        )}
-                        {spell.range && (
-                          <span className="flex items-center gap-1">
-                            <Target className="h-3 w-3" aria-hidden="true" />
-                            {spell.range}
-                          </span>
-                        )}
-                        {spell.duration && (
-                          <span className="flex items-center gap-1">
-                            <Hourglass className="h-3 w-3" aria-hidden="true" />
-                            {spell.duration}
-                          </span>
-                        )}
-                      </div>
+                      <SpellMetaRow spell={spell} />
                     </div>
 
                     <Button

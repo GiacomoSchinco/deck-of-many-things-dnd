@@ -298,7 +298,7 @@ export function ItemPicker({
                               )}>
                                 {item.rarity === 'uncommon' && 'Non comune'}
                                 {item.rarity === 'rare' && 'Raro'}
-                                {item.rarity === 'very rare' && '⭐ Molto raro'}
+                                {item.rarity === 'very rare' && 'Molto raro'}
                                 {item.rarity === 'legendary' && 'Leggendario'}
                               </Badge>
                             )}

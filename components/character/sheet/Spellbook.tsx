@@ -10,8 +10,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { SpellsStep } from '@/components/character/creation-wizard/steps/SpellsStep';
 import SpellDetailDialog from '@/components/custom/SpellDetailDialog';
 import SpellSlotsManager from '@/components/custom/SpellSlotsManager';
+import { SpellFlagBadges, SpellMetaRow } from '@/components/shared/SpellSummary';
+import { useSpellDetailDialog } from '@/hooks/useSpellDetailDialog';
 import { getSchoolMeta } from '@/lib/theme/schools';
-import { BookOpen, Trash, Check, Sparkles, Star, Clock, Hourglass, Target } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { groupSpellsByLevel } from '@/lib/utils/spellLevels';
+import { BookOpen, Trash, Check, Sparkles, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Spell, SpellKnown, PreparedSpell, SpellSlot } from '@/types/spell';
 
@@ -37,7 +41,7 @@ export default function Spellbook({
   onSpellsChange,
 }: SpellbookProps) {
   const [managing, setManaging] = useState(false);
-  const [selectedSpell, setSelectedSpell] = useState<Spell | null>(null);
+  const { openDetail, dialogProps: spellDialogProps } = useSpellDetailDialog();
 
   const { data: spellsKnown, isLoading } = useCharacterSpells(characterId);
   const { data: spellSlots } = useCharacterSpellSlots(characterId);
@@ -89,14 +93,10 @@ export default function Spellbook({
   }
 
   const cantrips = (spellsKnown ?? []).filter((sk: SpellKnown) => sk.spell?.level === 0);
-  const leveledSpells = (spellsKnown ?? []).filter((sk: SpellKnown) => (sk.spell?.level ?? 0) > 0);
-  const byLevel: Record<number, SpellKnown[]> = {};
-
-  for (const sk of leveledSpells) {
-    const lvl = sk.spell?.level ?? 1;
-    if (!byLevel[lvl]) byLevel[lvl] = [];
-    byLevel[lvl].push(sk);
-  }
+  const leveledSpells: SpellKnown[] = (spellsKnown ?? []).filter(
+    (sk: SpellKnown) => (sk.spell?.level ?? 0) > 0,
+  );
+  const { byLevel, levels } = groupSpellsByLevel(leveledSpells, (sk) => sk.spell?.level ?? 1);
 
   type SlotEntry = { level: number; total: number; used: number };
   const slotsForManager: SlotEntry[] = (spellSlots as SpellSlot[] ?? []).map((slot: SpellSlot) => ({
@@ -181,7 +181,7 @@ export default function Spellbook({
                   <SpellRow
                     key={sk.id}
                     spell={sk.spell}
-                    onView={setSelectedSpell}
+                    onView={openDetail}
                     onDelete={() => handleRemoveSpell(sk.id, sk.spell?.name ?? 'incantesimo')}
                     isPrepared={false}
                     showPrepare={false}
@@ -193,11 +193,8 @@ export default function Spellbook({
           )}
 
           {/* Leveled spells */}
-          {Object.keys(byLevel)
-            .map(Number)
-            .sort((a, b) => a - b)
-            .map((lvl) => (
-              <section key={lvl}>
+          {levels.map((lvl) => (
+            <section key={lvl}>
                 <div className="flex justify-between items-baseline mb-2 pb-1 border-b border-frame/20">
                   <h4 className="text-md fantasy-title">
                     Livello {lvl}
@@ -215,7 +212,7 @@ export default function Spellbook({
                     <SpellRow
                       key={sk.id}
                       spell={sk.spell}
-                      onView={setSelectedSpell}
+                      onView={openDetail}
                       onDelete={() => handleRemoveSpell(sk.id, sk.spell?.name ?? 'incantesimo')}
                       isPrepared={preparedSpellIds.has(sk.spell_id)}
                       showPrepare={isPreparer && (sk.spell?.level ?? 0) > 0}
@@ -248,11 +245,7 @@ export default function Spellbook({
       </Dialog>
 
       {/* Dettaglio incantesimo */}
-      <SpellDetailDialog
-        spell={selectedSpell}
-        open={selectedSpell !== null}
-        onClose={() => setSelectedSpell(null)}
-      />
+      <SpellDetailDialog {...spellDialogProps} />
     </>
   );
 }
@@ -300,29 +293,9 @@ function SpellRow({
         <div className="flex flex-wrap items-center gap-2">
           <span className="font-semibold text-ink-strong">{spell.name}</span>
           <Badge className={`text-xs ${school.badge}`}>{school.it}</Badge>
-          {spell.ritual && <Badge className="text-xs border-school-illusion/35 bg-school-illusion/10 text-school-illusion">Rituale</Badge>}
-          {spell.concentration && <Badge className="text-xs border-antique-gold/40 bg-antique-gold/15 text-frame-deep">Concentrazione</Badge>}
+          <SpellFlagBadges spell={spell} />
         </div>
-        <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-ink-muted mt-1">
-          {spell.casting_time && (
-            <span className="flex items-center gap-1">
-              <Clock className="h-3 w-3" aria-hidden="true" />
-              {spell.casting_time}
-            </span>
-          )}
-          {spell.range && (
-            <span className="flex items-center gap-1">
-              <Target className="h-3 w-3" aria-hidden="true" />
-              {spell.range}
-            </span>
-          )}
-          {spell.duration && (
-            <span className="flex items-center gap-1">
-              <Hourglass className="h-3 w-3" aria-hidden="true" />
-              {spell.duration}
-            </span>
-          )}
-        </div>
+        <SpellMetaRow spell={spell} />
       </div>
 
       <div className="flex items-center gap-1 ml-4" onClick={(e) => e.stopPropagation()}>
@@ -357,9 +330,4 @@ function SpellRow({
       </div>
     </div>
   );
-}
-
-// Utility per cn (se non hai già importato)
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(' ');
 }

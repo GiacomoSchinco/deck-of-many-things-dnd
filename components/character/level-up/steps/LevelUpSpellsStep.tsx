@@ -4,13 +4,17 @@
 import { useState, useMemo } from 'react';
 import { useSpells, useCharacterSpells } from '@/hooks/queries/useSpells';
 import { WizardNav } from '@/components/shared/WizardNav';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { SpellDetailButton } from '@/components/shared/SpellDetailButton';
+import { SpellSearchInput } from '@/components/shared/SpellSearchInput';
+import { SpellFlagBadges } from '@/components/shared/SpellSummary';
+import { useSpellDetailDialog } from '@/hooks/useSpellDetailDialog';
 import { cn, filterByName } from '@/lib/utils';
-import { Search, Sparkles, BookOpen, CheckCircle2, Info, ArrowUpCircle, RefreshCw, X } from 'lucide-react';
-import { getItalianSchool, schoolBadgeColors } from '@/lib/utils/nameMappers';
-import { getAvailableSpellLevels } from '@/lib/utils/spellLevels';
+import { Sparkles, BookOpen, ArrowUpCircle, RefreshCw, X } from 'lucide-react';
+import { getSchoolMeta } from '@/lib/theme/schools';
+import { SelectableCard } from '@/components/ui/selectable-card';
+import { getAvailableSpellLevels, groupSpellsByLevel } from '@/lib/utils/spellLevels';
 import { PREPARER_CLASSES_LEVELUP, SWAP_CLASSES } from '@/lib/rules/spellcasting';
 import type { Spell, SpellKnown } from '@/types/spell';
 import SpellDetailDialog from '@/components/custom/SpellDetailDialog';
@@ -57,7 +61,7 @@ export default function LevelUpSpellsStep({
 }: LevelUpSpellsStepProps) {
   const [search, setSearch] = useState('');
   const [selectedSpells, setSelectedSpells] = useState<string[]>(data.newSpells || []);
-  const [detailSpell, setDetailSpell] = useState<Spell | null>(null);
+  const { openDetail, dialogProps: spellDialogProps } = useSpellDetailDialog();
   // Stato sostituzione incantesimo (SWAP_CLASSES)
   const [swapFrom, setSwapFrom] = useState<string | null>(null);  // known_id da rimuovere
   const [swapTo, setSwapTo] = useState<string | null>(null);       // spell_id sostituto
@@ -91,22 +95,18 @@ export default function LevelUpSpellsStep({
 
   // Filtra gli incantesimi per livello e ricerca (nuovi incantesimi)
   const spellsByLevel = useMemo(() => {
-    if (!allSpells) return {};
-    const spells = filterByName(
-      (allSpells as Spell[]).filter(s => availableLevels.includes(s.level)),
-      search
-    );
-    const grouped: Record<number, Spell[]> = {};
-    spells.forEach(spell => {
-      if (!grouped[spell.level]) grouped[spell.level] = [];
-      grouped[spell.level].push(spell);
-    });
-    return grouped;
+    const spells = allSpells
+      ? filterByName(
+          (allSpells as Spell[]).filter(s => availableLevels.includes(s.level)),
+          search
+        )
+      : [];
+    return groupSpellsByLevel(spells, (spell) => spell.level);
   }, [allSpells, availableLevels, search]);
 
   // Incantesimi disponibili per la sostituzione (escludi già conosciuti e già selezionati)
   const swapToByLevel = useMemo(() => {
-    if (!allSpells || !canSwap) return {};
+    if (!allSpells || !canSwap) return groupSpellsByLevel<Spell>([], (spell) => spell.level);
     const spells = filterByName(
       (allSpells as Spell[]).filter(s =>
         availableLevels.includes(s.level) &&
@@ -115,12 +115,7 @@ export default function LevelUpSpellsStep({
       ),
       swapSearch
     );
-    const grouped: Record<number, Spell[]> = {};
-    spells.forEach(spell => {
-      if (!grouped[spell.level]) grouped[spell.level] = [];
-      grouped[spell.level].push(spell);
-    });
-    return grouped;
+    return groupSpellsByLevel(spells, (spell) => spell.level);
   }, [allSpells, availableLevels, existingSpellIds, selectedSpells, swapSearch, canSwap]);
 
   const toggleSpell = (spell: Spell) => {
@@ -245,15 +240,7 @@ export default function LevelUpSpellsStep({
         {/* Selezione incantesimi (solo per classi che conoscono) */}
         {!isPreparer && changes.spellChanges.newSpellsKnown > 0 && (
           <div className="space-y-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-500" />
-              <Input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Cerca incantesimo..."
-                className="pl-9 bg-amber-50 border-amber-300"
-              />
-            </div>
+            <SpellSearchInput value={search} onChange={setSearch} />
 
             <div className="flex justify-between text-sm">
               <span className="text-amber-700">Incantesimi selezionati:</span>
@@ -269,70 +256,50 @@ export default function LevelUpSpellsStep({
 
             <ScrollArea className="h-80">
               <div className="space-y-4 pr-4">
-                {Object.entries(spellsByLevel).map(([level, spells]) => (
+                {spellsByLevel.levels.map((level) => (
                   <div key={level}>
                     <h4 className="font-serif font-medium text-amber-800 mb-2 sticky top-0 bg-white py-1">
                       {level}° Livello
                     </h4>
                     <div className="space-y-2">
-                      {(spells as Spell[]).map((spell) => {
+                      {spellsByLevel.byLevel[level].map((spell) => {
                         const isSelected = selectedSpells.includes(String(spell.id));
                         const isKnown = isSpellAlreadyKnown(spell.id);
                         const isDisabled = (!isSelected && selectedSpells.length >= changes.spellChanges.newSpellsKnown) || isKnown;
 
                         return (
-                          <button
-                            key={spell.id}
-                            type="button"
-                            onClick={() => !isKnown && toggleSpell(spell)}
-                            disabled={isDisabled}
-                            className={cn(
-                              "w-full flex items-start gap-2 p-2 rounded-lg border text-left transition-all",
-                              isSelected
-                                ? "border-amber-500 bg-amber-50 text-amber-900"
-                                : isKnown
-                                ? "border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed"
-                                : "border-amber-200 hover:border-amber-400 hover:bg-amber-50/50 text-amber-800"
-                            )}
-                          >
-                            <CheckCircle2
-                              className={cn(
-                                "w-4 h-4 mt-0.5 shrink-0",
-                                isSelected ? "text-amber-600" : "text-gray-300"
-                              )}
-                            />
-                            <div className="min-w-0 flex-1">
-                              <p className="text-sm font-medium truncate">{spell.name}</p>
-                              <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-                                <span className={cn(
-                                  "text-xs px-1.5 py-0.5 rounded-full",
-                                  schoolBadgeColors[spell.school] ?? 'bg-gray-100 text-gray-600'
-                                )}>
-                                  {getItalianSchool(spell.school)}
-                                </span>
-                                {spell.ritual && (
-                                  <Badge variant="outline" className="text-xs py-0 h-4">Rituale</Badge>
-                                )}
-                                {spell.concentration && (
-                                  <Badge variant="outline" className="text-xs py-0 h-4">Conc.</Badge>
-                                )}
-                              </div>
-                            </div>
-                            <span
-                              role="button"
-                              onClick={(e) => { e.stopPropagation(); setDetailSpell(spell); }}
-                              className="shrink-0 p-0.5 text-amber-400 hover:text-amber-700 transition-colors cursor-pointer"
+                          <div key={spell.id} className="flex items-stretch gap-1.5">
+                            <SelectableCard
+                              multiple
+                              size="sm"
+                              selected={isSelected}
+                              disabled={isDisabled && !isKnown}
+                              onClick={() => toggleSpell(spell)}
+                              className="flex flex-1 items-start gap-2"
                             >
-                              <Info className="w-3.5 h-3.5" />
-                            </span>
-                          </button>
+                              <span className="min-w-0 flex-1">
+                                <span className="block truncate text-sm font-medium text-ink-strong">{spell.name}</span>
+                                <span className="mt-0.5 flex flex-wrap items-center gap-1">
+                                  <Badge className={cn('text-xs py-0 h-4', getSchoolMeta(spell.school).badge)}>
+                                    {getSchoolMeta(spell.school).it}
+                                  </Badge>
+                                  <SpellFlagBadges spell={spell} variant="compact" />
+                                  {isKnown && <span className="text-xs text-ink-muted">già conosciuto</span>}
+                                </span>
+                              </span>
+                            </SelectableCard>
+
+                            {/* Dettagli fuori dall'area selezionabile (prima era un
+                                comando annidato dentro un altro comando). */}
+                            <SpellDetailButton spellName={spell.name} onOpen={() => openDetail(spell)} />
+                          </div>
                         );
                       })}
                     </div>
                   </div>
                 ))}
 
-                {Object.keys(spellsByLevel).length === 0 && (
+                {spellsByLevel.levels.length === 0 && (
                   <p className="text-center text-amber-500 py-8">
                     {search ? 'Nessun incantesimo trovato' : 'Nessun incantesimo disponibile per questo livello'}
                   </p>
@@ -399,55 +366,42 @@ export default function LevelUpSpellsStep({
             {swapFrom && (
               <div className="p-4 pt-0 space-y-2 border-t border-amber-200">
                 <p className="text-sm font-medium text-amber-700">2. Scegli il sostituto:</p>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-500" />
-                  <Input
-                    value={swapSearch}
-                    onChange={(e) => setSwapSearch(e.target.value)}
-                    placeholder="Cerca..."
-                    className="pl-9 bg-amber-50 border-amber-300 h-8 text-sm"
-                  />
-                </div>
+                <SpellSearchInput
+                  value={swapSearch}
+                  onChange={setSwapSearch}
+                  placeholder="Cerca..."
+                  size="sm"
+                />
                 <ScrollArea className="h-56">
                   <div className="space-y-4 pr-2">
-                    {Object.entries(swapToByLevel).map(([level, spells]) => (
+                    {swapToByLevel.levels.map((level) => (
                       <div key={level}>
-                        <h4 className="text-xs font-medium text-amber-600 mb-1 sticky top-0 bg-white py-0.5">
+                        <h4 className="text-xs font-medium text-ink-muted mb-1 sticky top-0 bg-parchment-50 py-0.5">
                           {level}° Livello
                         </h4>
                         <div className="space-y-1">
-                          {(spells as Spell[]).map(spell => (
-                            <button
-                              key={spell.id}
-                              type="button"
-                              onClick={() => setSwapTo(prev => prev === String(spell.id) ? null : String(spell.id))}
-                              className={cn(
-                                'w-full flex items-center gap-2 p-2 rounded-lg border text-left text-sm transition-all',
-                                swapTo === String(spell.id)
-                                  ? 'border-amber-500 bg-amber-50 text-amber-900'
-                                  : 'border-amber-200 hover:border-amber-400 hover:bg-amber-50/50 text-amber-800'
-                              )}
-                            >
-                              <CheckCircle2 className={cn('w-3.5 h-3.5 shrink-0', swapTo === String(spell.id) ? 'text-green-500' : 'text-gray-300')} />
-                              <div className="min-w-0 flex-1">
-                                <p className="truncate">{spell.name}</p>
-                                <span className={cn('text-xs px-1.5 py-0.5 rounded-full', schoolBadgeColors[spell.school] ?? 'bg-gray-100 text-gray-600')}>
-                                  {getItalianSchool(spell.school)}
-                                </span>
-                              </div>
-                              <span
-                                role="button"
-                                onClick={(e) => { e.stopPropagation(); setDetailSpell(spell); }}
-                                className="shrink-0 p-0.5 text-amber-400 hover:text-amber-700 transition-colors cursor-pointer"
+                          {swapToByLevel.byLevel[level].map(spell => (
+                            <div key={spell.id} className="flex items-stretch gap-1.5">
+                              <SelectableCard
+                                size="sm"
+                                selected={swapTo === String(spell.id)}
+                                onClick={() => setSwapTo(prev => prev === String(spell.id) ? null : String(spell.id))}
                               >
-                                <Info className="w-3.5 h-3.5" />
-                              </span>
-                            </button>
+                                <span className="min-w-0 flex-1 block truncate text-sm text-ink-strong">
+                                  {spell.name}
+                                </span>
+                                <Badge className={cn('mt-0.5 text-xs py-0 h-4', getSchoolMeta(spell.school).badge)}>
+                                  {getSchoolMeta(spell.school).it}
+                                </Badge>
+                              </SelectableCard>
+
+                              <SpellDetailButton spellName={spell.name} onOpen={() => openDetail(spell)} />
+                            </div>
                           ))}
                         </div>
                       </div>
                     ))}
-                    {Object.keys(swapToByLevel).length === 0 && (
+                    {swapToByLevel.levels.length === 0 && (
                       <p className="text-center text-amber-500 py-4 text-sm">
                         {swapSearch ? 'Nessun incantesimo trovato' : 'Nessun incantesimo disponibile'}
                       </p>
@@ -466,7 +420,7 @@ export default function LevelUpSpellsStep({
         {isPreparer && changes.spellChanges.newSpellsPreparable > 0 && (
           <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
             <p className="text-sm text-blue-800">
-              🔮 Al livello {newLevel} puoi preparare {changes.spellChanges.newSpellsPreparable} incantesimi in più.
+              Al livello {newLevel} puoi preparare {changes.spellChanges.newSpellsPreparable} incantesimi in più.
               {className === 'wizard' && (
                 <span className="block mt-1 text-xs text-blue-600">
                   Puoi anche aggiungere nuovi incantesimi al tuo grimorio dalla sezione &quot;Gestisci Incantesimi&quot;.
@@ -493,11 +447,7 @@ export default function LevelUpSpellsStep({
         />
       </div>
 
-      <SpellDetailDialog
-        spell={detailSpell}
-        open={detailSpell !== null}
-        onClose={() => setDetailSpell(null)}
-      />
+      <SpellDetailDialog {...spellDialogProps} />
     </>
   );
 }
