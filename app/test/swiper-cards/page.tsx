@@ -27,7 +27,7 @@ export default function SwiperCardsTestPage() {
             id: 1,
             node: (
                 <CharacterCard
-                    id={1}
+                    id="1"
                     name="Aran"
                     race="Human"
                     characterClass="Wizard"
@@ -46,7 +46,7 @@ export default function SwiperCardsTestPage() {
             id: 2,
             node: (
                 <CharacterCard
-                    id={2}
+                    id="2"
                     name="Bera"
                     race="Elf"
                     characterClass="Rogue"
