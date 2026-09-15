@@ -1,4 +1,4 @@
-// app/api/classes/route.ts
+// app/api/campaigns/route.ts
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { createServerSupabase, requireAuth } from '@/lib/supabase/server'

@@ -148,7 +148,7 @@ export default function CharacterPage() {
           <span className="hidden h-5 w-px bg-frame/30 sm:block" aria-hidden="true" />
 
           <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-            <DialogTrigger
+            <DialogTrigger className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
               render={
                 <Button
                   variant="ghost"

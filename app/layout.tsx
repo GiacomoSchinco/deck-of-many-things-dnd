@@ -43,6 +43,10 @@ export default function RootLayout({
       lang="it"
       /* Le variabili dei font vanno su <html>: i token di @theme vivono su :root,
          quindi un font definito su <body> non verrebbe mai risolto. */
+      /* `scroll-smooth` e `data-scroll-behavior` viaggiano insieme: Next 16 usa
+         l'attributo per sospendere lo scorrimento fluido durante i cambi di
+         rotta. Senza l'attributo avvisa in console, e lo scroll resta animato. */
+      data-scroll-behavior="smooth"
       className={`scroll-smooth ${cinzel.variable} ${imFellEnglish.variable} ${inter.variable}`}
     >
       <body className="antialiased bg-[#1a0f08]">
